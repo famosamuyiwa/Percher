@@ -11,17 +11,24 @@ module.exports = {
         "plus-jakarta-light": ["Plus-Jakarta-Light", "sans-serif"],
         "plus-jakarta-extralight": ["Plus-Jakarta-ExtraLight", "sans-serif"],
         "plus-jakarta-bold": ["Plus-Jakarta-Bold", "sans-serif"],
-        "plus-jakarta-semibold": ["Plus-Jakarta-SemiBild", "sans-serif"],
+        "plus-jakarta-semibold": ["Plus-Jakarta-SemiBold", "sans-serif"],
         "plus-jakarta-extrabold": ["Plus-Jakarta-ExtraBold", "sans-serif"],
       },
       colors: {
         primary: {
-          100: "#0061FF0A",
-          200: "#0061FF1A",
-          300: "#0061FF",
+          100: "#00BFFF0A",
+          200: "#00BFFF1A",
+          300: "#00BFFF",
         },
         accent: {
-          100: "#FBFBFD",
+          100: "#1F24300A",
+          200: "#1F24301A",
+          300: "#1F2430",
+        },
+        secondary: {
+          100: "#FF7F500A",
+          200: "#FF7F501A",
+          300: "#FF7F50",
         },
         black: {
           DEFAULT: "#000000",

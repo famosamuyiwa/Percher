@@ -1,127 +1,37 @@
+import { CategoryKey } from "./enums";
 import icons from "./icons";
 import images from "./images";
 
-export const cards = [
-  {
-    title: "Card 1",
-    location: "Location 1",
-    price: "$100",
-    rating: 4.8,
-    category: "house",
-    image: images.newYork,
-  },
-  {
-    title: "Card 2",
-    location: "Location 2",
-    price: "$200",
-    rating: 3,
-    category: "house",
-    image: images.japan,
-  },
-  {
-    title: "Card 3",
-    location: "Location 3",
-    price: "$300",
-    rating: 2,
-    category: "flat",
-    image: images.newYork,
-  },
-  {
-    title: "Card 4",
-    location: "Location 4",
-    price: "$400",
-    rating: 5,
-    category: "villa",
-    image: images.japan,
-  },
-];
-
-export const featuredCards = [
-  {
-    title: "Featured 1",
-    location: "Location 1",
-    price: "$100",
-    rating: 4.8,
-    image: images.newYork,
-    category: "house",
-  },
-  {
-    title: "Featured 2",
-    location: "Location 2",
-    price: "$200",
-    rating: 3,
-    image: images.japan,
-    category: "flat",
-  },
-];
-
 export const categories = [
-  { title: "All", category: "All" },
-  { title: "Houses", category: "House" },
-  { title: "Condos", category: "Condos" },
-  { title: "Duplexes", category: "Duplexes" },
-  { title: "Studios", category: "Studios" },
-  { title: "Villas", category: "Villa" },
-  { title: "Apartments", category: "Apartments" },
-  { title: "Townhomes", category: "Townhomes" },
-  { title: "Others", category: "Others" },
-];
-
-export const settings = [
-  {
-    title: "My Bookings",
-    icon: icons.calendar,
-  },
-  {
-    title: "Payments",
-    icon: icons.wallet,
-  },
-  {
-    title: "Profile",
-    icon: icons.person,
-  },
-  {
-    title: "Notifications",
-    icon: icons.bell,
-  },
-  {
-    title: "Security",
-    icon: icons.shield,
-  },
-  {
-    title: "Language",
-    icon: icons.language,
-  },
-  {
-    title: "Help Center",
-    icon: icons.info,
-  },
-  {
-    title: "Invite Friends",
-    icon: icons.people,
-  },
+  { title: "All", category: "All", key: CategoryKey.PERCHTYPE },
+  { title: "Houses", category: "House", key: CategoryKey.PERCHTYPE },
+  { title: "Condos", category: "Condos", key: CategoryKey.PERCHTYPE },
+  { title: "Duplexes", category: "Duplexes", key: CategoryKey.PERCHTYPE },
+  { title: "Studios", category: "Studios", key: CategoryKey.PERCHTYPE },
+  { title: "Villas", category: "Villa", key: CategoryKey.PERCHTYPE },
+  { title: "Apartments", category: "Apartments", key: CategoryKey.PERCHTYPE },
+  { title: "Townhomes", category: "Townhomes", key: CategoryKey.PERCHTYPE },
+  { title: "Others", category: "Others", key: CategoryKey.PERCHTYPE },
+  { title: "Current", category: "Current", key: CategoryKey.BOOKINGS },
+  { title: "Upcoming", category: "Upcoming", key: CategoryKey.BOOKINGS },
+  { title: "Pending", category: "Pending", key: CategoryKey.BOOKINGS },
+  { title: "Completed", category: "Completed", key: CategoryKey.BOOKINGS },
+  { title: "Rejected", category: "Rejected", key: CategoryKey.BOOKINGS },
+  { title: "Cancelled", category: "Cancelled", key: CategoryKey.BOOKINGS },
 ];
 
 export const facilities = [
   {
     title: "Laundry",
-    icon: icons.laundry,
+    icon: "shirt",
   },
   {
-    title: "Car Parking",
-    icon: icons.carPark,
-  },
-  {
-    title: "Sports Center",
-    icon: icons.run,
-  },
-  {
-    title: "Cutlery",
-    icon: icons.cutlery,
+    title: "Garage",
+    icon: "car",
   },
   {
     title: "Gym",
-    icon: icons.dumbell,
+    icon: "barbell",
   },
   {
     title: "Swimming pool",
@@ -129,11 +39,7 @@ export const facilities = [
   },
   {
     title: "Wifi",
-    icon: icons.wifi,
-  },
-  {
-    title: "Pet Center",
-    icon: icons.dog,
+    icon: "wifi",
   },
 ];
 

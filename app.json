@@ -9,13 +9,18 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.barrakudadev.Percher",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.barrakudadev.Percher"
     },
     "web": {
       "bundler": "metro",
@@ -42,7 +47,7 @@
             "./assets/fonts/PlusJakartaSans-Light.ttf",
             "./assets/fonts/PlusJakartaSans-ExtraLight.ttf",
             "./assets/fonts/PlusJakartaSans-Bold.ttf",
-            "./assets/fonts/PlusJakartaSans-SemiBild.ttf",
+            "./assets/fonts/PlusJakartaSans-SemiBold.ttf",
             "./assets/fonts/PlusJakartaSans-ExtraBold.ttf"
           ]
         }
@@ -50,6 +55,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "f615f113-95b1-4d01-afe6-ecbe5e2bd0f7"
+      }
+    },
+    "owner": "barrakudadev"
   }
 }

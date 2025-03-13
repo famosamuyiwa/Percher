@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: "lightgrey",
     borderWidth: 0.4,
-    borderColor: Colors.secondary,
+    borderColor: Colors.accent,
   },
 });
 

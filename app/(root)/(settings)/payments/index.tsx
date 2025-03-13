@@ -189,11 +189,11 @@ export default function Payments() {
                     </View>
                   </Pressable>
                   <View className="pb-5">
-                    <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-20 my-2">
+                    <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-20 my-2">
                       <MaterialCommunityIcons
                         name="bank-transfer-out"
                         size={40}
-                        color={Colors.secondary}
+                        color={Colors.accent}
                       />
                     </View>
 
@@ -217,7 +217,7 @@ export default function Payments() {
                     </View>
 
                     <View className="flex-row items-center gap-2 justify-end">
-                      <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10 my-2">
+                      <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 my-2">
                         <Image
                           source={images.zenithLogo}
                           style={{ width: 20, height: 20 }}
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   walletContainer: {
-    backgroundColor: Colors.accent,
+    backgroundColor: Colors.secondary,
     borderRadius: 20,
     padding: 20,
   },

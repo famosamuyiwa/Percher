@@ -1,6 +1,6 @@
-import { Link, router, useLocalSearchParams } from "expo-router";
-import React, { useEffect } from "react";
-import { View, StyleSheet, ActivityIndicator, Text } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect } from "react";
+import { View, ActivityIndicator, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
 
@@ -37,7 +37,9 @@ export default function Explore() {
     });
   }, [params.filter, params.query]);
 
-  const handleCardPress = (id: string) => router.push(`/properties/${id}`);
+  const handleCardPress = useCallback((id: string) => {
+    router.push(`/properties/${id}`);
+  }, []);
 
   const listHeader = () => (
     <View className="px-5">

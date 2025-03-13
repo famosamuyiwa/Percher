@@ -178,8 +178,8 @@ export default function PerchRegistrationForm({
   return (
     <View className="gap-10">
       <View className="bg-white rounded-2xl p-5 gap-5">
-        <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10 mb-2">
-          <Entypo name="home" size={16} color={Colors.secondary} />
+        <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 mb-2">
+          <Entypo name="home" size={16} color={Colors.accent} />
         </View>
         <View>
           <Controller
@@ -402,7 +402,7 @@ export default function PerchRegistrationForm({
                         height: "100%",
                         borderRadius: 10,
                         borderWidth: 0.4,
-                        borderColor: Colors.secondary,
+                        borderColor: Colors.accent,
                       }}
                       source={{ uri: header }}
                       contentFit="cover"
@@ -422,8 +422,8 @@ export default function PerchRegistrationForm({
       </View>
 
       <View className="bg-white rounded-2xl p-5 gap-5">
-        <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10 mb-2">
-          <Entypo name="location" size={16} color={Colors.secondary} />
+        <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 mb-2">
+          <Entypo name="location" size={16} color={Colors.accent} />
         </View>
         <View>
           <Controller
@@ -451,8 +451,8 @@ export default function PerchRegistrationForm({
       </View>
 
       <View className="bg-white rounded-2xl p-5 gap-5 ">
-        <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10 mb-2">
-          <Entypo name="images" size={16} color={Colors.secondary} />
+        <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 mb-2">
+          <Entypo name="images" size={16} color={Colors.accent} />
         </View>
         <View>
           <Controller
@@ -505,11 +505,11 @@ export default function PerchRegistrationForm({
       </View>
 
       <View className="bg-white rounded-2xl p-5 gap-5">
-        <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10 mb-2">
+        <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 mb-2">
           <FontAwesome6
             name="hand-holding-dollar"
             size={16}
-            color={Colors.secondary}
+            color={Colors.accent}
           />
         </View>
         <View>
@@ -715,8 +715,8 @@ export default function PerchRegistrationForm({
       </View>
 
       <View className="gap-5 bg-white rounded-2xl p-5">
-        <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10 mb-2">
-          <FontAwesome name="id-card" size={16} color={Colors.secondary} />
+        <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 mb-2">
+          <FontAwesome name="id-card" size={16} color={Colors.accent} />
         </View>
         <View>
           <Controller

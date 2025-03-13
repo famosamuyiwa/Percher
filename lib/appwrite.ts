@@ -11,7 +11,6 @@ import { Property } from "../interfaces";
 import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
-import { getSessionUser } from "@/api/api.service";
 
 export const config = {
   platform: "com.jsm.percher-web",
@@ -39,7 +38,7 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
 
-export async function login() {
+export async function loginWithOAuth(provider: any) {
   try {
     // Create a deep link that works across Expo environments
     // Ensure localhost is used for the hostname to validation error for success/failure URLs
@@ -74,7 +73,8 @@ export async function login() {
 
     if (!session) throw new Error("Failed to create a session");
 
-    return true;
+    const jwt = await getJwtToken();
+    return jwt;
   } catch (err) {
     console.error(err);
     return false;

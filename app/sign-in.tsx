@@ -13,24 +13,26 @@ import { Image } from "expo-image";
 
 import images from "@/constants/images";
 import icons from "@/constants/icons";
-import { login } from "../lib/appwrite";
 import { useGlobalContext } from "../lib/global-provider";
 import { Redirect, router } from "expo-router";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { LoginProvider } from "@/constants/enums";
+import { useLoginMutation } from "@/hooks/mutation/useAuthMutation";
 
 const SignIn = () => {
   const { refetch, loading, isLoggedIn } = useGlobalContext();
+  const loginMutation = useLoginMutation();
 
   if (!loading && isLoggedIn) return <Redirect href="/(root)/(tabs)" />;
 
   const handleLogin = async (provider: LoginProvider) => {
-    let result = undefined;
+    // let result = undefined;
     switch (provider) {
       case LoginProvider.GOOGLE:
-        result = await login();
+        onHandleLoginWithOauth(provider);
         break;
       case LoginProvider.APPLE:
+        onHandleLoginWithOauth(provider);
         break;
       case LoginProvider.MAIL:
         router.navigate("/mail-auth");
@@ -38,12 +40,16 @@ const SignIn = () => {
       default:
         Alert.alert("Error", "Invalid login provider");
     }
-    if (result) {
-      refetch();
-    } else {
-      Alert.alert("Error", "Failed to login");
-    }
+    // if (result) {
+    //   refetch();
+    // } else {
+    //   Alert.alert("Error", "Failed to login");
+    // }
   };
+
+  async function onHandleLoginWithOauth(provider: LoginProvider) {
+    loginMutation.mutate(provider);
+  }
 
   return (
     <SafeAreaView className="bg-white h-full">

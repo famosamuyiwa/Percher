@@ -102,7 +102,7 @@ export const Card = ({ item, onPress }: Props) => {
 export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
   return (
     <TouchableOpacity
-      className="flex-1 w-full mt-4 rounded-3xl bg-accent-300 shadow-lg shadow-black-100/70 "
+      className="flex-1 w-full mt-4 rounded-3xl bg-secondary-300 shadow-lg shadow-black-100/70 "
       onPress={onPress}
     >
       <View className="flex-row justify-between px-4 py-2">
@@ -129,7 +129,7 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
             </Text>
           </View>
           <View className="flex-row justify-between">
-            <Entypo name="location" size={14} color={Colors.secondary} />
+            <Entypo name="location" size={14} color={Colors.accent} />
             <Text className=" font-plus-jakarta-regular text-xs">
               Lagos, Nigeria
             </Text>
@@ -148,7 +148,7 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
 export const BookingCardHost = ({ item, onPress }: BookingProps) => {
   return (
     <TouchableOpacity
-      className="flex-1 w-full mt-4 rounded-3xl bg-accent-300 shadow-lg shadow-black-100/70 "
+      className="flex-1 w-full mt-4 rounded-3xl bg-secondary-300 shadow-lg shadow-black-100/70 "
       onPress={onPress}
     >
       <View className="flex-row justify-between px-4 py-2">
@@ -175,7 +175,7 @@ export const BookingCardHost = ({ item, onPress }: BookingProps) => {
             </Text>
           </View>
           <View className="flex-row justify-between">
-            <Ionicons name="person" size={14} color={Colors.secondary} />
+            <Ionicons name="person" size={14} color={Colors.accent} />
             <Text className=" font-plus-jakarta-regular text-xs">Horus</Text>
           </View>
           <View className="flex-row justify-end">
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.accent,
+    backgroundColor: Colors.secondary,
   },
   houseImg: {
     height: 60,

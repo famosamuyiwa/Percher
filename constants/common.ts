@@ -1,9 +1,11 @@
 import { CalendarTheme } from "@marceloterreiro/flash-calendar";
 
+export const USE_AUTH_QUERY_KEY = ["auth"];
+
 export const Colors = {
   primary: "#00BFFF",
-  secondary: "#FF7F50",
-  accent: "#1F2430",
+  accent: "#FF7F50",
+  secondary: "#1F2430",
 };
 
 export const CalendarRangeTheme: CalendarTheme = {
@@ -20,7 +22,7 @@ export const CalendarRangeTheme: CalendarTheme = {
       borderStyle: "solid",
     },
   },
-  itemWeekName: { content: { color: Colors.accent } },
+  itemWeekName: { content: { color: Colors.secondary } },
   itemDayContainer: {
     activeDayFiller: {
       backgroundColor: Colors.primary,
@@ -33,7 +35,7 @@ export const CalendarRangeTheme: CalendarTheme = {
         borderRadius: 4,
       },
       content: {
-        color: !isPressed ? Colors.accent : "#ffffff",
+        color: !isPressed ? Colors.secondary : "#ffffff",
       },
     }),
     today: ({ isPressed }) => ({
@@ -43,7 +45,7 @@ export const CalendarRangeTheme: CalendarTheme = {
         backgroundColor: isPressed ? Colors.primary : "transparent",
       },
       content: {
-        color: isPressed ? "#ffffff" : Colors.accent,
+        color: isPressed ? "#ffffff" : Colors.secondary,
       },
     }),
     active: ({ isEndOfRange, isStartOfRange, isDisabled }) => ({

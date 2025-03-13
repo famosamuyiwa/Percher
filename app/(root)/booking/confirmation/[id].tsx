@@ -74,11 +74,11 @@ const BookingConfirmation = () => {
                 </View>
                 <View className="flex-row gap-3">
                   <View className="flex-row">
-                    <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-5">
+                    <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-5">
                       <FontAwesome5
                         name="bed"
                         size={10}
-                        color={Colors.secondary}
+                        color={Colors.accent}
                       />
                     </View>
                     <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-1">
@@ -86,11 +86,11 @@ const BookingConfirmation = () => {
                     </Text>
                   </View>
                   <View className="flex-row">
-                    <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-5">
+                    <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-5">
                       <FontAwesome
                         name="bath"
                         size={10}
-                        color={Colors.secondary}
+                        color={Colors.accent}
                       />
                     </View>
                     <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-1">
@@ -100,13 +100,13 @@ const BookingConfirmation = () => {
                 </View>
 
                 <View className="flex-row gap-2 items-baseline">
-                  <Entypo name="location" size={14} color={Colors.secondary} />
+                  <Entypo name="location" size={14} color={Colors.accent} />
                   <Text className="font-plus-jakarta-regular text-sm">
                     Lagos, Nigeria
                   </Text>
                 </View>
                 <View className="flex-row items-center">
-                  <Text className="font-plus-jakarta-bold text-secondary-300 text-sm">
+                  <Text className="font-plus-jakarta-bold text-accent-300 text-sm">
                     ₦150,000.00
                   </Text>
                   <Text className="text-xs text-gray-400"> per night</Text>

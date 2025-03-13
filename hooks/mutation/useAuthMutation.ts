@@ -1,35 +1,28 @@
-// import { login, resetPassword, signup } from "@/api/api.service";
-// import { ApiResponse, User } from "@/utils/interfaces";
-// import { useGlobalStore } from "@/store/store";
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
-// import { AuthCache } from "@/utils/types";
-// import { USE_AUTH_QUERY_KEY } from "@/constants/common";
-// import { Alert } from "react-native";
-// import { router } from "expo-router";
+import { login } from "@/api/api.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AuthCache } from "@/utils/types";
+import { USE_AUTH_QUERY_KEY } from "@/constants/common";
+import { Alert } from "react-native";
+import { ApiResponse, User } from "@/interfaces";
 
-// // Login Mutation
-// export const useLoginMutation = () => {
-//   const queryClient = useQueryClient();
-//   const { saveAuthState } = useGlobalStore();
+// Login Mutation
+export const useLoginMutation = () => {
+  const queryClient = useQueryClient();
 
-//   //save user id to global store and update auth query with user data
-//   const onUseLoginMutationSuccess = (payload: ApiResponse<User>) => {
-//     queryClient.setQueryData<AuthCache>(USE_AUTH_QUERY_KEY, payload);
-//     // No need to invoke getUserById since you are directly setting the data
-//     saveAuthState(payload.data.id);
-//     router.replace("/(tabs)/home");
-//   };
+  const onUseLoginMutationSuccess = (payload: ApiResponse<User>) => {
+    queryClient.setQueryData<AuthCache>(USE_AUTH_QUERY_KEY, payload);
+  };
 
-//   const onUseLoginMutationError = (error: Error) => {
-//     Alert.alert("Log in error", error.message);
-//   };
+  const onUseLoginMutationError = (error: Error) => {
+    Alert.alert("Log in error", error.message);
+  };
 
-//   return useMutation({
-//     mutationFn: login,
-//     onSuccess: onUseLoginMutationSuccess,
-//     onError: onUseLoginMutationError,
-//   });
-// };
+  return useMutation({
+    mutationFn: login,
+    onSuccess: onUseLoginMutationSuccess,
+    onError: onUseLoginMutationError,
+  });
+};
 
 // //sign up mutation
 // export const useSignupMutation = () => {

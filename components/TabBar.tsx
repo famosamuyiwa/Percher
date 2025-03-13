@@ -6,7 +6,7 @@ import {
   Text,
 } from "react-native";
 import React from "react";
-import { Ionicons, MaterialIcons, Octicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Colors } from "@/constants/common";
 

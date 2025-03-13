@@ -110,7 +110,7 @@ const ReferralsScreen = () => {
           </Text>
         </Pressable>
       </View>
-      <View className="bg-accent-300 rounded-2xl flex-row justify-between items-center p-4 mx-5 my-2">
+      <View className="bg-secondary-300 rounded-2xl flex-row justify-between items-center p-4 mx-5 my-2">
         <View className="gap-5">
           <Text className="text-white font-plus-jakarta-regular">
             Your referral code

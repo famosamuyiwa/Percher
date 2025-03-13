@@ -140,14 +140,14 @@ const Details = () => {
           </View>
 
           <View className="flex flex-row items-center px-5">
-            <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10">
-              <FontAwesome5 name="bed" size={16} color={Colors.secondary} />
+            <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10">
+              <FontAwesome5 name="bed" size={16} color={Colors.accent} />
             </View>
             <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-2">
               3 Bed(s)
             </Text>
-            <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10 ml-7">
-              <FontAwesome name="bath" size={16} color={Colors.secondary} />
+            <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 ml-7">
+              <FontAwesome name="bath" size={16} color={Colors.accent} />
             </View>
             <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-2">
               4 Bathroom(s)
@@ -155,7 +155,7 @@ const Details = () => {
           </View>
 
           <View className="flex flex-row items-center justify-start gap-2 px-5">
-            <Entypo name="location" size={16} color={Colors.secondary} />
+            <Entypo name="location" size={16} color={Colors.accent} />
             <Text className="text-black-200 text-sm font-plus-jakarta-medium">
               23, omighodalo street ogudu GRA, ojota. Lagos, Nigeria.
             </Text>

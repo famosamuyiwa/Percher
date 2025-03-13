@@ -1,7 +1,6 @@
 import { ReactNode, createContext, useContext } from "react";
-import { useAppwrite } from "./useAppwrite";
-import { getCurrentUser } from "./appwrite";
 import React from "react";
+import { useAuthQuery } from "@/hooks/query/useAuthQuery";
 
 interface User {
   $id: string;
@@ -20,17 +19,12 @@ interface GlobalContextType {
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
-  const { data: user, loading, refetch } = useAppwrite({ fn: getCurrentUser });
+  const { data: user, isLoading, refetch } = useAuthQuery();
   const isLoggedIn = !!user;
 
   return (
     <GlobalContext.Provider
-      value={{
-        isLoggedIn,
-        user,
-        loading,
-        refetch,
-      }}
+      value={{ isLoggedIn, user, loading: isLoading, refetch }}
     >
       {children}
     </GlobalContext.Provider>

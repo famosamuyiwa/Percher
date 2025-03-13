@@ -1,6 +1,5 @@
 import {
   fetchBanksFromPaystack,
-  getSessionUser,
   verifyAccountNumberFromPaystack,
 } from "@/api/api.service";
 import CustomButton from "@/components/Button";
@@ -72,17 +71,7 @@ const Banks = () => {
       if (data.status) setBanks(data.data);
     };
 
-    const test = async () => {
-      try {
-        const user = getSessionUser();
-        console.log("test: ", user);
-      } catch (error) {
-        console.log("error: ", error);
-      }
-    };
-
     getBanks();
-    test();
   }, []);
 
   useEffect(() => {

@@ -1,10 +1,9 @@
-import { config, getJwtToken } from "@/lib/appwrite";
+import { LoginProvider } from "@/constants/enums";
+import { loginWithOAuth } from "@/lib/appwrite";
+import { useGlobalStore } from "@/store/store";
 import { handleApiError } from "@/utils/common";
 import axios from "axios";
 import { Platform } from "react-native";
-
-// let API_BASE_URL = Constants?.expoConfig?.extra?.apiBaseUrl;
-// // let API_BASE_URL = "https://tabbie-backend-service.onrender.com";
 
 let API_BASE_URL: string;
 const PAYSTACK_SECRET_KEY = process.env.EXPO_PUBLIC_PAYSTACK_TEST_SECRET_KEY!;
@@ -15,6 +14,14 @@ if (Platform.OS === "android") {
 } else {
   API_BASE_URL = "http://localhost:3000"; // Replace with your actual port number
 }
+
+export const getHeaders = () => {
+  const { jwt } = useGlobalStore(); // ✅ Hook inside a function
+
+  return {
+    Authorization: `Bearer ${jwt}`,
+  };
+};
 
 // export const login = async (credentials: LoginRequest) => {
 //   try {
@@ -251,7 +258,7 @@ if (Platform.OS === "android") {
 
 export const fetchBanksFromPaystack = async () => {
   try {
-    const response = await axios.get(
+    const { data: payload } = await axios.get(
       "https://api.paystack.co/bank?currency=NGN&supports_transfer=true&active=true",
       {
         headers: {
@@ -260,7 +267,7 @@ export const fetchBanksFromPaystack = async () => {
       }
     );
 
-    return response.data;
+    return payload;
   } catch (error) {
     handleApiError(error);
   }
@@ -271,7 +278,7 @@ export const verifyAccountNumberFromPaystack = async (
   bankCode: number
 ) => {
   try {
-    const response = await axios.get(
+    const { data: payload } = await axios.get(
       `https://api.paystack.co/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`,
       {
         headers: {
@@ -279,51 +286,44 @@ export const verifyAccountNumberFromPaystack = async (
         },
       }
     );
-    return response.data;
+    return payload;
   } catch (error) {
     handleApiError(error);
   }
 };
 
-// export const getSessionUser = async () => {
-//   // const token = await getJwtToken();
-//   try {
-//     const response = await axios.get(`http://localhost:3000/appwrite`, {
-//       headers: {
-//         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiI2N2MzOWRiMWQwZWJjMjYwY2U4OCIsInNlc3Npb25JZCI6IjY3Y2Y3Y2M3ZjIxNjk5YTBlZTYxIiwiZXhwIjoxNzQxNjUyMDYzfQ.CAuCP6CrXatwKzN7vE9YwSER3H-PWBx2VMtDcnLMCTE`,
-//       },
-//     });
-//     return response;
-//   } catch (error) {
-//     console.log("error: ", error);
-//     handleApiError(error);
-//   }
-// };
-
-export const getSessionUser = async () => {
+export const login = async (provider: LoginProvider) => {
+  let jwt;
   try {
-    const response = await axios.get(`http://localhost:3000/appwrite`, {
-      headers: {
-        Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiI2N2MzOWRiMWQwZWJjMjYwY2U4OCIsInNlc3Npb25JZCI6IjY3Y2Y3Y2M3ZjIxNjk5YTBlZTYxIiwiZXhwIjoxNzQxNjUyMDYzfQ.CAuCP6CrXatwKzN7vE9YwSER3H-PWBx2VMtDcnLMCTE`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      // Add these options to help with CORS issues
-      withCredentials: false,
-      timeout: 10000,
-    });
-    return response;
-  } catch (error: any) {
-    console.log("error: ", error);
-    // More detailed error logging
-    if (error.response) {
-      // Server responded with non-2xx code
-      console.log("Response data:", error.response.data);
-      console.log("Response status:", error.response.status);
-    } else if (error.request) {
-      // Request was made but no response received
-      console.log("No response received:", error.request);
+    if (provider === LoginProvider.APPLE || provider === LoginProvider.GOOGLE) {
+      jwt = await loginWithOAuth(provider);
+    } else {
     }
+
+    if (!jwt) return;
+    console.log("jwt: ", jwt);
+    return;
+    const { data: payload } = await axios.post(`${API_BASE_URL}/auth/login`, {
+      jwt,
+    });
+    return payload;
+  } catch (error) {
+    console.log("error: ", error);
+    handleApiError(error);
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const headers = getHeaders();
+    console.log("running here too");
+    const { data: payload } = await axios.get(`${API_BASE_URL}/auth`, {
+      headers,
+    });
+
+    return payload;
+  } catch (error) {
+    console.log("error: ", error);
     handleApiError(error);
   }
 };

@@ -51,3 +51,26 @@ export interface ApiResponse<T = any> {
   data: T;
   nextCursor?: number;
 }
+
+export interface AuthState {
+  jwt: string;
+  saveAuthState: (jwt: string) => void;
+  resetAuthState: () => void;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  avatar?: string;
+  phoneNumber?: string;
+  referralCode?: string;
+  referralPoints?: number;
+  referredById?: number;
+  referralCount?: number;
+  firstLogin?: boolean;
+  lastLogin?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+  isFriend?: boolean;
+}

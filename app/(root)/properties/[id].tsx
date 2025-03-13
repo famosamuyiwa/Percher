@@ -106,14 +106,14 @@ const Property = () => {
           </View>
 
           <View className="flex flex-row items-center mt-5">
-            <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10">
-              <FontAwesome5 name="bed" size={16} color={Colors.secondary} />
+            <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10">
+              <FontAwesome5 name="bed" size={16} color={Colors.accent} />
             </View>
             <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-2">
               {property?.bedrooms} Bed(s)
             </Text>
-            <View className="flex flex-row items-center justify-center bg-secondary-100 rounded-full size-10 ml-7">
-              <FontAwesome name="bath" size={16} color={Colors.secondary} />
+            <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 ml-7">
+              <FontAwesome name="bath" size={16} color={Colors.accent} />
             </View>
             <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-2">
               {property?.bathrooms} Bathroom(s)
@@ -178,11 +178,11 @@ const Property = () => {
                       key={index}
                       className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                     >
-                      <View className="size-14 bg-secondary-100 rounded-full flex items-center justify-center">
+                      <View className="size-14 bg-accent-100 rounded-full flex items-center justify-center">
                         <Ionicons
                           name={facility ? facility.icon : icons.info}
                           size={24}
-                          color={Colors.secondary}
+                          color={Colors.accent}
                         />
                       </View>
 
@@ -227,7 +227,7 @@ const Property = () => {
               Location
             </Text>
             <View className="flex flex-row items-center justify-start mt-4 gap-2">
-              <Entypo name="location" size={28} color={Colors.secondary} />
+              <Entypo name="location" size={28} color={Colors.accent} />
               <Text className="text-black-200 text-sm font-plus-jakarta-medium">
                 {property?.address}
               </Text>

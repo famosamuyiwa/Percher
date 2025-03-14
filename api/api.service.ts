@@ -16,11 +16,15 @@ if (Platform.OS === "android") {
 }
 
 export const getHeaders = () => {
-  const { jwt } = useGlobalStore(); // ✅ Hook inside a function
+  const jwt = useGlobalStore.getState().jwt; // ✅ Access state without a hook
 
   return {
     Authorization: `Bearer ${jwt}`,
   };
+};
+
+export const saveJwt = (jwt: string) => {
+  useGlobalStore.getState().saveAuthState(jwt);
 };
 
 // export const login = async (credentials: LoginRequest) => {
@@ -294,6 +298,7 @@ export const verifyAccountNumberFromPaystack = async (
 
 export const login = async (provider: LoginProvider) => {
   let jwt;
+
   try {
     if (provider === LoginProvider.APPLE || provider === LoginProvider.GOOGLE) {
       jwt = await loginWithOAuth(provider);
@@ -301,11 +306,10 @@ export const login = async (provider: LoginProvider) => {
     }
 
     if (!jwt) return;
-    console.log("jwt: ", jwt);
-    return;
     const { data: payload } = await axios.post(`${API_BASE_URL}/auth/login`, {
       jwt,
     });
+    if (payload) saveJwt(jwt);
     return payload;
   } catch (error) {
     console.log("error: ", error);
@@ -323,7 +327,6 @@ export const getCurrentUser = async () => {
 
     return payload;
   } catch (error) {
-    console.log("error: ", error);
     handleApiError(error);
   }
 };

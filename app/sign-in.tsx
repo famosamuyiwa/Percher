@@ -18,6 +18,7 @@ import { Redirect, router } from "expo-router";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { LoginProvider } from "@/constants/enums";
 import { useLoginMutation } from "@/hooks/mutation/useAuthMutation";
+import { ResponseStatus } from "@/interfaces";
 
 const SignIn = () => {
   const { refetch, loading, isLoggedIn } = useGlobalContext();
@@ -26,7 +27,6 @@ const SignIn = () => {
   if (!loading && isLoggedIn) return <Redirect href="/(root)/(tabs)" />;
 
   const handleLogin = async (provider: LoginProvider) => {
-    // let result = undefined;
     switch (provider) {
       case LoginProvider.GOOGLE:
         onHandleLoginWithOauth(provider);
@@ -40,15 +40,18 @@ const SignIn = () => {
       default:
         Alert.alert("Error", "Invalid login provider");
     }
-    // if (result) {
-    //   refetch();
-    // } else {
-    //   Alert.alert("Error", "Failed to login");
-    // }
+  };
+
+  const handleOnOAuthSuccess = (payload: any) => {
+    if (payload.status === ResponseStatus.SUCCESS) {
+      refetch();
+    } else {
+      Alert.alert("Error: ", "Failed to login");
+    }
   };
 
   async function onHandleLoginWithOauth(provider: LoginProvider) {
-    loginMutation.mutate(provider);
+    loginMutation.mutate(provider, { onSuccess: handleOnOAuthSuccess });
   }
 
   return (

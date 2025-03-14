@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
@@ -112,7 +113,7 @@ export default function Index() {
   return (
     <SafeAreaView edges={["top"]} className="bg-white h-full">
       {/* <Button title="Seed" onPress={seed} /> */}
-      <FlashList
+      <FlatList
         data={properties}
         keyExtractor={(item) => item.$id}
         numColumns={2}
@@ -131,7 +132,7 @@ export default function Index() {
             <NoResults />
           )
         }
-        estimatedItemSize={200}
+        // estimatedItemSize={200}
       />
     </SafeAreaView>
   );

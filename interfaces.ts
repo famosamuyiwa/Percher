@@ -59,18 +59,22 @@ export interface AuthState {
 }
 
 export interface User {
-  id: number;
-  name: string;
+  id: string;
   email: string;
-  avatar?: string;
+  name: string;
+  phone: string;
+  password: string;
+  profilePicture: string;
+  role: string;
+  referredBy: User;
+  referredUsers: User[];
   phoneNumber?: string;
   referralCode?: string;
-  referralPoints?: number;
-  referredById?: number;
-  referralCount?: number;
-  firstLogin?: boolean;
-  lastLogin?: Date;
   createdAt?: Date;
   updatedAt?: Date;
-  isFriend?: boolean;
+}
+
+export enum ResponseStatus {
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
 }

@@ -19,8 +19,14 @@ interface GlobalContextType {
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
-  const { data: user, isLoading, refetch } = useAuthQuery();
-  const isLoggedIn = !!user;
+  const { data: user, isLoading, refetch, isError, error } = useAuthQuery();
+  let isLoggedIn = !!user;
+
+  if (isError) {
+    if (error.message.includes("JWT")) {
+      isLoggedIn = false;
+    }
+  }
 
   return (
     <GlobalContext.Provider

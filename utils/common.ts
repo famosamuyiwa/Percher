@@ -59,10 +59,13 @@ export const normalizeFormData = (data: PerchRegistrationFormData) => {
 export const handleApiError = (error: any): never => {
   if (error.response) {
     const customMessage = error.response.data?.message || "Request failed!";
+    console.log("error: ", customMessage);
     throw new Error(customMessage);
   } else if (error.request) {
+    console.log("error: No response from server. Please try again later.");
     throw new Error("No response from server. Please try again later.");
   } else {
+    console.log("error: An error occurred. Please try again.");
     throw new Error("An error occurred. Please try again.");
   }
 };

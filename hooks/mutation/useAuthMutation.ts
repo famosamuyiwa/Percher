@@ -4,22 +4,17 @@ import { AuthCache } from "@/utils/types";
 import { USE_AUTH_QUERY_KEY } from "@/constants/common";
 import { Alert } from "react-native";
 import { ApiResponse, User } from "@/interfaces";
+import { useGlobalStore } from "@/store/store";
+import { router } from "expo-router";
 
 // Login Mutation
 export const useLoginMutation = () => {
-  const queryClient = useQueryClient();
-
-  const onUseLoginMutationSuccess = (payload: ApiResponse<User>) => {
-    queryClient.setQueryData<AuthCache>(USE_AUTH_QUERY_KEY, payload);
-  };
-
   const onUseLoginMutationError = (error: Error) => {
-    Alert.alert("Log in error", error.message);
+    Alert.alert("Error", error.message);
   };
 
   return useMutation({
     mutationFn: login,
-    onSuccess: onUseLoginMutationSuccess,
     onError: onUseLoginMutationError,
   });
 };

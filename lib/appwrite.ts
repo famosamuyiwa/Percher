@@ -11,6 +11,7 @@ import { Property } from "../interfaces";
 import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
+import { jwtDecode } from "jwt-decode";
 
 export const config = {
   platform: "com.jsm.percher-web",
@@ -50,7 +51,7 @@ export async function loginWithOAuth(provider: any) {
 
     // Start OAuth flow
     const loginUrl = await account.createOAuth2Token(
-      OAuthProvider.Google,
+      provider,
       `${deepLink}`,
       `${deepLink}`
     );
@@ -77,7 +78,7 @@ export async function loginWithOAuth(provider: any) {
     return jwt;
   } catch (err) {
     console.error(err);
-    return false;
+    return null;
   }
 }
 
@@ -98,6 +99,12 @@ export const getJwtToken = async () => {
   } catch (error) {
     console.error("JWT Error:", error);
   }
+};
+
+const isJwtExpired = (token: string): boolean => {
+  if (!token) return true; // If no token, treat it as expired
+  const decoded: any = jwtDecode(token);
+  return decoded.exp * 1000 < Date.now(); // Convert `exp` to milliseconds
 };
 
 export async function getCurrentUser() {

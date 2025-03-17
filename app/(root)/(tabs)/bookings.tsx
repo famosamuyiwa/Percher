@@ -24,6 +24,7 @@ import {
   BookingCardHost,
   GradientCard,
 } from "@/components/Cards";
+import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 
 const Bookings = () => {
   const { filter, query } = useLocalSearchParams<{
@@ -92,56 +93,62 @@ const Bookings = () => {
   }, [loading, userType]);
 
   return (
-    <SafeAreaView edges={["top"]} className="bg-white h-full">
-      <View className="px-5">
-        <View className="items-center justify-center">
-          <Text className="font-plus-jakarta-bold text-lg self-center">
-            Bookings
-          </Text>
-          <TouchableOpacity
-            onPress={() => setUserTypeVisible(true)}
-            className="h-10 w-3/12 rounded-lg border-primary-300 flex-row items-center px-2 gap-2 absolute right-0"
-            style={{ borderWidth: 0.4 }}
-          >
-            <FontAwesome name="user" size={16} color={Colors.primary} />
-            <Text className="text-xs font-plus-jakarta-semibold">
-              {userType}
+    <Animated.View
+      layout={LinearTransition}
+      entering={FadeIn.duration(500)}
+      className="flex-1"
+    >
+      <SafeAreaView edges={["top"]} className="bg-white h-full">
+        <View className="px-5">
+          <View className="items-center justify-center">
+            <Text className="font-plus-jakarta-bold text-lg self-center">
+              Bookings
             </Text>
-            <Entypo name="chevron-down" size={16} color={Colors.primary} />
-          </TouchableOpacity>
-        </View>
-        <View className="my-5">
-          <Filters categoryKey={CategoryKey.BOOKINGS} />
-        </View>
-      </View>
-
-      <FlashList
-        data={bookings ?? []}
-        numColumns={1}
-        contentContainerClassName="pb-32"
-        showsVerticalScrollIndicator={false}
-        renderItem={renderItem}
-        estimatedItemSize={200}
-        ListHeaderComponent={<View className="px-5" />}
-        ListEmptyComponent={listEmptyComponent}
-      />
-
-      <Modal visible={userTypeModalVisible} transparent animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={userType}
-              onValueChange={setUserType}
-              itemStyle={{ color: "black", fontSize: 18 }}
+            <TouchableOpacity
+              onPress={() => setUserTypeVisible(true)}
+              className="h-10 w-3/12 rounded-lg border-primary-300 flex-row items-center px-2 gap-2 absolute right-0"
+              style={{ borderWidth: 0.4 }}
             >
-              <Picker.Item label={UserType.GUEST} value={UserType.GUEST} />
-              <Picker.Item label={UserType.HOST} value={UserType.HOST} />
-            </Picker>
-            <Button title="Done" onPress={() => setUserTypeVisible(false)} />
+              <FontAwesome name="user" size={16} color={Colors.primary} />
+              <Text className="text-xs font-plus-jakarta-semibold">
+                {userType}
+              </Text>
+              <Entypo name="chevron-down" size={16} color={Colors.primary} />
+            </TouchableOpacity>
+          </View>
+          <View className="my-5">
+            <Filters categoryKey={CategoryKey.BOOKINGS} />
           </View>
         </View>
-      </Modal>
-    </SafeAreaView>
+
+        <FlashList
+          data={bookings ?? []}
+          numColumns={1}
+          contentContainerClassName="pb-32"
+          showsVerticalScrollIndicator={false}
+          renderItem={renderItem}
+          estimatedItemSize={200}
+          ListHeaderComponent={<View className="px-5" />}
+          ListEmptyComponent={listEmptyComponent}
+        />
+
+        <Modal visible={userTypeModalVisible} transparent animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={userType}
+                onValueChange={setUserType}
+                itemStyle={{ color: "black", fontSize: 18 }}
+              >
+                <Picker.Item label={UserType.GUEST} value={UserType.GUEST} />
+                <Picker.Item label={UserType.HOST} value={UserType.HOST} />
+              </Picker>
+              <Button title="Done" onPress={() => setUserTypeVisible(false)} />
+            </View>
+          </View>
+        </Modal>
+      </SafeAreaView>
+    </Animated.View>
   );
 };
 

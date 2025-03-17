@@ -39,59 +39,6 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const storage = new Storage(client);
 
-export async function loginWithOAuth(provider: any) {
-  try {
-    // Create a deep link that works across Expo environments
-    // Ensure localhost is used for the hostname to validation error for success/failure URLs
-    const deepLink = new URL(makeRedirectUri({ preferLocalhost: true }));
-    if (!deepLink.hostname) {
-      deepLink.hostname = Platform.OS === "ios" ? "localhost" : "10.0.2.2";
-    }
-    const scheme = `${deepLink.protocol}//`; // e.g. 'exp://' or 'playground://'
-
-    // Start OAuth flow
-    const loginUrl = await account.createOAuth2Token(
-      provider,
-      `${deepLink}`,
-      `${deepLink}`
-    );
-
-    // Open loginUrl and listen for the scheme redirect
-    const browserResult = await WebBrowser.openAuthSessionAsync(
-      `${loginUrl}`,
-      scheme
-    );
-
-    if (browserResult.type !== "success") throw new Error("Failed to login");
-
-    const url = new URL(browserResult.url);
-    const secret = url.searchParams.get("secret")?.toString();
-    const userId = url.searchParams.get("userId")?.toString();
-
-    if (!secret || !userId) throw new Error("Failed to login");
-
-    const session = await account.createSession(userId, secret);
-
-    if (!session) throw new Error("Failed to create a session");
-
-    const jwt = await getJwtToken();
-    return jwt;
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
-}
-
-export async function logout() {
-  try {
-    const result = await account.deleteSession("current");
-    return result;
-  } catch (err) {
-    console.error(err);
-    return false;
-  }
-}
-
 export const getJwtToken = async () => {
   try {
     const jwt = await account.createJWT(); // Generates JWT
@@ -100,30 +47,6 @@ export const getJwtToken = async () => {
     console.error("JWT Error:", error);
   }
 };
-
-const isJwtExpired = (token: string): boolean => {
-  if (!token) return true; // If no token, treat it as expired
-  const decoded: any = jwtDecode(token);
-  return decoded.exp * 1000 < Date.now(); // Convert `exp` to milliseconds
-};
-
-export async function getCurrentUser() {
-  try {
-    const response = await account.get();
-
-    if (response.$id) {
-      const userAvatar = avatar.getInitials(response.name);
-
-      return {
-        ...response,
-        avatar: userAvatar.toString(),
-      };
-    }
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
-}
 
 export async function getLatestProperties() {
   try {

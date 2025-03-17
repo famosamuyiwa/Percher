@@ -5,7 +5,7 @@ export default function PaymentsLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
-      <Stack.Screen name="banks" />\{" "}
+      <Stack.Screen name="banks" />
     </Stack>
   );
 }

@@ -2,6 +2,8 @@ import {
   PerchRegistrationFormData,
   PerchRegistrationFormProps,
 } from "@/interfaces";
+import { useGlobalStore } from "@/store/store";
+import * as SecureStore from "expo-secure-store";
 
 export const Commafy = (value: number) => {
   if (!value) return;
@@ -61,6 +63,10 @@ export const handleApiError = (error: any): never => {
     const customMessage = error.response.data?.message || "Request failed!";
     console.log("error: ", customMessage);
     throw new Error(customMessage);
+  } else if (error.message) {
+    const customMessage = error.message || "Request failed!";
+    console.log("error: ", customMessage);
+    throw new Error(customMessage);
   } else if (error.request) {
     console.log("error: No response from server. Please try again later.");
     throw new Error("No response from server. Please try again later.");
@@ -69,3 +75,28 @@ export const handleApiError = (error: any): never => {
     throw new Error("An error occurred. Please try again.");
   }
 };
+
+export const getHeaders = () => {
+  const sessionId = useGlobalStore.getState().sessionId; // ✅ Access state without a hook
+
+  return {
+    Authorization: `Session ${sessionId ?? ""}`,
+  };
+};
+
+export const saveJwt = (jwt: string) => {
+  useGlobalStore.getState().saveAuthState(jwt);
+  console.log("are you :", useGlobalStore.getState().jwt);
+};
+
+export async function saveToken(key: string, value: string) {
+  await SecureStore.setItemAsync(key, value);
+}
+
+export async function getToken(key: string) {
+  return await SecureStore.getItemAsync(key);
+}
+
+export async function removeToken(key: string) {
+  await SecureStore.deleteItemAsync(key);
+}

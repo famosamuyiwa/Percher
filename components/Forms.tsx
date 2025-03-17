@@ -22,18 +22,20 @@ import {
 } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 import { Image } from "expo-image";
-import useStorageBucket from "@/hooks/useStorageBucket";
 import useImagePicker from "@/hooks/useImagePicker";
 import { Picker } from "@react-native-picker/picker";
 import {
   ChargeType,
   CheckInTime,
+  CheckOutTime,
   Facility,
   PerchTypes,
 } from "@/constants/enums";
 import MiniGalleryItem from "./GalleryItem";
 import MultiPicker from "./MultiPicker";
 import { PerchRegistrationFormProps } from "@/interfaces";
+import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
+import CustomButton from "./Button";
 
 // Validation Schema
 const schema = z.object({
@@ -65,9 +67,10 @@ export default function PerchRegistrationForm({
   const [height, setHeight] = useState(20);
   const [perchTypeModalVisible, setPerchTypeModalVisible] = useState(false);
   const [chargeTypeModalVisible, setChargeTypeModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { pickMultimedia } = useImagePicker();
-  const { uploadMultimedia } = useStorageBucket();
+  const { uploadMultimedia, progress } = useStorageBucket();
 
   const {
     control,
@@ -92,13 +95,14 @@ export default function PerchRegistrationForm({
   const checkInTimes = watch("checkInTimes");
   const checkOutTimes = watch("checkOutTimes");
 
-  const uploadAndUpdateFormMediaURLs = async (uri: any[]) => {
-    await uploadMultimedia(
-      {
-        uri,
-      },
-      (downloadUrl: URL) => {}
-    );
+  const uploadAndUpdateFormMediaURLs = async (uriList: any[]) => {
+    const files = uriList.map((u) => ({
+      uri: u,
+    }));
+    return await uploadMultimedia(files, (downloadUrls: string[]) => {
+      console.log("downloadUrls: ", downloadUrls);
+      return downloadUrls;
+    });
   };
 
   const handleHeaderSelect = async () => {
@@ -106,7 +110,7 @@ export default function PerchRegistrationForm({
       const image: any = await pickMultimedia(false, true);
       setValue("header", image.uri[0]);
     } catch {
-      console.log("Error uploading image");
+      console.log("Error picking media");
     }
   };
 
@@ -126,7 +130,6 @@ export default function PerchRegistrationForm({
             ...currentProofOfOwnership,
             ...images.uri,
           ];
-
           setValue("proofOfOwnership", updatedProofOfOwnership); // Update form state
           break;
         case "proofOfIdentity":
@@ -171,8 +174,14 @@ export default function PerchRegistrationForm({
     }
   };
 
-  const handleOnSubmit = (data: any) => {
-    onSubmit(data);
+  const handleOnSubmit = async (data: any) => {
+    try {
+      const proof = await uploadAndUpdateFormMediaURLs(data.proofOfOwnership);
+      console.log("pof: ", proof);
+      onSubmit(data);
+    } catch (err) {
+      console.log("error: ", err);
+    }
   };
 
   return (
@@ -610,11 +619,40 @@ export default function PerchRegistrationForm({
                     <Text className="text-xs font-plus-jakarta-regular pb-3">
                       Check-Out periods
                     </Text>
-                    <MultiPicker
-                      options={Object.values(CheckInTime)} // Options
-                      selectedValues={checkOutTimes} // Initially selected
-                      onChange={onChange} // Callback function
-                    />
+                    <Modal
+                      visible={perchTypeModalVisible}
+                      transparent
+                      animationType="slide"
+                    >
+                      <View style={styles.modalContainer}>
+                        <View style={styles.pickerContainer}>
+                          <Picker
+                            selectedValue={perchType}
+                            onValueChange={(itemValue) =>
+                              setValue("propertyType", itemValue)
+                            }
+                            itemStyle={{
+                              color: "black", // Set text color
+                              fontSize: 18, // Set font size
+                            }}
+                          >
+                            {Object.values(CheckOutTime).map((type) => (
+                              <Picker.Item
+                                key={type}
+                                label={type}
+                                value={type}
+                              />
+                            ))}
+                          </Picker>
+                          <Button
+                            title="Done"
+                            onPress={() => {
+                              setPerchTypeModalVisible(false);
+                            }}
+                          />
+                        </View>
+                      </View>
+                    </Modal>
                   </View>
                 )}
               />
@@ -843,30 +881,14 @@ export default function PerchRegistrationForm({
       </View>
 
       <View className="justify-end py-10 px-5">
-        {isValid && (
-          <TouchableOpacity
-            onPress={handleSubmit((data) => {
-              handleOnSubmit(data);
-            })}
-            className={`h-30 items-center justify-center bg-primary-300 shadow-md shadow-zinc-400 py-3 rounded-full `}
-          >
-            <Text className="text-white text-lg text-center font-plus-jakarta-bold">
-              Register
-            </Text>
-          </TouchableOpacity>
-        )}
-        {!isValid && (
-          <TouchableOpacity
-            onPress={handleSubmit((data) => {
-              handleOnSubmit(data);
-            })}
-            className={`h-30 items-center justify-center bg-gray-300 py-3 rounded-full `}
-          >
-            <Text className="text-white text-lg text-center font-plus-jakarta-bold">
-              Register
-            </Text>
-          </TouchableOpacity>
-        )}
+        <CustomButton
+          label="Register"
+          onPress={handleSubmit((data) => {
+            handleOnSubmit(data);
+          })}
+          isDisabled={!isValid}
+          isLoading={isLoading}
+        />
       </View>
     </View>
   );

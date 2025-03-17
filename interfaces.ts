@@ -1,5 +1,5 @@
 import { Models } from "react-native-appwrite";
-import { Facility, PropertyType } from "./constants/enums";
+import { Facility, LoginProvider, PropertyType } from "./constants/enums";
 
 export interface Property extends Models.Document {
   description: string;
@@ -53,7 +53,8 @@ export interface ApiResponse<T = any> {
 }
 
 export interface AuthState {
-  jwt: string;
+  jwt?: string;
+  sessionId: string;
   saveAuthState: (jwt: string) => void;
   resetAuthState: () => void;
 }
@@ -64,11 +65,10 @@ export interface User {
   name: string;
   phone: string;
   password: string;
-  profilePicture: string;
+  avatar: string;
   role: string;
   referredBy: User;
   referredUsers: User[];
-  phoneNumber?: string;
   referralCode?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -77,4 +77,28 @@ export interface User {
 export enum ResponseStatus {
   SUCCESS = "SUCCESS",
   FAILED = "FAILED",
+}
+
+export interface OAuthRequest {
+  provider: LoginProvider;
+  name: string;
+  email: string;
+}
+
+export interface SignupRequest {
+  email: string;
+  name: string;
+  password: string;
+  referralCode?: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  password: string;
+}
+
+export interface ToastProps {
+  type?: "success" | "warning" | "error";
+  description?: string;
+  duration?: number;
 }

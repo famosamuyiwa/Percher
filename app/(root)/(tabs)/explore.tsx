@@ -11,6 +11,7 @@ import { useAppwrite } from "../../../lib/useAppwrite";
 import { getProperties } from "../../../lib/appwrite";
 import NoResults from "../../../components/NoResults";
 import { CategoryKey } from "@/constants/enums";
+import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 
 export default function Explore() {
   const params = useLocalSearchParams<{ query?: string; filter?: string }>();
@@ -50,40 +51,49 @@ export default function Explore() {
   );
 
   return (
-    <SafeAreaView edges={["top"]} className="bg-white h-full">
-      {/* <Button title="Seed" onPress={seed} /> */}
+    <Animated.View
+      layout={LinearTransition}
+      entering={FadeIn.duration(500)}
+      className="flex-1"
+    >
+      <SafeAreaView edges={["top"]} className="bg-white h-full">
+        {/* <Button title="Seed" onPress={seed} /> */}
 
-      <View className="px-5">
-        <Text className="font-plus-jakarta-bold self-center text-lg">
-          Explore
-        </Text>
-        <SearchBar />
+        <View className="px-5">
+          <Text className="font-plus-jakarta-bold self-center text-lg">
+            Explore
+          </Text>
+          <SearchBar />
 
-        <View className="my-5">
-          <Filters categoryKey={CategoryKey.PERCHTYPE} />
-        </View>
-      </View>
-      <FlashList
-        data={properties}
-        keyExtractor={(item) => item.$id}
-        numColumns={1}
-        contentContainerClassName="pb-32"
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View className="mx-5">
-            <Card item={item} onPress={() => handleCardPress(item.$id)} />
+          <View className="my-5">
+            <Filters categoryKey={CategoryKey.PERCHTYPE} />
           </View>
-        )}
-        ListHeaderComponent={listHeader}
-        ListEmptyComponent={
-          loading ? (
-            <ActivityIndicator size="small" className="text-primary-300 mt-5" />
-          ) : (
-            <NoResults />
-          )
-        }
-        estimatedItemSize={200}
-      />
-    </SafeAreaView>
+        </View>
+        <FlashList
+          data={properties}
+          keyExtractor={(item) => item.$id}
+          numColumns={1}
+          contentContainerClassName="pb-32"
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View className="mx-5">
+              <Card item={item} onPress={() => handleCardPress(item.$id)} />
+            </View>
+          )}
+          ListHeaderComponent={listHeader}
+          ListEmptyComponent={
+            loading ? (
+              <ActivityIndicator
+                size="small"
+                className="text-primary-300 mt-5"
+              />
+            ) : (
+              <NoResults />
+            )
+          }
+          estimatedItemSize={200}
+        />
+      </SafeAreaView>
+    </Animated.View>
   );
 }

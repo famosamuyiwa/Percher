@@ -3,6 +3,7 @@ import { resetAuthState, saveAuthState } from "../utils";
 
 export const createAuthSlice = (set: any, get: any): AuthState => ({
   jwt: "",
+  sessionId: "",
   saveAuthState: (jwt: string) => set(() => saveAuthState(jwt)),
   resetAuthState: () => set(() => resetAuthState()),
 });

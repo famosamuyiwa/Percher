@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { Image } from "expo-image";
 import { TextField } from "@/components/Textfield";
@@ -9,19 +9,22 @@ import {
 } from "@expo/vector-icons";
 // import useImagePicker from "@/hooks/useImagePicker";
 import { MaterialIndicator } from "react-native-indicators";
-import useStorageBucket from "@/hooks/useStorageBucket";
 import { Colors } from "@/constants/common";
-import images from "@/constants/images";
 import SettingsHeader from "@/components/SettingsHeader";
 import useImagePicker from "@/hooks/useImagePicker";
+import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
+import { useUpdateUserMutation } from "@/hooks/mutation/useUserMutation";
+import { useGlobalContext } from "@/lib/global-provider";
 
 const ProfileScreen = () => {
+  const { user, refetch } = useGlobalContext();
+
   const [isEditing, setIsEditing] = useState(false);
-  const [avatar, setAvatar] = useState();
-  const [name, setName] = useState("Nen Ling");
-  const [email, setEmail] = useState("nenling19@gmail.com");
-  const [phoneNumber, setPhoneNumber] = useState("08033044770");
-  // const updateUserMutation = useUpdateUserMutation();
+  const [avatar, setAvatar] = useState(user?.avatar);
+  const [name, setName] = useState(user?.name);
+  const [email, setEmail] = useState(user?.email);
+  const [phoneNumber, setPhoneNumber] = useState(user?.phone);
+  const updateUserMutation = useUpdateUserMutation();
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -32,7 +35,7 @@ const ProfileScreen = () => {
   const handleSave = () => {
     setIsSaving(true);
     // if (avatar !== authQuery.data?.data.avatar) {
-    if (avatar) {
+    if (user?.avatar !== avatar) {
       uploadAndMutate();
     } else {
       mutate();
@@ -58,10 +61,13 @@ const ProfileScreen = () => {
 
   const uploadAndMutate = async () => {
     await uploadMultimedia(
-      {
-        uri: avatar,
-      },
-      (downloadUrl: URL) => {
+      [
+        {
+          uri: avatar,
+        },
+      ],
+      (downloadUrls: string[]) => {
+        console.log("dowloadUrls: ", downloadUrls);
         // updateUserMutation.mutate(
         //   {
         //     id: authQuery.data?.data.id,
@@ -75,13 +81,14 @@ const ProfileScreen = () => {
   };
 
   const mutate = () => {
-    // updateUserMutation.mutate(
-    //   {
-    //     id: authQuery.data?.data.id,
-    //     name,
-    //   },
-    //   { onSettled, onSuccess }
-    // );
+    updateUserMutation.mutate(
+      {
+        id: user?.id,
+        name,
+        phone: phoneNumber,
+      },
+      { onSettled, onSuccess }
+    );
   };
 
   const onSettled = () => {
@@ -89,6 +96,7 @@ const ProfileScreen = () => {
   };
 
   const onSuccess = () => {
+    refetch();
     setIsEditing(false);
   };
 
@@ -100,7 +108,7 @@ const ProfileScreen = () => {
           <TouchableOpacity onPress={handleImagePress}>
             <Image
               style={styles.avatar}
-              source={avatar ?? images.avatarPlaceholder}
+              source={avatar}
               contentFit="cover"
               transition={300}
             />

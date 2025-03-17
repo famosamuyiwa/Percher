@@ -6,7 +6,6 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
-  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
@@ -22,6 +21,7 @@ import NoResults from "../../../components/NoResults";
 import AnimationParallaxCarousel from "@/components/animation-parallax-carousel/animation-parallax-carousel";
 import { CategoryKey } from "@/constants/enums";
 import { FlashList } from "@shopify/flash-list";
+import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 
 export default function Index() {
   const { user } = useGlobalContext();
@@ -111,30 +111,39 @@ export default function Index() {
   );
 
   return (
-    <SafeAreaView edges={["top"]} className="bg-white h-full">
-      {/* <Button title="Seed" onPress={seed} /> */}
-      <FlatList
-        data={properties}
-        keyExtractor={(item) => item.$id}
-        numColumns={2}
-        contentContainerClassName="pb-32"
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View className="flex-1 px-2">
-            <Card item={item} onPress={() => handleCardPress(item.$id)} />
-          </View>
-        )}
-        ListHeaderComponent={useMemo(listHeader, [properties])}
-        ListEmptyComponent={
-          loading ? (
-            <ActivityIndicator size="small" className="text-primary-300 mt-5" />
-          ) : (
-            <NoResults />
-          )
-        }
-        // estimatedItemSize={200}
-      />
-    </SafeAreaView>
+    <Animated.View
+      layout={LinearTransition}
+      entering={FadeIn.duration(500)}
+      className="flex-1"
+    >
+      <SafeAreaView edges={["top"]} className="bg-white h-full">
+        {/* <Button title="Seed" onPress={seed} /> */}
+        <FlashList
+          data={properties}
+          keyExtractor={(item) => item.$id}
+          numColumns={2}
+          contentContainerClassName="pb-32"
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View className="flex-1 px-2">
+              <Card item={item} onPress={() => handleCardPress(item.$id)} />
+            </View>
+          )}
+          ListHeaderComponent={useMemo(listHeader, [properties, user])}
+          ListEmptyComponent={
+            loading ? (
+              <ActivityIndicator
+                size="small"
+                className="text-primary-300 mt-5"
+              />
+            ) : (
+              <NoResults />
+            )
+          }
+          estimatedItemSize={250}
+        />
+      </SafeAreaView>
+    </Animated.View>
   );
 }
 

@@ -1,9 +1,15 @@
-import { LoginProvider } from "@/constants/enums";
-import { loginWithOAuth } from "@/lib/appwrite";
-import { useGlobalStore } from "@/store/store";
-import { handleApiError } from "@/utils/common";
+import {
+  OAuthRequest,
+  ResetPasswordRequest,
+  SignupRequest,
+  User,
+} from "@/interfaces";
+import { getHeaders, handleApiError, saveJwt } from "@/utils/common";
 import axios from "axios";
 import { Platform } from "react-native";
+import api from "./axios";
+import * as SecureStore from "expo-secure-store";
+import { signOut } from "@/hooks/useGoogleOAuth";
 
 let API_BASE_URL: string;
 const PAYSTACK_SECRET_KEY = process.env.EXPO_PUBLIC_PAYSTACK_TEST_SECRET_KEY!;
@@ -15,112 +21,106 @@ if (Platform.OS === "android") {
   API_BASE_URL = "http://localhost:3000"; // Replace with your actual port number
 }
 
-export const getHeaders = () => {
-  const jwt = useGlobalStore.getState().jwt; // ✅ Access state without a hook
-
-  return {
-    Authorization: `Bearer ${jwt}`,
-  };
+export const login = async (credentials: {
+  email: string;
+  password: string;
+}) => {
+  try {
+    const { data: payload } = await api.post(`${API_BASE_URL}/auth/login`, {
+      ...credentials,
+    });
+    const { accessToken, refreshToken } = payload.data;
+    await SecureStore.setItemAsync("accessToken", accessToken);
+    await SecureStore.setItemAsync("refreshToken", refreshToken);
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
 };
 
-export const saveJwt = (jwt: string) => {
-  useGlobalStore.getState().saveAuthState(jwt);
+export const loginWithOAuth = async (credentials: OAuthRequest) => {
+  try {
+    const { data: payload } = await api.post(`${API_BASE_URL}/auth/oauth`, {
+      ...credentials,
+    });
+    const { accessToken, refreshToken } = payload.data;
+
+    // Store tokens
+    await SecureStore.setItemAsync("accessToken", accessToken);
+    await SecureStore.setItemAsync("refreshToken", refreshToken);
+
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
 };
 
-// export const login = async (credentials: LoginRequest) => {
-//   try {
-//     const { data: payload } = await axios.post(`${API_BASE_URL}/auth/login`, {
-//       ...credentials,
-//     });
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
+export const logout = async () => {
+  try {
+    await signOut();
+    const { data: payload } = await api.get(`${API_BASE_URL}/auth/logout`);
+    await SecureStore.deleteItemAsync("accessToken");
+    await SecureStore.deleteItemAsync("refreshToken");
+    console.log("payload: ", payload);
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
 
-// export const loginWithOAuth = async (credentials: OAuthRequest) => {
-//   console.log("BASE_URL: ", API_BASE_URL);
-//   try {
-//     const { data: payload } = await axios.post(`${API_BASE_URL}/auth/oauth`, {
-//       ...credentials,
-//     });
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
+export const signup = async (credentials: SignupRequest) => {
+  try {
+    const { data: payload } = await api.post(`${API_BASE_URL}/auth/register`, {
+      ...credentials,
+    });
+    const { accessToken, refreshToken } = payload.data;
 
-// export const OAuthFirstTimeLogin = async (
-//   credentials: OAuthFirstTimeRequest
-// ) => {
-//   try {
-//     const { data: payload } = await axios.put(
-//       `${API_BASE_URL}/auth/oauth/update`,
-//       {
-//         ...credentials,
-//       }
-//     );
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
+    await SecureStore.setItemAsync("accessToken", accessToken);
+    await SecureStore.setItemAsync("refreshToken", refreshToken);
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
 
-// export const signup = async (credentials: SignupRequest) => {
-//   try {
-//     const { data: payload } = await axios.post(
-//       `${API_BASE_URL}/auth/register`,
-//       {
-//         ...credentials,
-//       }
-//     );
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
+export const resetPassword = async (credentials: ResetPasswordRequest) => {
+  try {
+    const { data: payload } = await api.post(
+      `${API_BASE_URL}/auth/reset-password`,
+      {
+        ...credentials,
+      }
+    );
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
 
-// export const resetPassword = async (credentials: ResetPasswordRequest) => {
-//   try {
-//     const { data: payload } = await axios.post(
-//       `${API_BASE_URL}/auth/reset-password`,
-//       {
-//         ...credentials,
-//       }
-//     );
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
+export const verifyUserByEmail = async (email: string) => {
+  try {
+    const { data: payload } = await api.get(
+      `${API_BASE_URL}/auth/check/${email}`
+    );
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
 
-// export const verifyUserByEmail = async (email: string) => {
-//   try {
-//     const { data: payload } = await axios.get(`${API_BASE_URL}/auth/check`, {
-//       params: {
-//         by: QueryBy.EMAIL,
-//         value: email,
-//       },
-//     });
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
-
-// export const verifyOTPByEmail = async (email: string, otp: string) => {
-//   try {
-//     const { data: payload } = await axios.get(
-//       `${API_BASE_URL}/otp/verify/${otp}`,
-//       {
-//         params: { email },
-//       }
-//     );
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
+export const verifyOTPByEmail = async (email: string, otp: string) => {
+  try {
+    const { data: payload } = await api.get(
+      `${API_BASE_URL}/auth/verify/${otp}`,
+      {
+        params: { email },
+      }
+    );
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
 
 // export const getUserById = async (userId: number) => {
 //   try {
@@ -247,18 +247,18 @@ export const saveJwt = (jwt: string) => {
 //   }
 // };
 
-// export const updateUser = async (credentials: Partial<User>) => {
-//   const { id } = credentials;
-//   delete credentials.id;
-//   try {
-//     const { data: payload } = await axios.put(`${API_BASE_URL}/user/${id}`, {
-//       ...credentials,
-//     });
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
+export const updateUser = async (credentials: Partial<User>) => {
+  const { id } = credentials;
+  delete credentials.id;
+  try {
+    const { data: payload } = await axios.put(`${API_BASE_URL}/user/${id}`, {
+      ...credentials,
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
 
 export const fetchBanksFromPaystack = async () => {
   try {
@@ -296,35 +296,9 @@ export const verifyAccountNumberFromPaystack = async (
   }
 };
 
-export const login = async (provider: LoginProvider) => {
-  let jwt;
-
-  try {
-    if (provider === LoginProvider.APPLE || provider === LoginProvider.GOOGLE) {
-      jwt = await loginWithOAuth(provider);
-    } else {
-    }
-
-    if (!jwt) return;
-    const { data: payload } = await axios.post(`${API_BASE_URL}/auth/login`, {
-      jwt,
-    });
-    if (payload) saveJwt(jwt);
-    return payload;
-  } catch (error) {
-    console.log("error: ", error);
-    handleApiError(error);
-  }
-};
-
 export const getCurrentUser = async () => {
   try {
-    const headers = getHeaders();
-    console.log("running here too");
-    const { data: payload } = await axios.get(`${API_BASE_URL}/auth`, {
-      headers,
-    });
-
+    const { data: payload } = await api.get(`${API_BASE_URL}/auth`);
     return payload;
   } catch (error) {
     handleApiError(error);

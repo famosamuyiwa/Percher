@@ -21,7 +21,9 @@ import { router } from "expo-router";
 import SettingsItem from "@/components/SettingsItem";
 import { Colors } from "@/constants/common";
 import { useGlobalContext } from "@/lib/global-provider";
-import { logout } from "@/lib/appwrite";
+import { logout } from "@/api/api.service";
+import images from "@/constants/images";
+import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 
 const Profile = () => {
   const { user, refetch } = useGlobalContext();
@@ -30,7 +32,6 @@ const Profile = () => {
     const result = await logout();
 
     if (result) {
-      Alert.alert("Success", "You have been logged out successfully");
       refetch();
     } else {
       Alert.alert("Error", "An error occurred while logging out");
@@ -57,144 +58,160 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} className="h-full px-5">
-      <ScrollView
-        className="py-5 "
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-      >
-        <TouchableOpacity
-          onPress={() => router.navigate("/(root)/(settings)/profile")}
-          className="flex-row items-center justify-between my-2"
-          style={styles.itemsContainer}
+    <Animated.View
+      layout={LinearTransition}
+      entering={FadeIn.duration(500)}
+      className="flex-1"
+    >
+      <SafeAreaView style={styles.container} className="h-full px-5">
+        <ScrollView
+          className="py-5 "
+          scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
         >
-          <View className="flex-row">
-            <Image
-              style={styles.avatar}
-              source={{ uri: user?.avatar }}
-              contentFit="cover"
-            />
-            <View className="px-5 justify-center">
-              <Text className="text-xl font-plus-jakarta-medium">
-                {user?.name}
-              </Text>
-              <Text
-                className="text-sm font-plus-jakarta-regular"
-                style={{ color: Colors.primary }}
-              >
-                Edit profile
-              </Text>
+          <TouchableOpacity
+            onPress={() => router.navigate("/(root)/(settings)/profile")}
+            className="flex-row items-center justify-between my-2"
+            style={styles.itemsContainer}
+          >
+            <View className="flex-row">
+              <Image
+                style={styles.avatar}
+                source={{ uri: user?.avatar }}
+                contentFit="cover"
+              />
+              <View className="px-5 justify-center">
+                <Text className="text-xl font-plus-jakarta-medium">
+                  {user?.name}
+                </Text>
+                <Text
+                  className="text-sm font-plus-jakarta-regular"
+                  style={{ color: Colors.primary }}
+                >
+                  Edit profile
+                </Text>
+              </View>
+            </View>
+            <View>
+              <Ionicons
+                name="chevron-forward"
+                size={18}
+                color={Colors.primary}
+              />
+            </View>
+          </TouchableOpacity>
+          <View style={styles.itemsContainer} className="my-4">
+            <TouchableOpacity style={styles.borderedItem}>
+              <SettingsItem
+                icon={
+                  <MaterialCommunityIcons
+                    name="bell-ring-outline"
+                    color={Colors.primary}
+                    size={20}
+                  />
+                }
+                title="Notifications"
+                onPress={() =>
+                  router.navigate("/(root)/(settings)/notification")
+                }
+              />
+            </TouchableOpacity>
+            <View style={styles.borderedItem} className="pt-2">
+              <SettingsItem
+                icon={
+                  <FontAwesome6
+                    name="house-chimney-user"
+                    color={Colors.primary}
+                    size={18}
+                  />
+                }
+                title="My Perchs"
+                onPress={() => router.navigate("/(root)/(settings)/my-perchs")}
+              />
+            </View>
+            <View className="pt-2">
+              <SettingsItem
+                icon={
+                  <MaterialIcons
+                    name="currency-exchange"
+                    color={Colors.primary}
+                    size={20}
+                  />
+                }
+                title="Payments"
+                onPress={() => router.navigate("/(root)/(settings)/payments")}
+              />
             </View>
           </View>
-          <View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
+          <View style={styles.itemsContainer} className="my-4">
+            <View style={styles.borderedItem}>
+              <SettingsItem
+                icon={
+                  <Ionicons
+                    name="invert-mode-sharp"
+                    color={Colors.primary}
+                    size={20}
+                  />
+                }
+                title="Appearance"
+                subtitle="System Settings"
+                onPress={() => router.navigate("/(root)/(settings)/appearance")}
+              />
+            </View>
+            <View>
+              <SettingsItem
+                icon={
+                  <MaterialIcons name="lock" color={Colors.primary} size={20} />
+                }
+                title="Security"
+              />
+            </View>
           </View>
-        </TouchableOpacity>
-        <View style={styles.itemsContainer} className="my-4">
-          <TouchableOpacity style={styles.borderedItem}>
-            <SettingsItem
-              icon={
-                <MaterialCommunityIcons
-                  name="bell-ring-outline"
-                  color={Colors.primary}
-                  size={20}
-                />
-              }
-              title="Notifications"
-              onPress={() => router.navigate("/(root)/(settings)/notification")}
-            />
-          </TouchableOpacity>
-          <View style={styles.borderedItem} className="pt-2">
-            <SettingsItem
-              icon={
-                <FontAwesome6
-                  name="house-chimney-user"
-                  color={Colors.primary}
-                  size={20}
-                />
-              }
-              title="My Perchs"
-              onPress={() => router.navigate("/(root)/(settings)/my-perchs")}
-            />
+          <View style={styles.itemsContainer} className="my-4">
+            <View style={styles.borderedItem}>
+              <SettingsItem
+                icon={
+                  <Feather
+                    name="help-circle"
+                    color={Colors.primary}
+                    size={20}
+                  />
+                }
+                title="Help"
+                onPress={() => router.navigate("/(root)/(settings)/help")}
+              />
+            </View>
+            <View className="pt-2">
+              <SettingsItem
+                icon={
+                  <MaterialIcons
+                    name="group-add"
+                    color={Colors.primary}
+                    size={20}
+                  />
+                }
+                title="Referrals"
+                onPress={() => router.navigate("/(root)/(settings)/referrals")}
+              />
+            </View>
           </View>
-          <View className="pt-2">
-            <SettingsItem
-              icon={
-                <MaterialIcons
-                  name="currency-exchange"
-                  color={Colors.primary}
-                  size={20}
-                />
-              }
-              title="Payments"
-              onPress={() => router.navigate("/(root)/(settings)/payments")}
-            />
+          <View style={styles.itemsContainer} className="mt-4 mb-2">
+            <TouchableOpacity onPress={showPrompt} className="flex-row px-2">
+              <Ionicons name="exit-outline" size={20} color="red" />
+              <Text
+                className="px-5 font-plus-jakarta-medium"
+                style={{ color: "red" }}
+              >
+                Logout
+              </Text>
+            </TouchableOpacity>
           </View>
-        </View>
-        <View style={styles.itemsContainer} className="my-4">
-          <View style={styles.borderedItem}>
-            <SettingsItem
-              icon={
-                <Ionicons
-                  name="invert-mode-sharp"
-                  color={Colors.primary}
-                  size={20}
-                />
-              }
-              title="Appearance"
-              subtitle="System Settings"
-              onPress={() => router.navigate("/(root)/(settings)/appearance")}
-            />
-          </View>
-          <View>
-            <SettingsItem
-              icon={
-                <MaterialIcons name="lock" color={Colors.primary} size={20} />
-              }
-              title="Security"
-            />
-          </View>
-        </View>
-        <View style={styles.itemsContainer} className="my-4">
-          <View style={styles.borderedItem}>
-            <SettingsItem
-              icon={
-                <Feather name="help-circle" color={Colors.primary} size={20} />
-              }
-              title="Help"
-              onPress={() => router.navigate("/(root)/(settings)/help")}
-            />
-          </View>
-          <View className="pt-2">
-            <SettingsItem
-              icon={
-                <MaterialIcons
-                  name="group-add"
-                  color={Colors.primary}
-                  size={20}
-                />
-              }
-              title="Referrals"
-              onPress={() => router.navigate("/(root)/(settings)/referrals")}
-            />
-          </View>
-        </View>
-        <View style={styles.itemsContainer} className="mt-4 mb-2">
-          <TouchableOpacity onPress={showPrompt} className="flex-row px-2">
-            <Ionicons name="exit-outline" size={20} color="red" />
-            <Text
-              className="px-5 font-plus-jakarta-medium"
-              style={{ color: "red" }}
-            >
-              Logout
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <Text className="text-xs text-gray-300 font-plus-jakarta-bold px-2 ">
-          V-1.0.0
-        </Text>
-      </ScrollView>
-    </SafeAreaView>
+          <Text className="text-xs text-gray-300 font-plus-jakarta-bold px-2 ">
+            V-1.0.0
+          </Text>
+        </ScrollView>
+      </SafeAreaView>
+    </Animated.View>
   );
 };
 

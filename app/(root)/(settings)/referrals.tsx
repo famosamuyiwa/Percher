@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   View,
   StyleSheet,
@@ -15,9 +15,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 // import * as Clipboard from "expo-clipboard";
 import { Colors } from "@/constants/common";
+import { ToastType } from "@/constants/enums";
+import { Toast } from "@/components/animation-toast/components";
+import { useGlobalContext } from "@/lib/global-provider";
 
 const ReferralsScreen = () => {
   const tintColor = Colors.primary;
+  const { displayToast } = useGlobalContext();
 
   const copyToClipboard = async () => {
     // if (!authQuery.data?.data?.referralCode) return;
@@ -55,10 +59,16 @@ const ReferralsScreen = () => {
       // Fallback to clipboard
       try {
         // await Clipboard.setStringAsync(message);
-        Alert.alert("Link Copied", "Invite link copied to clipboard.");
+        return displayToast({
+          type: ToastType.ERROR,
+          description: `User with email does not exist`,
+        });
       } catch (clipboardError) {
         console.error("Clipboard error:", clipboardError);
-        Alert.alert("Error", "Something went wrong while sharing.");
+        return displayToast({
+          type: ToastType.ERROR,
+          description: `Something went wrong while sharing`,
+        });
       }
     }
   };

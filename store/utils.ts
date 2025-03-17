@@ -4,5 +4,6 @@ export const saveAuthState = (jwt: string) => ({
 
 export const resetAuthState = () => ({
   jwt: undefined,
+  session: undefined,
   isAuthenticated: false,
 });

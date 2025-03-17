@@ -112,6 +112,21 @@ export enum CheckInTime {
   _11PM = "11:00 PM",
 }
 
+export enum CheckOutTime {
+  _12PM = "12:00 PM",
+  _1PM = "1:00 PM",
+  _2PM = "2:00 PM",
+  _3PM = "3:00 PM",
+  _4PM = "4:00 PM",
+  _5PM = "5:00 PM",
+  _6PM = "6:00 PM",
+  _7PM = "7:00 PM",
+  _8PM = "8:00 PM",
+  _9PM = "9:00 PM",
+  _10PM = "10:00 PM",
+  _11PM = "11:00 PM",
+}
+
 export enum LoginProvider {
   GOOGLE = "google",
   APPLE = "apple",
@@ -126,4 +141,10 @@ export enum Screens {
   OTP = "OTP",
   FORGOT_PASSWORD = "FORGOT_PASSWORD",
   RESET_PASSWORD = "RESET_PASSWORD",
+}
+
+export enum ToastType {
+  SUCCESS = "success",
+  ERROR = "error",
+  WARNING = "warning",
 }

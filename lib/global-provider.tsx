@@ -1,38 +1,52 @@
-import { ReactNode, createContext, useContext } from "react";
+import { ReactNode, createContext, useContext, useRef } from "react";
 import React from "react";
 import { useAuthQuery } from "@/hooks/query/useAuthQuery";
-
-interface User {
-  $id: string;
-  name: string;
-  email: string;
-  avatar: string;
-}
+import { ToastProps, User } from "@/interfaces";
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
+import { Toast } from "@/components/animation-toast/components";
+import { View } from "react-native";
 
 interface GlobalContextType {
   isLoggedIn: boolean;
-  user: User | null;
+  user: User | undefined;
   loading: boolean;
-  refetch: (newParams?: Record<string, string | number>) => Promise<void>;
+  refetch: (
+    options?: RefetchOptions | undefined
+  ) => Promise<QueryObserverResult>;
+  displayToast: (toast: ToastProps) => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
-  const { data: user, isLoading, refetch, isError, error } = useAuthQuery();
+  const { data, isLoading, refetch, isError, error } = useAuthQuery();
+  const user = data?.data;
   let isLoggedIn = !!user;
+  const toastRef = useRef<any>({});
 
   if (isError) {
-    if (error.message.includes("JWT")) {
+    console.log("GlobalContextException: ", error);
+    if (
+      error.message.includes("JWT") ||
+      error.message.includes("refresh token")
+    ) {
       isLoggedIn = false;
     }
   }
 
+  const displayToast = (toast: ToastProps) => {
+    toastRef.current.show({
+      type: toast.type,
+      description: toast.description,
+    });
+  };
+
   return (
     <GlobalContext.Provider
-      value={{ isLoggedIn, user, loading: isLoading, refetch }}
+      value={{ isLoggedIn, user, loading: isLoading, refetch, displayToast }}
     >
       {children}
+      <Toast ref={toastRef} />
     </GlobalContext.Provider>
   );
 };

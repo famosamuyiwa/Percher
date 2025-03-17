@@ -8,7 +8,7 @@ export const AppGradient = ({
   style,
 }: {
   children: any;
-  colors: string[];
+  colors: [string, string, ...string[]];
   style?: any;
 }) => {
   return (
@@ -26,7 +26,7 @@ export const AppGradientRounded = ({
   colors,
 }: {
   children: any;
-  colors: string[];
+  colors: [string, string, ...string[]];
 }) => {
   return (
     <LinearGradient colors={colors} className={"flex-1 rounded-full"}>
@@ -40,7 +40,7 @@ export const AppGradientMessage = ({
   colors,
 }: {
   children: any;
-  colors: string[];
+  colors: [string, string, ...string[]];
 }) => {
   return (
     <LinearGradient

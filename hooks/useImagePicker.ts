@@ -1,10 +1,10 @@
 import { useState } from "react";
 import * as MediaPicker from "expo-image-picker";
 import { compressImage } from "./useImageManipulator";
-import useStorageBucket from "./useStorageBucket";
+import useStorageBucket from "./useBackblazeStorageBucket";
 
 const useImagePicker = () => {
-  const [image, setImage] = useState<string[]>([]);
+  const [imageUris, setImageUris] = useState<string[]>([]);
   const { uploadMultimedia, progress } = useStorageBucket();
 
   async function pickMultimedia(
@@ -25,26 +25,20 @@ const useImagePicker = () => {
 
       const newMedia = {
         uri: result.assets.map((asset: any) => asset.uri),
-        fileType: result.assets[0].type,
-        fileName: result.assets[0].fileName,
       };
 
-      setImage((prevImages) => [...prevImages, newMedia.uri]);
+      setImageUris((prevImages) => [...prevImages, newMedia.uri]);
 
       if (isUpload) {
         await uploadMultimedia(
-          {
-            uri: result.assets[0].uri,
-            fileType: result.assets[0].type,
-          },
-          function (downloadUrl: any) {
-            setImage([]);
+          imageUris.map((uri) => ({ uri })),
+
+          function (downloadUrls: any) {
+            setImageUris([]);
 
             //return promise resolve on successful upload
             resolve({
-              downloadUrl,
-              fileType: result.assets[0].type,
-              fileName: result.assets[0].fileName,
+              downloadUrls,
             });
           }
         );
@@ -54,7 +48,7 @@ const useImagePicker = () => {
     });
   }
 
-  return { image, pickMultimedia, setImage, progress };
+  return { imageUris, pickMultimedia, setImageUris, progress };
 };
 
 export default useImagePicker;

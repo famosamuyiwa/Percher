@@ -22,15 +22,14 @@ import AnimationParallaxCarousel from "@/components/animation-parallax-carousel/
 import { CategoryKey } from "@/constants/enums";
 import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
+import { HomeSkeleton } from "@/components/SkeletonLoader";
 
 export default function Index() {
   const { user } = useGlobalContext();
   const params = useLocalSearchParams<{ query?: string; filter?: string }>();
 
   const { data: latestProperties, loading: latestPropertiesLoading } =
-    useAppwrite({
-      fn: getLatestProperties,
-    });
+    useAppwrite({ fn: getLatestProperties });
 
   const {
     data: properties,
@@ -56,58 +55,62 @@ export default function Index() {
 
   const handleCardPress = (id: string) => router.push(`/properties/${id}`);
 
-  const listHeader = () => (
-    <View>
-      <View className="flex flex-row items-center justify-between mt-5 px-5">
-        <View className="flex flex-row items-center">
-          <Image source={{ uri: user?.avatar }} style={styles.avatar} />
-          <View className="flex flex-col items-start ml-2 justify-center">
-            <Text className="font-plus-jakarta-semibold">
-              Hey <Text className="text-accent-300">{user?.name}!</Text> 👋
+  // Always call useMemo so that hooks order remains consistent
+  const memoizedListHeader = useMemo(
+    () => (
+      <View>
+        <View className="flex flex-row items-center justify-between mt-5 px-5">
+          <View className="flex flex-row items-center">
+            <Image source={{ uri: user?.avatar }} style={styles.avatar} />
+            <View className="flex flex-col items-start ml-2 justify-center">
+              <Text className="font-plus-jakarta-semibold">
+                Hey <Text className="text-accent-300">{user?.name}!</Text> 👋
+              </Text>
+            </View>
+          </View>
+          <View>
+            <TouchableOpacity
+              onPress={() => router.push("/(root)/notifications")}
+            >
+              <MaterialIcons name="notifications" size={20} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View className="px-5">
+          <SearchBar />
+        </View>
+        <View className="my-5">
+          <View className="flex flex-row items-center justify-between px-5">
+            <Text className="text-xl font-plus-jakarta-bold text-black-300">
+              Guest Favorites
             </Text>
           </View>
+          {latestPropertiesLoading ? (
+            <ActivityIndicator size="small" className="text-primary-300" />
+          ) : !latestProperties || latestProperties.length === 0 ? (
+            <NoResults />
+          ) : (
+            <View>
+              <AnimationParallaxCarousel data={latestProperties} />
+            </View>
+          )}
         </View>
-        <View>
-          <TouchableOpacity
-            onPress={() => router.push("/(root)/notifications")}
-          >
-            <MaterialIcons name="notifications" size={20} />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View className="px-5">
-        <SearchBar />
-      </View>
-      <View className="my-5">
         <View className="flex flex-row items-center justify-between px-5">
           <Text className="text-xl font-plus-jakarta-bold text-black-300">
-            Guest Favorites
+            Our Recommendation
           </Text>
+          <TouchableOpacity>
+            <Text className="text-sm font-plus-jakarta-semibold text-primary-300">
+              See All
+            </Text>
+          </TouchableOpacity>
         </View>
-        {latestPropertiesLoading ? (
-          <ActivityIndicator size="small" className="text-primary-300" />
-        ) : !latestProperties || latestProperties.length === 0 ? (
-          <NoResults />
-        ) : (
-          <View>
-            <AnimationParallaxCarousel data={latestProperties} />
-          </View>
-        )}
+        <View className="px-5">
+          <Filters categoryKey={CategoryKey.PERCHTYPE} />
+        </View>
       </View>
-      <View className="flex flex-row items-center justify-between px-5">
-        <Text className="text-xl font-plus-jakarta-bold text-black-300">
-          Our Recommendation
-        </Text>
-        <TouchableOpacity>
-          <Text className="text-sm font-plus-jakarta-semibold text-primary-300">
-            See All
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View className="px-5">
-        <Filters categoryKey={CategoryKey.PERCHTYPE} />
-      </View>
-    </View>
+    ),
+    [latestProperties, latestPropertiesLoading, user]
   );
 
   return (
@@ -117,31 +120,42 @@ export default function Index() {
       className="flex-1"
     >
       <SafeAreaView edges={["top"]} className="bg-white h-full">
-        {/* <Button title="Seed" onPress={seed} /> */}
-        <FlashList
-          data={properties}
-          keyExtractor={(item) => item.$id}
-          numColumns={2}
-          contentContainerClassName="pb-32"
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <View className="flex-1 px-2">
-              <Card item={item} onPress={() => handleCardPress(item.$id)} />
-            </View>
-          )}
-          ListHeaderComponent={useMemo(listHeader, [properties, user])}
-          ListEmptyComponent={
-            loading ? (
-              <ActivityIndicator
-                size="small"
-                className="text-primary-300 mt-5"
-              />
-            ) : (
-              <NoResults />
-            )
-          }
-          estimatedItemSize={250}
-        />
+        {loading ? (
+          // Conditionally render the skeleton while loading
+          <HomeSkeleton />
+        ) : (
+          // Render the FlashList when data is available
+          <Animated.View
+            layout={LinearTransition}
+            entering={FadeIn.duration(500)}
+            className="flex-1"
+          >
+            <FlashList
+              data={properties}
+              keyExtractor={(item) => item.$id}
+              numColumns={2}
+              contentContainerClassName="pb-32"
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <View className="flex-1 px-2">
+                  <Card item={item} onPress={() => handleCardPress(item.$id)} />
+                </View>
+              )}
+              ListHeaderComponent={memoizedListHeader}
+              ListEmptyComponent={
+                loading ? (
+                  <ActivityIndicator
+                    size="small"
+                    className="text-primary-300 mt-5"
+                  />
+                ) : (
+                  <NoResults />
+                )
+              }
+              estimatedItemSize={250}
+            />
+          </Animated.View>
+        )}
       </SafeAreaView>
     </Animated.View>
   );

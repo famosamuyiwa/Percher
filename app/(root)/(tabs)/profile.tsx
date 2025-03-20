@@ -24,9 +24,10 @@ import { useGlobalContext } from "@/lib/global-provider";
 import { logout } from "@/api/api.service";
 import images from "@/constants/images";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
+import { ToastType } from "@/constants/enums";
 
 const Profile = () => {
-  const { user, refetch } = useGlobalContext();
+  const { user, refetch, displayToast } = useGlobalContext();
 
   const handleLogout = async () => {
     const result = await logout();
@@ -34,7 +35,10 @@ const Profile = () => {
     if (result) {
       refetch();
     } else {
-      Alert.alert("Error", "An error occurred while logging out");
+      displayToast({
+        type: ToastType.ERROR,
+        description: "An error occurred while logging out",
+      });
     }
   };
 

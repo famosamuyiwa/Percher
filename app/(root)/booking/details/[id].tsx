@@ -23,22 +23,28 @@ import {
 import { Image } from "expo-image";
 import images from "@/constants/images";
 import { Colors } from "@/constants/common";
-import { ApprovalActions, UserType } from "@/constants/enums";
+import { ApprovalActions, ToastType, UserType } from "@/constants/enums";
+import { useGlobalContext } from "@/lib/global-provider";
 
 const Details = () => {
   const windowHeight = Dimensions.get("window").height;
   const { id, userType } = useLocalSearchParams();
 
+  const { user, displayToast } = useGlobalContext();
+
   const handleApproval = async (choice: ApprovalActions) => {
     if (true) {
-      Alert.alert(
-        "Success",
-        `You have successfully ${
+      displayToast({
+        type: ToastType.SUCCESS,
+        description: `You have successfully ${
           choice === ApprovalActions.APPROVE ? "approved" : "rejected"
-        } this request`
-      );
+        } this request`,
+      });
     } else {
-      Alert.alert("Error", "An error occurred while logging out");
+      displayToast({
+        type: ToastType.ERROR,
+        description: "An error occurred. Try again later",
+      });
     }
   };
 

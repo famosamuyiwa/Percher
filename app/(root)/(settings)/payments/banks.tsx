@@ -1,4 +1,5 @@
 import {
+  fetchBankFromNigerianBanksApi,
   fetchBanksFromPaystack,
   verifyAccountNumberFromPaystack,
 } from "@/api/api.service";
@@ -21,13 +22,15 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { Image } from "expo-image";
 
 const Banks = () => {
   const params = useLocalSearchParams<{ query?: string }>();
 
   const [banks, setBanks] = useState<any>([]);
-  const [selectedBank, setSelectedBank] = useState();
+  const [selectedBank, setSelectedBank] = useState<any>();
   const [selectedBankName, setSelectedBankName] = useState();
+  const [selectedBankLogo, setSelectedBankLogo] = useState();
   const [accountNumber, setAccountNumber] = useState("");
   const [accountDetails, setAccountDetails] = useState<any>();
   const [filteredBanks, setFilteredBanks] = useState<any>([]);
@@ -41,6 +44,7 @@ const Banks = () => {
     if (filterBanks.length > 0) {
       setSelectedBank(filterBanks[0].code); // Set the first bank as default
       setSelectedBankName(filterBanks[0].name);
+      setSelectedBankLogo(filterBanks[0].logo);
     }
   };
 
@@ -50,7 +54,7 @@ const Banks = () => {
       setAccountDetails(undefined);
       return;
     }
-    verifyAccountNumber(text, selectedBank);
+    verifyAccountNumber(text, selectedBank.code);
   };
 
   const verifyAccountNumber = async (accountNumber: string, code: number) => {
@@ -67,8 +71,8 @@ const Banks = () => {
 
   useEffect(() => {
     const getBanks = async () => {
-      const data = await fetchBanksFromPaystack();
-      if (data.status) setBanks(data.data);
+      const data = await fetchBankFromNigerianBanksApi();
+      setBanks(data);
     };
 
     getBanks();
@@ -84,6 +88,7 @@ const Banks = () => {
     if (!selectedBank && banks.length > 0) {
       setSelectedBank(banks[0].code); // Set the first bank as default
       setSelectedBankName(banks[0].name);
+      setSelectedBankLogo(banks[0].logo);
     }
     setBanksModalVisible(true);
   };
@@ -99,7 +104,7 @@ const Banks = () => {
           into after you initiate a withdrawal. Funds are sent instantly ⚡️
         </Text>
 
-        <View className="mt-10 gap-10">
+        <View className="mt-10">
           <View>
             <Text className="text-xs font-plus-jakarta-regular pb-3">Bank</Text>
             <TouchableOpacity
@@ -131,7 +136,7 @@ const Banks = () => {
                         </View>
 
                         <Picker
-                          selectedValue={selectedBank}
+                          selectedValue={selectedBank?.code}
                           onValueChange={(itemValue) => {
                             const selected: any = banks.find(
                               (bank: any) => bank.code === itemValue
@@ -139,8 +144,9 @@ const Banks = () => {
                             console.log("itemValue: ", itemValue);
                             console.log("selected: ", selected);
                             if (selected) {
-                              setSelectedBank(itemValue);
+                              setSelectedBank(selected);
                               setSelectedBankName(selected.name);
+                              setSelectedBankLogo(selected.logo);
                             }
                           }}
                           itemStyle={{
@@ -151,7 +157,7 @@ const Banks = () => {
                           {(params.query ? filteredBanks : banks).map(
                             (bank: any) => (
                               <Picker.Item
-                                key={bank.id}
+                                key={bank.code}
                                 label={bank.name}
                                 value={bank.code}
                               />
@@ -179,9 +185,15 @@ const Banks = () => {
                 className="absolute right-0 px-5"
               />
             </TouchableOpacity>
+            <View className="items-center justify-center self-end bg-accent-100 rounded-full size-10 my-2">
+              <Image
+                source={{ uri: selectedBankLogo }}
+                style={{ width: 20, height: 20 }}
+              />
+            </View>
           </View>
           {selectedBank && (
-            <View>
+            <View className="pb-10">
               <TextField
                 isSmallLabelVisible={true}
                 label="Account number"
@@ -191,7 +203,9 @@ const Banks = () => {
                 style={styles.input}
                 keyboardType="numeric"
                 placeholderColor="darkgrey"
-                onBlur={() => verifyAccountNumber(accountNumber, selectedBank)}
+                onBlur={() =>
+                  verifyAccountNumber(accountNumber, selectedBank.code)
+                }
               />
               {accountDetails && (
                 <Text className="text-xs font-plus-jakarta-semibold text-gray-500 self-end py-2">

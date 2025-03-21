@@ -30,12 +30,14 @@ import {
   CheckOutTime,
   Facility,
   PerchTypes,
+  ToastType,
 } from "@/constants/enums";
 import MiniGalleryItem from "./GalleryItem";
 import MultiPicker from "./MultiPicker";
 import { PerchRegistrationFormProps } from "@/interfaces";
 import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
 import CustomButton from "./Button";
+import { useGlobalContext } from "@/lib/global-provider";
 
 // Validation Schema
 const schema = z.object({
@@ -57,7 +59,7 @@ const schema = z.object({
   }),
   facilities: z.array(z.string()).default([]), // Ensures it's always an array
   checkInTimes: z.array(z.string()).default([]), // Ensures it's always an array
-  checkOutTimes: z.array(z.string()).default([]), // Ensures it's always an array
+  checkOutTime: z.string().optional(),
 });
 
 export default function PerchRegistrationForm({
@@ -67,10 +69,11 @@ export default function PerchRegistrationForm({
   const [height, setHeight] = useState(20);
   const [perchTypeModalVisible, setPerchTypeModalVisible] = useState(false);
   const [chargeTypeModalVisible, setChargeTypeModalVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [checkOutPeriodModalVisible, setCheckOutPeriodModalVisible] =
+    useState(false);
 
+  const { displayToast } = useGlobalContext();
   const { pickMultimedia } = useImagePicker();
-  const { uploadMultimedia, progress } = useStorageBucket();
 
   const {
     control,
@@ -85,25 +88,15 @@ export default function PerchRegistrationForm({
     defaultValues: data,
   });
   const header = watch("header"); // Automatically updates when changed
-  const gallery = watch("gallery"); // Automatically updates when changed
-  const proofOfOwnership = watch("proofOfOwnership"); // Automatically updates when changed
-  const proofOfIdentity = watch("proofOfIdentity"); // Automatically updates when changed
-  const facilities = watch("facilities"); // Automatically updates when changed
-  const txc = watch("txc"); // Automatically updates when changed
-  const chargeType = watch("chargeType"); // Automatically updates when changed
-  const perchType = watch("propertyType"); // Automatically updates when changed
+  const gallery = watch("gallery");
+  const proofOfOwnership = watch("proofOfOwnership");
+  const proofOfIdentity = watch("proofOfIdentity");
+  const facilities = watch("facilities");
+  const txc = watch("txc");
+  const chargeType = watch("chargeType");
+  const perchType = watch("propertyType");
   const checkInTimes = watch("checkInTimes");
-  const checkOutTimes = watch("checkOutTimes");
-
-  const uploadAndUpdateFormMediaURLs = async (uriList: any[]) => {
-    const files = uriList.map((u) => ({
-      uri: u,
-    }));
-    return await uploadMultimedia(files, (downloadUrls: string[]) => {
-      console.log("downloadUrls: ", downloadUrls);
-      return downloadUrls;
-    });
-  };
+  const checkOutTime = watch("checkOutTime");
 
   const handleHeaderSelect = async () => {
     try {
@@ -176,11 +169,12 @@ export default function PerchRegistrationForm({
 
   const handleOnSubmit = async (data: any) => {
     try {
-      const proof = await uploadAndUpdateFormMediaURLs(data.proofOfOwnership);
-      console.log("pof: ", proof);
       onSubmit(data);
-    } catch (err) {
-      console.log("error: ", err);
+    } catch (err: any) {
+      displayToast({
+        type: ToastType.ERROR,
+        description: err.message,
+      });
     }
   };
 
@@ -613,52 +607,66 @@ export default function PerchRegistrationForm({
             <View className="w-5/12">
               <Controller
                 control={control}
-                name="checkOutTimes"
+                name="checkOutTime"
                 render={({ field: { onChange, value, onBlur } }) => (
                   <View>
                     <Text className="text-xs font-plus-jakarta-regular pb-3">
-                      Check-Out periods
+                      Check-Out period
                     </Text>
-                    <Modal
-                      visible={perchTypeModalVisible}
-                      transparent
-                      animationType="slide"
+                    <TouchableOpacity
+                      onPress={() => setCheckOutPeriodModalVisible(true)}
+                      style={styles.pickerBtn}
                     >
-                      <View style={styles.modalContainer}>
-                        <View style={styles.pickerContainer}>
-                          <Picker
-                            selectedValue={perchType}
-                            onValueChange={(itemValue) =>
-                              setValue("propertyType", itemValue)
-                            }
-                            itemStyle={{
-                              color: "black", // Set text color
-                              fontSize: 18, // Set font size
-                            }}
-                          >
-                            {Object.values(CheckOutTime).map((type) => (
-                              <Picker.Item
-                                key={type}
-                                label={type}
-                                value={type}
-                              />
-                            ))}
-                          </Picker>
-                          <Button
-                            title="Done"
-                            onPress={() => {
-                              setPerchTypeModalVisible(false);
-                            }}
-                          />
+                      <Modal
+                        visible={checkOutPeriodModalVisible}
+                        transparent
+                        animationType="slide"
+                      >
+                        <View style={styles.modalContainer}>
+                          <View style={styles.pickerContainer}>
+                            <Picker
+                              selectedValue={checkOutTime}
+                              onValueChange={(itemValue) =>
+                                setValue("checkOutTime", itemValue)
+                              }
+                              itemStyle={{
+                                color: "black", // Set text color
+                                fontSize: 18, // Set font size
+                              }}
+                            >
+                              {Object.values(CheckOutTime).map((type) => (
+                                <Picker.Item
+                                  key={type}
+                                  label={type}
+                                  value={type}
+                                />
+                              ))}
+                            </Picker>
+                            <Button
+                              title="Done"
+                              onPress={() => {
+                                setCheckOutPeriodModalVisible(false);
+                              }}
+                            />
+                          </View>
                         </View>
-                      </View>
-                    </Modal>
+                      </Modal>
+                      <Text className="font-plus-jakarta-regular">
+                        {checkOutTime ?? "-- Select --"}
+                      </Text>
+                      <Entypo
+                        name="chevron-down"
+                        size={16}
+                        color={"darkgrey"}
+                        className="absolute right-0 px-5"
+                      />
+                    </TouchableOpacity>
                   </View>
                 )}
               />
-              {errors.checkOutTimes && (
+              {errors.checkOutTime && (
                 <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
-                  {errors.checkOutTimes.message}
+                  {errors.checkOutTime.message}
                 </Text>
               )}
             </View>
@@ -887,7 +895,6 @@ export default function PerchRegistrationForm({
             handleOnSubmit(data);
           })}
           isDisabled={!isValid}
-          isLoading={isLoading}
         />
       </View>
     </View>

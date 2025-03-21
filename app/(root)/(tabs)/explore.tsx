@@ -12,6 +12,7 @@ import { getProperties } from "../../../lib/appwrite";
 import NoResults from "../../../components/NoResults";
 import { CategoryKey } from "@/constants/enums";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
+import { Skeleton } from "moti/skeleton";
 
 export default function Explore() {
   const params = useLocalSearchParams<{ query?: string; filter?: string }>();
@@ -83,10 +84,10 @@ export default function Explore() {
           ListHeaderComponent={listHeader}
           ListEmptyComponent={
             loading ? (
-              <ActivityIndicator
-                size="small"
-                className="text-primary-300 mt-5"
-              />
+              <View className="w-full p-5 gap-5">
+                <Skeleton width="100%" height={200} colorMode="light" />
+                <Skeleton width="100%" height={200} colorMode="light" />
+              </View>
             ) : (
               <NoResults />
             )

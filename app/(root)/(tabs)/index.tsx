@@ -23,6 +23,7 @@ import { CategoryKey } from "@/constants/enums";
 import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { HomeSkeleton } from "@/components/SkeletonLoader";
+import { Skeleton } from "moti/skeleton";
 
 export default function Index() {
   const { user } = useGlobalContext();
@@ -120,14 +121,14 @@ export default function Index() {
       className="flex-1"
     >
       <SafeAreaView edges={["top"]} className="bg-white h-full">
-        {loading ? (
+        {latestPropertiesLoading ? (
           // Conditionally render the skeleton while loading
           <HomeSkeleton />
         ) : (
           // Render the FlashList when data is available
           <Animated.View
             layout={LinearTransition}
-            entering={FadeIn.duration(500)}
+            entering={FadeIn.duration(1000)}
             className="flex-1"
           >
             <FlashList
@@ -144,10 +145,10 @@ export default function Index() {
               ListHeaderComponent={memoizedListHeader}
               ListEmptyComponent={
                 loading ? (
-                  <ActivityIndicator
-                    size="small"
-                    className="text-primary-300 mt-5"
-                  />
+                  <View className="flex-row justify-between w-full p-5">
+                    <Skeleton width={160} height={200} colorMode="light" />
+                    <Skeleton width={160} height={200} colorMode="light" />
+                  </View>
                 ) : (
                   <NoResults />
                 )

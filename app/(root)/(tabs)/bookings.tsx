@@ -25,6 +25,7 @@ import {
   GradientCard,
 } from "@/components/Cards";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
+import { Skeleton } from "moti/skeleton";
 
 const Bookings = () => {
   const { filter, query } = useLocalSearchParams<{
@@ -75,12 +76,19 @@ const Bookings = () => {
   const listEmptyComponent = useMemo(() => {
     if (loading) {
       return (
-        <ActivityIndicator size="small" className="text-primary-300 mt-5" />
+        <View className="w-full p-5 gap-5">
+          <Skeleton width="100%" height={200} colorMode="light" />
+          <Skeleton width="100%" height={200} colorMode="light" />
+        </View>
       );
     }
 
     return (
-      <View className="items-center justify-center mt-52">
+      <Animated.View
+        layout={LinearTransition}
+        entering={FadeIn.duration(500)}
+        className="items-center justify-center mt-52"
+      >
         {userType === UserType.GUEST && false && (
           <GradientCard
             onPress={() => router.push("/(root)/(settings)/my-perchs")}
@@ -88,7 +96,7 @@ const Bookings = () => {
           />
         )}
         <EmptyBookings />
-      </View>
+      </Animated.View>
     );
   }, [loading, userType]);
 

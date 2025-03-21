@@ -277,6 +277,16 @@ export const fetchBanksFromPaystack = async () => {
   }
 };
 
+export const fetchBankFromNigerianBanksApi = async () => {
+  try {
+    const { data: payload } = await axios.get("https://nigerianbanks.xyz");
+
+    return payload;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 export const verifyAccountNumberFromPaystack = async (
   accountNumber: number,
   bankCode: number

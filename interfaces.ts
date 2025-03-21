@@ -36,7 +36,7 @@ export interface PerchRegistrationFormData {
   txc: boolean;
   facilities: string[];
   checkInTimes: string[];
-  checkOutTimes: string[];
+  checkOutTime: string;
 }
 
 export interface PerchRegistrationFormProps {

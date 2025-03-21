@@ -128,9 +128,7 @@ const Property = () => {
             <View className="flex flex-row items-center justify-between mt-4">
               <View className="flex flex-row items-center">
                 <Image
-                  source={{
-                    uri: property?.agent.avatar,
-                  }}
+                  source={{ uri: property?.agent.avatar }}
                   style={styles.agentAvatar}
                 />
 

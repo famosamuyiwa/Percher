@@ -10,10 +10,55 @@ import {
 } from "react-native";
 import PerchRegistrationForm from "@/components/Forms";
 import { PerchRegistrationFormData } from "@/interfaces";
+import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
+import { useState } from "react";
+import { ToastType } from "@/constants/enums";
+import { useGlobalContext } from "@/lib/global-provider";
 
 const Form = () => {
-  const handleRegisterClick = (formData: PerchRegistrationFormData) => {
-    console.log("data: ", formData);
+  const { uploadMultimedia, progress } = useStorageBucket();
+  const [isLoading, setIsLoading] = useState(false);
+  const { displayToast } = useGlobalContext();
+
+  const handleRegisterClick = async (formData: PerchRegistrationFormData) => {
+    try {
+      const gallery = await uploadAndUpdateFormMediaURLs(formData.gallery);
+      const proofOfIdentity = await uploadAndUpdateFormMediaURLs(
+        formData.proofOfIdentity
+      );
+      const proofOfOwnership = await uploadAndUpdateFormMediaURLs(
+        formData.proofOfOwnership
+      );
+      const dataAfterMediaUpload = {
+        ...formData,
+        gallery: gallery ?? [],
+        proofOfIdentity: proofOfIdentity ?? [],
+        proofOfOwnership: proofOfOwnership ?? [],
+      };
+
+      console.log("data: ", dataAfterMediaUpload);
+    } catch (err: any) {
+      displayToast({
+        type: ToastType.ERROR,
+        description: err.message,
+      });
+    }
+  };
+
+  const uploadAndUpdateFormMediaURLs = async (uriList: any[]) => {
+    let downloadUrls;
+
+    if (uriList.length < 1) return;
+
+    const files = uriList.map((u) => ({
+      uri: u,
+    }));
+
+    await uploadMultimedia(files, (data: string[]) => {
+      downloadUrls = data;
+    });
+
+    return downloadUrls;
   };
 
   return (

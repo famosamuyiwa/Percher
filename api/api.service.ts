@@ -1,5 +1,8 @@
 import {
+  Booking,
+  Filter,
   OAuthRequest,
+  PerchRegistrationFormData,
   ResetPasswordRequest,
   SignupRequest,
   User,
@@ -201,39 +204,55 @@ export const verifyOTPByEmail = async (email: string, otp: string) => {
 //   }
 // };
 
-// export const createSplit = async (credentials: CreateSplit) => {
-//   try {
-//     const { data: payload } = await axios.post(`${API_BASE_URL}/split`, {
-//       ...credentials,
-//     });
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
+export const createProperty = async (
+  credentials: PerchRegistrationFormData
+) => {
+  try {
+    const { data: payload } = await api.post(`${API_BASE_URL}/property`, {
+      ...credentials,
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
 
-// export const getSplitsByUserId = async (
-//   userId: number,
-//   pageParam: number | null = null,
-//   status: SplitStatus | null = null,
-//   limit: number = 12
-// ) => {
-//   try {
-//     const { data: payload } = await axios.get(
-//       `${API_BASE_URL}/split/${userId}`,
-//       {
-//         params: {
-//           limit,
-//           cursor: pageParam,
-//           status,
-//         },
-//       }
-//     );
-//     return payload;
-//   } catch (error: any) {
-//     handleApiError(error);
-//   }
-// };
+export const createBooking = async (credentials: Booking) => {
+  try {
+    const { data: payload } = await api.post(`${API_BASE_URL}/booking`, {
+      ...credentials,
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const getAllProperties = async (
+  pageParam: number | null = null,
+  filters: Filter
+) => {
+  try {
+    const { data: payload } = await api.get(`${API_BASE_URL}/property`, {
+      params: {
+        cursor: pageParam,
+        ...filters,
+      },
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const getPropertyById = async (id: number) => {
+  try {
+    const { data: payload } = await api.get(`${API_BASE_URL}/property/${id}`);
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
 
 // export const markExpensesAsPaid = async (credentials: markAsPaid) => {
 //   try {
@@ -251,7 +270,7 @@ export const updateUser = async (credentials: Partial<User>) => {
   const { id } = credentials;
   delete credentials.id;
   try {
-    const { data: payload } = await axios.put(`${API_BASE_URL}/user/${id}`, {
+    const { data: payload } = await api.put(`${API_BASE_URL}/user/${id}`, {
       ...credentials,
     });
     return payload;

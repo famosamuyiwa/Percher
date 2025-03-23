@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, ActivityIndicator, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
@@ -7,39 +7,38 @@ import { FlashList } from "@shopify/flash-list";
 import SearchBar from "../../../components/SearchBar";
 import { Card } from "../../../components/Cards";
 import Filters from "../../../components/Filters";
-import { useAppwrite } from "../../../lib/useAppwrite";
-import { getProperties } from "../../../lib/appwrite";
 import NoResults from "../../../components/NoResults";
-import { CategoryKey } from "@/constants/enums";
+import { FilterCategoryKey, PerchTypes, UserType } from "@/constants/enums";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { Skeleton } from "moti/skeleton";
+import { useExplorePropertyQuery } from "@/hooks/query/usePropertyQuery";
+import { Filter } from "@/interfaces";
 
 export default function Explore() {
-  const params = useLocalSearchParams<{ query?: string; filter?: string }>();
-
-  const {
-    data: properties,
-    loading,
-    refetch,
-  } = useAppwrite({
-    fn: getProperties,
-    params: {
-      filter: params.filter!,
-      query: params.query!,
-      limit: 20,
-    },
-    skip: true,
+  const [filters, setFilters] = useState<Filter>({
+    location: "",
+    type: null,
+    limit: 10,
+    category: null,
+    from: UserType.GUEST,
   });
+  const propertiesQuery = useExplorePropertyQuery(filters);
 
-  useEffect(() => {
-    refetch({
-      filter: params.filter!,
-      query: params.query!,
-      limit: 20,
-    });
-  }, [params.filter, params.query]);
+  // Memoize derived data
+  const properties = useMemo(
+    () => propertiesQuery.data?.pages.flatMap((page) => page.data) || [],
+    [propertiesQuery.data]
+  );
 
-  const handleCardPress = useCallback((id: string) => {
+  const loadMore = useCallback(() => {
+    if (propertiesQuery.hasNextPage) {
+      propertiesQuery.fetchNextPage();
+    }
+  }, [propertiesQuery]);
+
+  useEffect(() => {}, [filters]);
+
+  const handleCardPress = useCallback((id: number) => {
     router.push(`/properties/${id}`);
   }, []);
 
@@ -67,23 +66,23 @@ export default function Explore() {
           <SearchBar />
 
           <View className="my-5">
-            <Filters categoryKey={CategoryKey.PERCHTYPE} />
+            <Filters categoryKey={FilterCategoryKey.PERCHTYPE} />
           </View>
         </View>
         <FlashList
           data={properties}
-          keyExtractor={(item) => item.$id}
+          keyExtractor={(item) => item.id.toString()}
           numColumns={1}
           contentContainerClassName="pb-32"
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <View className="mx-5">
-              <Card item={item} onPress={() => handleCardPress(item.$id)} />
+              <Card item={item} onPress={() => handleCardPress(item.id)} />
             </View>
           )}
           ListHeaderComponent={listHeader}
           ListEmptyComponent={
-            loading ? (
+            propertiesQuery.isLoading ? (
               <View className="w-full p-5 gap-5">
                 <Skeleton width="100%" height={200} colorMode="light" />
                 <Skeleton width="100%" height={200} colorMode="light" />
@@ -92,6 +91,9 @@ export default function Explore() {
               <NoResults />
             )
           }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.1}
+          scrollEventThrottle={16}
           estimatedItemSize={200}
         />
       </SafeAreaView>

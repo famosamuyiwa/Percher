@@ -15,10 +15,7 @@ import icons from "@/constants/icons";
 import images from "@/constants/images";
 import Comment from "@/components/Comment";
 import { facilities } from "@/constants/data";
-
-import { useAppwrite } from "@/lib/useAppwrite";
-import { getPropertyById } from "@/lib/appwrite";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AntDesign,
   Entypo,
@@ -28,25 +25,26 @@ import {
 } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 import { Commafy } from "@/utils/common";
-import { Modal } from "@/constants/enums";
-import Button from "@/components/Button";
+
 import CustomButton from "@/components/Button";
+import { usePropertyByIdQuery } from "@/hooks/query/usePropertyQuery";
+import { useGlobalStore } from "@/store/store";
 
 const Property = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
-
+  const { saveBookingState } = useGlobalStore();
   const windowHeight = Dimensions.get("window").height;
-
-  const { data: property } = useAppwrite({
-    fn: getPropertyById,
-    params: {
-      id: id!,
-    },
-  });
+  const propertyQuery = usePropertyByIdQuery(Number(id));
 
   const handleOnPerchClick = () => {
     router.push(`/booking/${id}`);
   };
+
+  useEffect(() => {
+    if (propertyQuery.data?.data) {
+      saveBookingState(propertyQuery.data.data);
+    }
+  }, [propertyQuery.data?.data]);
 
   return (
     <View>
@@ -56,7 +54,7 @@ const Property = () => {
       >
         <View className="relative w-full" style={{ height: windowHeight / 2 }}>
           <Image
-            source={{ uri: property?.image }}
+            source={{ uri: propertyQuery?.data?.data?.header }}
             style={styles.propertyImg}
             contentFit="cover"
           />
@@ -87,20 +85,21 @@ const Property = () => {
 
         <View className="px-5 mt-7 flex gap-2">
           <Text className="text-2xl font-plus-jakarta-extrabold">
-            {property?.name}
+            {propertyQuery?.data?.data?.name}
           </Text>
 
           <View className="flex flex-row items-center gap-3">
             <View className="flex flex-row items-center px-4 py-2 bg-primary-100 rounded-full">
               <Text className="text-xs font-plus-jakarta-bold text-primary-300">
-                {property?.type}
+                {propertyQuery?.data?.data?.type}
               </Text>
             </View>
 
             <View className="flex flex-row items-center gap-2">
               <AntDesign name="star" size={18} color="gold" />
               <Text className="text-black-200 text-sm mt-1 font-plus-jakarta-medium">
-                {property?.rating} ({property?.reviews.length} reviews)
+                {propertyQuery?.data?.data?.reviews} (
+                {propertyQuery?.data?.data?.reviews?.length ?? 0} reviews)
               </Text>
             </View>
           </View>
@@ -110,13 +109,13 @@ const Property = () => {
               <FontAwesome5 name="bed" size={16} color={Colors.accent} />
             </View>
             <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-2">
-              {property?.bedrooms} Bed(s)
+              {propertyQuery?.data?.data?.bed} Bed(s)
             </Text>
             <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 ml-7">
               <FontAwesome name="bath" size={16} color={Colors.accent} />
             </View>
             <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-2">
-              {property?.bathrooms} Bathroom(s)
+              {propertyQuery?.data?.data?.bathroom} Bathroom(s)
             </Text>
           </View>
 
@@ -128,28 +127,28 @@ const Property = () => {
             <View className="flex flex-row items-center justify-between mt-4">
               <View className="flex flex-row items-center">
                 <Image
-                  source={{ uri: property?.agent.avatar }}
+                  source={{ uri: propertyQuery?.data?.data?.host?.avatar }}
                   style={styles.agentAvatar}
                 />
 
                 <View className="flex flex-col items-start justify-center ml-3">
                   <Text className="text-lg text-black-300 text-start font-plus-jakarta-bold">
-                    {property?.agent.name}
+                    {propertyQuery?.data?.data?.host?.name}
                   </Text>
                   <Text className="text-sm text-black-200 text-start font-plus-jakarta-medium">
-                    {property?.agent.email}
+                    {propertyQuery?.data?.data?.host?.email}
                   </Text>
                 </View>
               </View>
 
-              <View className="flex flex-row items-center gap-5">
+              {/* <View className="flex flex-row items-center gap-5">
                 <Ionicons
                   name="chatbox-ellipses"
                   size={28}
                   color={Colors.primary}
                 />
                 <FontAwesome5 name="phone" size={25} color={Colors.primary} />
-              </View>
+              </View> */}
             </View>
           </View>
 
@@ -158,7 +157,7 @@ const Property = () => {
               Overview
             </Text>
             <Text className="text-black-200 text-base font-plus-jakarta mt-2">
-              {property?.description}
+              {propertyQuery?.data?.data?.description}
             </Text>
           </View>
 
@@ -167,55 +166,54 @@ const Property = () => {
               Facilities
             </Text>
 
-            {property?.facilities.length > 0 && (
+            {(propertyQuery?.data?.data?.facilities?.length ?? 0) > 0 && (
               <View className="flex flex-row flex-wrap items-start justify-start mt-2 gap-5">
-                {property?.facilities.map((item: string, index: number) => {
-                  const facility = facilities.find(
-                    (facility) => facility.title === item
-                  );
-                  return (
-                    <View
-                      key={index}
-                      className="flex flex-1 flex-col items-center min-w-16 max-w-20"
-                    >
-                      <View className="size-14 bg-accent-100 rounded-full flex items-center justify-center">
-                        <Ionicons
-                          name={facility ? facility.icon : icons.info}
-                          size={24}
-                          color={Colors.accent}
-                        />
-                      </View>
-
-                      <Text
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        className="text-black-300 text-sm text-center font-plus-jakarta mt-1.5"
+                {propertyQuery?.data?.data?.facilities.map(
+                  (item: string, index: number) => {
+                    const facility = facilities.find(
+                      (facility) => facility.title === item
+                    );
+                    return (
+                      <View
+                        key={index}
+                        className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                       >
-                        {item}
-                      </Text>
-                    </View>
-                  );
-                })}
+                        <View className="size-14 bg-accent-100 rounded-full flex items-center justify-center">
+                          <Ionicons
+                            name={facility ? facility.icon : icons.info}
+                            size={24}
+                            color={Colors.accent}
+                          />
+                        </View>
+
+                        <Text
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                          className="text-black-300 text-sm text-center font-plus-jakarta mt-1.5"
+                        >
+                          {item}
+                        </Text>
+                      </View>
+                    );
+                  }
+                )}
               </View>
             )}
           </View>
 
-          {property?.gallery.length > 0 && (
+          {(propertyQuery?.data?.data?.gallery?.length ?? 0) > 0 && (
             <View className="mt-7">
               <Text className="text-black-300 text-xl font-plus-jakarta-bold">
                 Gallery
               </Text>
               <FlatList
                 contentContainerStyle={{ paddingRight: 20 }}
-                data={property?.gallery}
-                keyExtractor={(item) => item.$id}
+                data={propertyQuery?.data?.data?.gallery}
+                keyExtractor={(item) => item}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 renderItem={({ item }) => (
-                  <Image
-                    source={{ uri: item.image }}
-                    style={styles.galleryImg}
-                  />
+                  <Image source={{ uri: item }} style={styles.galleryImg} />
                 )}
                 contentContainerClassName="flex gap-4 mt-3"
               />
@@ -229,20 +227,21 @@ const Property = () => {
             <View className="flex flex-row items-center justify-start mt-4 gap-2">
               <Entypo name="location" size={28} color={Colors.accent} />
               <Text className="text-black-200 text-sm font-plus-jakarta-medium">
-                {property?.address}
+                {propertyQuery?.data?.data?.location}
               </Text>
             </View>
 
             <Image source={images.map} style={styles.locationImg} />
           </View>
 
-          {property?.reviews.length > 0 && (
+          {propertyQuery?.data?.data?.reviews?.length > 0 && (
             <View className="mt-7">
               <View className="flex flex-row items-center justify-between">
                 <View className="flex flex-row items-center">
                   <AntDesign name="star" size={20} color="gold" />
                   <Text className="text-black-300 text-xl font-plus-jakarta-bold ml-2">
-                    {property?.rating} ({property?.reviews.length} reviews)
+                    {propertyQuery?.data?.data?.rating} (
+                    {propertyQuery?.data?.data?.reviews.length} reviews)
                   </Text>
                 </View>
 
@@ -254,7 +253,7 @@ const Property = () => {
               </View>
 
               <View className="mt-5">
-                <Comment item={property?.reviews[0]} />
+                <Comment item={propertyQuery?.data?.data?.reviews[0]} />
               </View>
             </View>
           )}
@@ -271,7 +270,7 @@ const Property = () => {
               numberOfLines={1}
               className="text-primary-300 text-start text-2xl font-plus-jakarta-bold"
             >
-              ₦{Commafy(property?.price)}
+              ₦{Commafy(propertyQuery?.data?.data?.price ?? 0)}
             </Text>
           </View>
           <View className="flex-1">

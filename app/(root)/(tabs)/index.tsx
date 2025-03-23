@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Text,
   TouchableOpacity,
@@ -11,50 +11,63 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import SearchBar from "../../../components/SearchBar";
-import { Card } from "../../../components/Cards";
-import Filters from "../../../components/Filters";
-import { useGlobalContext } from "../../../lib/global-provider";
-import { useAppwrite } from "../../../lib/useAppwrite";
-import { getLatestProperties, getProperties } from "../../../lib/appwrite";
-import NoResults from "../../../components/NoResults";
+import SearchBar from "@/components/SearchBar";
+import { Card } from "@/components/Cards";
+import Filters from "@/components/Filters";
+import { useGlobalContext } from "@/lib/global-provider";
+import NoResults from "@/components/NoResults";
 import AnimationParallaxCarousel from "@/components/animation-parallax-carousel/animation-parallax-carousel";
-import { CategoryKey } from "@/constants/enums";
+import {
+  Category,
+  FilterCategoryKey,
+  PerchTypes,
+  UserType,
+} from "@/constants/enums";
 import { FlashList } from "@shopify/flash-list";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { HomeSkeleton } from "@/components/SkeletonLoader";
 import { Skeleton } from "moti/skeleton";
+import { Filter } from "@/interfaces";
+import {
+  useFeaturedPropertyQuery,
+  usePropertyQuery,
+} from "@/hooks/query/usePropertyQuery";
 
 export default function Index() {
+  const [filters, setFilters] = useState<Filter>({
+    location: "",
+    type: null,
+    limit: 10,
+    category: null,
+    from: UserType.GUEST,
+  });
   const { user } = useGlobalContext();
   const params = useLocalSearchParams<{ query?: string; filter?: string }>();
 
-  const { data: latestProperties, loading: latestPropertiesLoading } =
-    useAppwrite({ fn: getLatestProperties });
-
-  const {
-    data: properties,
-    loading,
-    refetch,
-  } = useAppwrite({
-    fn: getProperties,
-    params: {
-      filter: params.filter!,
-      query: params.query!,
-      limit: 6,
-    },
-    skip: true,
+  const propertiesQuery = usePropertyQuery({
+    ...filters,
+    category: Category.RECOMMENDATION,
+  });
+  const featuredPropertiesQuery = useFeaturedPropertyQuery({
+    ...filters,
+    category: Category.FEATURED,
   });
 
-  useEffect(() => {
-    refetch({
-      filter: params.filter!,
-      query: params.query!,
-      limit: 6,
-    });
-  }, [params.filter, params.query]);
+  // Memoize derived data
+  const properties = useMemo(
+    () => propertiesQuery.data?.pages.flatMap((page) => page.data) || [],
+    [propertiesQuery.data]
+  );
 
-  const handleCardPress = (id: string) => router.push(`/properties/${id}`);
+  // Memoize derived data
+  const featuredProperties = useMemo(
+    () => featuredPropertiesQuery.data?.data || [],
+    [featuredPropertiesQuery.data]
+  );
+
+  useEffect(() => {}, [params.filter, params.query]);
+
+  const handleCardPress = (id: number) => router.push(`/properties/${id}`);
 
   // Always call useMemo so that hooks order remains consistent
   const memoizedListHeader = useMemo(
@@ -80,23 +93,19 @@ export default function Index() {
         <View className="px-5">
           <SearchBar />
         </View>
-        <View className="my-5">
-          <View className="flex flex-row items-center justify-between px-5">
-            <Text className="text-xl font-plus-jakarta-bold text-black-300">
-              Guest Favorites
-            </Text>
-          </View>
-          {latestPropertiesLoading ? (
-            <ActivityIndicator size="small" className="text-primary-300" />
-          ) : !latestProperties || latestProperties.length === 0 ? (
-            <NoResults />
-          ) : (
-            <View>
-              <AnimationParallaxCarousel data={latestProperties} />
+        {featuredProperties.length > 0 && (
+          <View className="mt-5">
+            <View className="flex flex-row items-center justify-between px-5">
+              <Text className="text-xl font-plus-jakarta-bold text-black-300">
+                Guest Favorites
+              </Text>
             </View>
-          )}
-        </View>
-        <View className="flex flex-row items-center justify-between px-5">
+            <View>
+              <AnimationParallaxCarousel data={featuredProperties} />
+            </View>
+          </View>
+        )}
+        <View className="flex flex-row items-center justify-between px-5 mt-5">
           <Text className="text-xl font-plus-jakarta-bold text-black-300">
             Our Recommendation
           </Text>
@@ -107,11 +116,11 @@ export default function Index() {
           </TouchableOpacity>
         </View>
         <View className="px-5">
-          <Filters categoryKey={CategoryKey.PERCHTYPE} />
+          <Filters categoryKey={FilterCategoryKey.PERCHTYPE} />
         </View>
       </View>
     ),
-    [latestProperties, latestPropertiesLoading, user]
+    [featuredProperties, featuredPropertiesQuery.isLoading, user]
   );
 
   return (
@@ -121,41 +130,36 @@ export default function Index() {
       className="flex-1"
     >
       <SafeAreaView edges={["top"]} className="bg-white h-full">
-        {latestPropertiesLoading ? (
+        {featuredPropertiesQuery.isLoading ? (
           // Conditionally render the skeleton while loading
           <HomeSkeleton />
         ) : (
           // Render the FlashList when data is available
-          <Animated.View
-            layout={LinearTransition}
-            entering={FadeIn.duration(1000)}
-            className="flex-1"
-          >
-            <FlashList
-              data={properties}
-              keyExtractor={(item) => item.$id}
-              numColumns={2}
-              contentContainerClassName="pb-32"
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item }) => (
-                <View className="flex-1 px-2">
-                  <Card item={item} onPress={() => handleCardPress(item.$id)} />
+          <FlashList
+            data={properties}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerClassName="pb-32"
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View className="flex-1 px-2">
+                <Card item={item} onPress={() => handleCardPress(item.id)} />
+              </View>
+            )}
+            ListHeaderComponent={memoizedListHeader}
+            ListEmptyComponent={
+              propertiesQuery.isLoading ? (
+                <View className="flex-row justify-between w-full p-5">
+                  <Skeleton width={160} height={200} colorMode="light" />
+                  <Skeleton width={160} height={200} colorMode="light" />
                 </View>
-              )}
-              ListHeaderComponent={memoizedListHeader}
-              ListEmptyComponent={
-                loading ? (
-                  <View className="flex-row justify-between w-full p-5">
-                    <Skeleton width={160} height={200} colorMode="light" />
-                    <Skeleton width={160} height={200} colorMode="light" />
-                  </View>
-                ) : (
-                  <NoResults />
-                )
-              }
-              estimatedItemSize={250}
-            />
-          </Animated.View>
+              ) : (
+                <NoResults />
+              )
+            }
+            scrollEventThrottle={16}
+            estimatedItemSize={250}
+          />
         )}
       </SafeAreaView>
     </Animated.View>

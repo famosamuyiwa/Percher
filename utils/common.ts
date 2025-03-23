@@ -7,7 +7,7 @@ import * as SecureStore from "expo-secure-store";
 
 export const Commafy = (value: number) => {
   if (!value) return;
-  return value.toLocaleString(undefined, {
+  return Number(value).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });

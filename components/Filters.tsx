@@ -1,13 +1,14 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { categories } from "../constants/data";
-import { CategoryKey } from "@/constants/enums";
+import { filterCategories } from "../constants/data";
+import { FilterCategoryKey } from "@/constants/enums";
 
-const Filters = ({ categoryKey }: { categoryKey: CategoryKey }) => {
+const Filters = ({ categoryKey }: { categoryKey: FilterCategoryKey }) => {
   const params = useLocalSearchParams<{ filter?: string }>();
   const [selectedCategory, setSelectedCategory] = useState(
-    params.filter ?? (categoryKey === CategoryKey.PERCHTYPE ? "All" : "Current")
+    params.filter ??
+      (categoryKey === FilterCategoryKey.PERCHTYPE ? "All" : "Current")
   );
 
   const handleCategoryPress = (category: string) => {
@@ -24,7 +25,7 @@ const Filters = ({ categoryKey }: { categoryKey: CategoryKey }) => {
       showsHorizontalScrollIndicator={false}
       className="mt-3 mb-2"
     >
-      {categories
+      {filterCategories
         .filter((category) => category.key === categoryKey)
         .map((item, index) => (
           <TouchableOpacity

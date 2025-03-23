@@ -35,7 +35,6 @@ import {
 import MiniGalleryItem from "./GalleryItem";
 import MultiPicker from "./MultiPicker";
 import { PerchRegistrationFormProps } from "@/interfaces";
-import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
 import CustomButton from "./Button";
 import { useGlobalContext } from "@/lib/global-provider";
 
@@ -59,7 +58,7 @@ const schema = z.object({
   }),
   facilities: z.array(z.string()).default([]), // Ensures it's always an array
   checkInTimes: z.array(z.string()).default([]), // Ensures it's always an array
-  checkOutTime: z.string().optional(),
+  checkOutTime: z.string().default(""),
 });
 
 export default function PerchRegistrationForm({
@@ -240,7 +239,7 @@ export default function PerchRegistrationForm({
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextField
                   isSmallLabelVisible={true}
-                  label="Bathroom"
+                  label="Bathrooms"
                   placeholder="e.g 3"
                   value={value}
                   onValueChange={(text: string) => onChange(Number(text))}

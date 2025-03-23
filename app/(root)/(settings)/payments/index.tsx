@@ -29,10 +29,6 @@ import images from "@/constants/images";
 import CustomButton from "@/components/Button";
 
 export default function Payments() {
-  const tintColor = Colors.primary;
-  const borderColor = "#ccc";
-  const color = "black";
-
   const [isClicked, setIsClicked] = useState(false);
   const [withdrawalAmount, setWithdrawalAmount] = useState(0);
   const [withdrawModalVisible, setWithdrawModalVisible] = useState(false);

@@ -34,13 +34,15 @@ interface TransactionCardProps {
 export const FeaturedCard = ({ item, onPress }: Props) => {
   return (
     <View className="flex flex-col items-start relative">
-      <Image source={images.cardGradient} style={styles.gradientImg} />
-      <View className="flex-row items-center bg-white/90 px-3 py-1.5 rounded-full absolute bottom-5 right-0">
-        <Image source={icons.star} style={styles.starLg} />
-        <Text className="text-xs font-plus-jakarta-bold text-primary-300 ml-1">
-          {item.rating}
-        </Text>
-      </View>
+      {item.rating && (
+        <View className="flex-row items-center bg-white/90 px-3 py-1.5 rounded-full absolute bottom-5 right-0">
+          <Image source={icons.star} style={styles.starLg} />
+          <Text className="text-xs font-plus-jakarta-bold text-primary-300 ml-1">
+            {item.rating}
+          </Text>
+        </View>
+      )}
+
       <View className="flex flex-col items-start absolute bottom-5 ">
         <Text
           className="text-xl font-plus-jakarta-extrabold text-white"
@@ -49,7 +51,7 @@ export const FeaturedCard = ({ item, onPress }: Props) => {
           {item.name}
         </Text>
         <Text className="text-base font-plus-jakarta-regular text-white">
-          {item.address}
+          {item.location}
         </Text>
         <View className="flex flex-row items-center justify-between w-full">
           <Text className="text-xl font-plus-jakarta-extrabold text-white">
@@ -67,21 +69,23 @@ export const Card = ({ item, onPress }: Props) => {
       className="flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative"
       onPress={onPress}
     >
-      <View className="flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50">
-        <Image source={icons.star} style={styles.starSm} />
-        <Text className="text-xs font-plus-jakarta-bold text-primary-300 ml-0.5">
-          {item.rating}
-        </Text>
-      </View>
+      {item.reviews && (
+        <View className="flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50">
+          <Image source={icons.star} style={styles.starSm} />
+          <Text className="text-xs font-plus-jakarta-bold text-primary-300 ml-0.5">
+            {item.reviews}
+          </Text>
+        </View>
+      )}
 
-      <Image source={{ uri: item.image }} style={styles.cardImg} />
+      <Image source={{ uri: item.header }} style={styles.cardImg} />
 
       <View className="flex flex-col mt-2">
         <Text className="text-base font-p[us-jakarta-bold text-black-300">
           {item.name}
         </Text>
         <Text className="text-xs font-plus-jakarta-regular text-black-100">
-          {item.address}
+          {item.location}
         </Text>
 
         <View className="flex flex-row items-center justify-between mt-2">

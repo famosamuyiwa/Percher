@@ -1,5 +1,4 @@
 import { Colors } from "@/constants/common";
-import { config } from "@/lib/appwrite";
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { Paystack } from "react-native-paystack-webview";
@@ -23,22 +22,12 @@ export default function PaystackCheckout({
   onSuccess,
 }: PayStackProps) {
   const [pay, setPay] = useState(false);
-  // const [billingDetail, setBillingDetail] = useState({
-  //   billingName: "muyiwa",
-  //   billingEmail: "nenling19@gmail.com",
-  //   billingMobile: "08033044770",
-  //   amount,
-  // });
 
   useEffect(() => {
     if (clicked) {
       handleSubmit();
     }
   }, [clicked]);
-
-  // const handleOnchange = (text: any, input: any) => {
-  //   setBillingDetail((prevState) => ({ ...prevState, [input]: text }));
-  // };
 
   const handleSubmit = () => {
     if (

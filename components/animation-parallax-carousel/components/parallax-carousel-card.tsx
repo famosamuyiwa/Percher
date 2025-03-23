@@ -17,6 +17,7 @@ import Animated, {
 import { FeaturedCard } from "@/components/Cards";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { Property } from "@/interfaces";
 
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;
@@ -25,10 +26,10 @@ type TProps = {
   scrollX: SharedValue<number>;
   id: number;
   total: number;
-  item: any;
+  item: Property;
 };
 const ParallaxCarouselCard = ({ item, scrollX, id, total }: TProps) => {
-  const handleOnPress = (propertyId: string) => {
+  const handleOnPress = (propertyId: number) => {
     router.push(`/properties/${propertyId}`);
   };
 
@@ -85,9 +86,9 @@ const ParallaxCarouselCard = ({ item, scrollX, id, total }: TProps) => {
       ]}
     >
       <Animated.View style={[translateImageStyle]}>
-        <TouchableOpacity onPress={() => handleOnPress(item.$id)}>
+        <TouchableOpacity onPress={() => handleOnPress(item.id)}>
           <ImageBackground
-            source={{ uri: item.image }}
+            source={{ uri: item.header }}
             style={style.imageBackgroundStyle}
           >
             <LinearGradient

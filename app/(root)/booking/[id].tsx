@@ -9,18 +9,18 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { AntDesign, Entypo, FontAwesome5, Ionicons } from "@expo/vector-icons";
-import DatePicker from "react-native-date-picker";
+import { Entypo, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 import { formatDate } from "@/utils/common";
 import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "@/components/Button";
-import CalendarListDemo from "@/components/CalendarList";
 import CalendarList from "@/components/CalendarList";
+import { useGlobalStore } from "@/store/store";
 
 const Booking = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const { property, saveBookingState } = useGlobalStore();
 
   const [arrivalDate, setArrivalDate] = useState<Date | "">("");
   const [departureDate, setDepartureDate] = useState<Date | "">("");
@@ -38,6 +38,9 @@ const Booking = () => {
   }, []);
 
   const handleOnContinue = () => {
+    // saveBookingState({
+
+    // })
     router.push(`/booking/confirmation/${id}`);
   };
 
@@ -170,12 +173,10 @@ const Booking = () => {
                           fontSize: 18, // Set font size
                         }}
                       >
-                        <Picker.Item label="05:50 AM" value="05:50 AM" />
-                        <Picker.Item label="06:00 AM" value="06:00 AM" />
-                        <Picker.Item label="06:10 AM" value="06:10 AM" />
-                        <Picker.Item label="06:20 AM" value="06:20 AM" />
-                        <Picker.Item label="06:30 AM" value="06:30 AM" />
-                        <Picker.Item label="06:40 AM" value="06:40 AM" />
+                        <Picker.Item
+                          label={property?.checkOutPeriod}
+                          value={property?.checkOutPeriod}
+                        />
                       </Picker>
                       <Button
                         title="Done"
@@ -191,7 +192,7 @@ const Booking = () => {
             </View>
           </View>
         </View>
-        <View className="flex-row items-center gap-5 mb-5 justify-between">
+        {/* <View className="flex-row items-center gap-5 mb-5 justify-between">
           <Text className=" font-plus-jakarta-semibold">
             Availability Status
           </Text>
@@ -201,7 +202,7 @@ const Booking = () => {
               Available
             </Text>
           </View>
-        </View>
+        </View> */}
 
         <View className="flex-1 justify-end py-10">
           <CustomButton label="Continue" onPress={handleOnContinue} />
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
   },
   calendarModalContainer: {
     flex: 1,
-    paddingTop: 50,
+    paddingTop: 60,
     backgroundColor: "white",
   },
   pickerContainer: {

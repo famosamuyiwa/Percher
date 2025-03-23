@@ -13,10 +13,8 @@ import { FlashList } from "@shopify/flash-list";
 import { Picker } from "@react-native-picker/picker";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { useAppwrite } from "@/lib/useAppwrite";
-import { getProperties } from "@/lib/appwrite";
 import { Colors } from "@/constants/common";
-import { CategoryKey, UserType } from "@/constants/enums";
+import { FilterCategoryKey, UserType } from "@/constants/enums";
 import Filters from "@/components/Filters";
 import EmptyBookings from "@/components/empty-screens/bookings";
 import {
@@ -35,18 +33,10 @@ const Bookings = () => {
   const [userType, setUserType] = useState<UserType>(UserType.GUEST);
   const [userTypeModalVisible, setUserTypeVisible] = useState(false);
 
-  const { data: bookings, loading } = useAppwrite({
-    fn: getProperties,
-    params: {
-      filter: filter ?? "",
-      query: query ?? "",
-      limit: 20,
-    },
-    skip: true,
-  });
+  const loading = false;
 
   const handleCardPress = useCallback(
-    (id: string) =>
+    (id: number) =>
       router.push({
         pathname: "/booking/details/[id]",
         params: { userType, id },
@@ -125,12 +115,12 @@ const Bookings = () => {
             </TouchableOpacity>
           </View>
           <View className="my-5">
-            <Filters categoryKey={CategoryKey.BOOKINGS} />
+            <Filters categoryKey={FilterCategoryKey.BOOKINGS} />
           </View>
         </View>
 
         <FlashList
-          data={bookings ?? []}
+          data={[]}
           numColumns={1}
           contentContainerClassName="pb-32"
           showsVerticalScrollIndicator={false}
@@ -138,6 +128,7 @@ const Bookings = () => {
           estimatedItemSize={200}
           ListHeaderComponent={<View className="px-5" />}
           ListEmptyComponent={listEmptyComponent}
+          scrollEventThrottle={16}
         />
 
         <Modal visible={userTypeModalVisible} transparent animationType="slide">

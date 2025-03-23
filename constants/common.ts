@@ -1,6 +1,12 @@
 import { CalendarTheme } from "@marceloterreiro/flash-calendar";
 
 export const USE_AUTH_QUERY_KEY = ["auth"];
+export const USE_PROPERTY_QUERY_KEY = ["property"];
+export const USE_FEATURED_PROPERTY_QUERY_KEY = ["property", "featured"];
+export const USE_OWNED_PROPERTIES_QUERY_KEY = ["property", "owned"];
+export const USE_EXPLORE_PROPERTIES_QUERY_KEY = ["property", "explore"];
+export const USE_SINGLE_PROPERTY_QUERY_KEY = ["property", "single"];
+export const USE_BOOKING_QUERY_KEY = ["booking"];
 
 export const Colors = {
   primary: "#00BFFF",

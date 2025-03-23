@@ -1,48 +1,92 @@
 import { Card, GradientCard } from "@/components/Cards";
 import SettingsHeader from "@/components/SettingsHeader";
-import { Colors } from "@/constants/common";
-import { getProperties } from "@/lib/appwrite";
-import { useAppwrite } from "@/lib/useAppwrite";
 import { FlashList } from "@shopify/flash-list";
 
-import { View, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { router } from "expo-router";
+import { useMemo, useState } from "react";
+import {
+  useOwnedPropertyQuery,
+  usePropertyQuery,
+} from "@/hooks/query/usePropertyQuery";
+import { Filter } from "@/interfaces";
+import SearchBar from "@/components/SearchBar";
+import { UserType } from "@/constants/enums";
+import { AntDesign } from "@expo/vector-icons";
+import { Colors } from "@/constants/common";
 
 const MyPerchs = () => {
-  const listHeader = () => <View className="px-5"></View>;
-
-  const handleCardPress = (id: string) => {};
-
-  const {
-    data: bookings,
-    loading,
-    refetch,
-  } = useAppwrite({
-    fn: getProperties,
-    skip: true,
+  const [filters, setFilters] = useState<Filter>({
+    location: "",
+    type: null,
+    limit: 10,
+    category: null,
+    from: UserType.HOST,
   });
+
+  const handleCardPress = (id: number) => {
+    router.push({
+      pathname: "/my-perchs/form",
+      params: {
+        id,
+      },
+    });
+  };
+
+  // Memoize derived data
+  const propertiesQuery = useOwnedPropertyQuery({
+    ...filters,
+  });
+
+  const properties = useMemo(
+    () => propertiesQuery.data?.pages.flatMap((page) => page.data) || [],
+    [propertiesQuery.data]
+  );
+
+  const listHeader = () => {
+    return (
+      properties.length > 0 && (
+        <View className="px-5">
+          <Text className="text-sm font-plus-jakarta-bold">
+            Total: {properties?.length}
+          </Text>
+        </View>
+      )
+    );
+  };
 
   return (
     <View style={[styles.container, { flex: 1 }]}>
       <SettingsHeader title="My Perchs" />
+      {properties.length > 0 && (
+        <View className="mx-5 pb-5">
+          <SearchBar />
+        </View>
+      )}
       <ScrollView keyboardShouldPersistTaps="handled">
-        <View className="py-5" style={{ flex: 1 }}>
+        <View className="pb-5" style={{ flex: 1 }}>
           <View style={styles.itemsContainer} className="my-4 py-4">
             <FlashList
-              data={[]}
-              // keyExtractor={(item) => item.$id}
-              keyExtractor={(item) => item}
+              data={properties}
+              keyExtractor={(item) => item.id.toString()}
               numColumns={1}
               contentContainerClassName="pb-32"
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => (
                 <View className="mx-5">
-                  <Card item={item} onPress={() => handleCardPress(item)} />
+                  <Card item={item} onPress={() => handleCardPress(item.id)} />
                 </View>
               )}
               ListHeaderComponent={listHeader}
               ListEmptyComponent={
-                loading ? (
+                propertiesQuery.isLoading ? (
                   <ActivityIndicator
                     size="small"
                     className="text-primary-300 mt-5"
@@ -56,11 +100,20 @@ const MyPerchs = () => {
                   </View>
                 )
               }
+              scrollEventThrottle={16}
               estimatedItemSize={200}
             />
           </View>
         </View>
       </ScrollView>
+      {properties.length > 0 && (
+        <TouchableOpacity
+          onPress={() => router.push("/my-perchs/form")}
+          className="absolutew-full items-end px-10 bottom-20 shadow-sm"
+        >
+          <AntDesign name="pluscircle" size={60} color={Colors.primary} />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -73,10 +126,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 15,
     height: "100%",
-  },
-  borderedItem: {
-    borderBottomWidth: 1,
-    borderColor: "#F4F4F4",
   },
 });
 

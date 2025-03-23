@@ -1,23 +1,38 @@
-import { CategoryKey } from "./enums";
+import { FilterCategoryKey } from "./enums";
 import icons from "./icons";
-import images from "./images";
 
-export const categories = [
-  { title: "All", category: "All", key: CategoryKey.PERCHTYPE },
-  { title: "Houses", category: "House", key: CategoryKey.PERCHTYPE },
-  { title: "Condos", category: "Condos", key: CategoryKey.PERCHTYPE },
-  { title: "Duplexes", category: "Duplexes", key: CategoryKey.PERCHTYPE },
-  { title: "Studios", category: "Studios", key: CategoryKey.PERCHTYPE },
-  { title: "Villas", category: "Villa", key: CategoryKey.PERCHTYPE },
-  { title: "Apartments", category: "Apartments", key: CategoryKey.PERCHTYPE },
-  { title: "Townhomes", category: "Townhomes", key: CategoryKey.PERCHTYPE },
-  { title: "Others", category: "Others", key: CategoryKey.PERCHTYPE },
-  { title: "Current", category: "Current", key: CategoryKey.BOOKINGS },
-  { title: "Upcoming", category: "Upcoming", key: CategoryKey.BOOKINGS },
-  { title: "Pending", category: "Pending", key: CategoryKey.BOOKINGS },
-  { title: "Completed", category: "Completed", key: CategoryKey.BOOKINGS },
-  { title: "Rejected", category: "Rejected", key: CategoryKey.BOOKINGS },
-  { title: "Cancelled", category: "Cancelled", key: CategoryKey.BOOKINGS },
+export const filterCategories = [
+  { title: "All", category: "All", key: FilterCategoryKey.PERCHTYPE },
+  { title: "Houses", category: "House", key: FilterCategoryKey.PERCHTYPE },
+  { title: "Condos", category: "Condos", key: FilterCategoryKey.PERCHTYPE },
+  { title: "Duplexes", category: "Duplexes", key: FilterCategoryKey.PERCHTYPE },
+  { title: "Studios", category: "Studios", key: FilterCategoryKey.PERCHTYPE },
+  { title: "Villas", category: "Villa", key: FilterCategoryKey.PERCHTYPE },
+  {
+    title: "Apartments",
+    category: "Apartments",
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  {
+    title: "Townhomes",
+    category: "Townhomes",
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  { title: "Others", category: "Others", key: FilterCategoryKey.PERCHTYPE },
+  { title: "Current", category: "Current", key: FilterCategoryKey.BOOKINGS },
+  { title: "Upcoming", category: "Upcoming", key: FilterCategoryKey.BOOKINGS },
+  { title: "Pending", category: "Pending", key: FilterCategoryKey.BOOKINGS },
+  {
+    title: "Completed",
+    category: "Completed",
+    key: FilterCategoryKey.BOOKINGS,
+  },
+  { title: "Rejected", category: "Rejected", key: FilterCategoryKey.BOOKINGS },
+  {
+    title: "Cancelled",
+    category: "Cancelled",
+    key: FilterCategoryKey.BOOKINGS,
+  },
 ];
 
 export const facilities = [
@@ -40,32 +55,5 @@ export const facilities = [
   {
     title: "Wifi",
     icon: "wifi",
-  },
-];
-
-export const gallery = [
-  {
-    id: 1,
-    image: images.newYork,
-  },
-  {
-    id: 2,
-    image: images.japan,
-  },
-  {
-    id: 3,
-    image: images.newYork,
-  },
-  {
-    id: 4,
-    image: images.japan,
-  },
-  {
-    id: 5,
-    image: images.newYork,
-  },
-  {
-    id: 6,
-    image: images.japan,
   },
 ];

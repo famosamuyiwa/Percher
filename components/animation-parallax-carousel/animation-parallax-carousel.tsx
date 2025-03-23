@@ -3,6 +3,7 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import ParallaxCarouselCard from "./components/parallax-carousel-card";
 import ParallaxCarouselPagination from "./components/parallax-carousel-pagination";
+import { Property } from "@/interfaces";
 const OFFSET = 45;
 const ITEM_WIDTH = Dimensions.get("window").width - OFFSET * 2;
 
@@ -23,7 +24,7 @@ const AnimationParallaxCarousel = ({ data }: any) => {
         }}
         scrollEventThrottle={12}
       >
-        {data.map((item: any, id: number) => (
+        {data.map((item: Property, id: number) => (
           <ParallaxCarouselCard
             key={id}
             item={item}

@@ -8,7 +8,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 
@@ -18,7 +18,6 @@ import { useGlobalContext } from "../lib/global-provider";
 import { Redirect, router } from "expo-router";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { LoginProvider, ToastType } from "@/constants/enums";
-import { ApiResponse, User } from "@/interfaces";
 import { signIn } from "@/hooks/useGoogleOAuth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Colors } from "@/constants/common";
@@ -171,6 +170,7 @@ const styles = StyleSheet.create({
   onboardImg: {
     width: "100%",
     height: "55%",
+    marginBottom: 20,
   },
   googleImg: {
     width: 20,

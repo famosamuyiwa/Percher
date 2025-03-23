@@ -27,7 +27,7 @@ export enum UserType {
   GUEST = "Guest",
 }
 
-export enum CategoryKey {
+export enum FilterCategoryKey {
   PERCHTYPE = "PerchType",
   BOOKINGS = "Bookings",
 }
@@ -147,4 +147,15 @@ export enum ToastType {
   SUCCESS = "success",
   ERROR = "error",
   WARNING = "warning",
+}
+
+export enum Category {
+  FEATURED = "Featured",
+  RECOMMENDATION = "Recommendation",
+}
+
+export enum RegistrationStatus {
+  IN_REVIEW = "In Review",
+  APPROVED = "Approved",
+  REJECTED = "Rejected",
 }

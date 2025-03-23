@@ -4,15 +4,17 @@ import { ToastType } from "@/constants/enums";
 import { ApiResponse } from "@/interfaces";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Alert } from "react-native";
 
 export const useUpdateUserMutation = () => {
   const queryClient = useQueryClient();
   const { displayToast } = useGlobalContext();
 
-  //save user id to global store and update auth query with user data
   const onUseUpdateUserMutationSuccess = (payload: ApiResponse) => {
     queryClient.invalidateQueries({ queryKey: USE_AUTH_QUERY_KEY });
+    displayToast({
+      type: ToastType.SUCCESS,
+      description: "Profile updated",
+    });
   };
 
   const onUseUpdateUserMutationError = (error: Error) => {

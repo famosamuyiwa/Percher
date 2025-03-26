@@ -42,33 +42,6 @@ export enum TransactionType {
   CREDIT = "Credit",
 }
 
-export enum Bank {
-  GTB_BANK = "GTB",
-  PROVIDUS_BANK = "Providus Bank",
-  STERLING_BANK = "Sterling Bank",
-  ZENITH_BANK = "Zenith Bank",
-  ECO_BANK = "EcoBank",
-  ACCESS_BANK = "Access Bank",
-  ACCESS_DIAMOND_BANK = "Access Bank (Diamond)",
-  CITI_BANK = "Citibank Nigeria",
-  FCMB_BANK = "FCMB",
-  FIDELITY_BANK = "Fidelity Bank",
-  FIRST_BANK = "First Bank",
-  HERITAGE_BANK = "Heritage Bank",
-  JAIZ_BANK = "Jaiz Bank",
-  KEYSTONE_BANK = "Keystone Bank",
-  POLARIS_BANK = "Polaris Bank",
-  STANBIC_IBTC_BANK = "Stanbic IBTC Bank",
-  STANDARD_CHATERED_BANK = "Standered Chartered Bank",
-  UBA_BANK = "UBA",
-  UNION_BANK = "Union Bank",
-  UNITY_BANK = "Unity Bank",
-  WEMA_BANK = "Wema Bank",
-  OPAY_BANK = "Opay",
-  PALMPAY_BANK = "PalmPay",
-  MONIEPOINT_BANK = "Moniepoint",
-}
-
 export enum PerchTypes {
   HOUSE = "House",
   CONDO = "Condo",
@@ -141,6 +114,13 @@ export enum Screens {
   OTP = "OTP",
   FORGOT_PASSWORD = "FORGOT_PASSWORD",
   RESET_PASSWORD = "RESET_PASSWORD",
+  NOTIFICATIONS = "NOTIFICATIONS",
+  MY_PERCHS = "MY_PERCHS",
+  PAYMENTS = "PAYMENTS",
+  APPEARANCE = "APPEARANCE",
+  SECURITY = "SECURITY",
+  HELP = "HELP",
+  REFERRALS = "REFERRALS",
 }
 
 export enum ToastType {
@@ -158,4 +138,13 @@ export enum RegistrationStatus {
   IN_REVIEW = "In Review",
   APPROVED = "Approved",
   REJECTED = "Rejected",
+}
+
+export enum BookingStatus {
+  CURRENT = "Current",
+  UPCOMING = "Upcoming",
+  PENDING = "Pending",
+  COMPLETED = "Completed",
+  REJECTED = "Rejected",
+  CANCELLED = "Cancelled",
 }

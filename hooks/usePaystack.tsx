@@ -58,7 +58,7 @@ export default function PaystackCheckout({
             }}
             onSuccess={(response: any) => {
               // handle response here
-
+              console.log("response: ", response);
               const responseObject = response["transactionRef"]["message"];
               if (responseObject === "Approved") {
                 onSuccess();

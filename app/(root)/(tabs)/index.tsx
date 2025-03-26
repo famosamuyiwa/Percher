@@ -30,21 +30,19 @@ import { Skeleton } from "moti/skeleton";
 import { Filter } from "@/interfaces";
 import {
   useFeaturedPropertyQuery,
-  usePropertyQuery,
+  usePropertiesQuery,
 } from "@/hooks/query/usePropertyQuery";
 
 export default function Index() {
   const [filters, setFilters] = useState<Filter>({
     location: "",
-    type: null,
     limit: 10,
-    category: null,
     from: UserType.GUEST,
   });
   const { user } = useGlobalContext();
   const params = useLocalSearchParams<{ query?: string; filter?: string }>();
 
-  const propertiesQuery = usePropertyQuery({
+  const propertiesQuery = usePropertiesQuery({
     ...filters,
     category: Category.RECOMMENDATION,
   });

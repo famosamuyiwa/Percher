@@ -116,6 +116,8 @@ export default function SignInMailScreen() {
         type: ToastType.ERROR,
         description: err.message,
       });
+    } finally {
+      onSettled();
     }
   }
 
@@ -129,7 +131,7 @@ export default function SignInMailScreen() {
         } else {
           return displayToast({
             type: ToastType.ERROR,
-            description: `User with email already exists`,
+            description: response.message,
           });
         }
       } catch (error: any) {
@@ -206,6 +208,8 @@ export default function SignInMailScreen() {
         type: ToastType.ERROR,
         description: err.message,
       });
+    } finally {
+      onSettled();
     }
   }
 
@@ -301,6 +305,7 @@ export default function SignInMailScreen() {
               <CustomButton
                 label="Sign in"
                 onPress={onButtonClick}
+                isLoading={isLoading}
                 isDisabled={email === "" || password === ""}
               />
             </View>
@@ -379,6 +384,7 @@ export default function SignInMailScreen() {
                 <View style={[templateStyles.buttonSize, { marginTop: 30 }]}>
                   <CustomButton
                     label="Continue"
+                    isLoading={isLoading}
                     onPress={function () {
                       onButtonClick();
                     }}
@@ -573,6 +579,7 @@ export default function SignInMailScreen() {
                 onPress={function () {
                   onButtonClick();
                 }}
+                isLoading={isLoading}
                 isDisabled={
                   name === "" || password === "" || confirmPassword === ""
                 }
@@ -671,6 +678,7 @@ export default function SignInMailScreen() {
               <View style={templateStyles.buttonSize}>
                 <CustomButton
                   label="Verify"
+                  isLoading={isLoading}
                   onPress={function () {
                     onButtonClick();
                   }}
@@ -755,6 +763,7 @@ export default function SignInMailScreen() {
               <CustomButton
                 label="Continue"
                 onPress={onButtonClick}
+                isLoading={isLoading}
                 isDisabled={
                   (password === "" || confirmPassword === "") &&
                   password !== confirmPassword

@@ -17,9 +17,7 @@ import { Filter } from "@/interfaces";
 export default function Explore() {
   const [filters, setFilters] = useState<Filter>({
     location: "",
-    type: null,
     limit: 10,
-    category: null,
     from: UserType.GUEST,
   });
   const propertiesQuery = useExplorePropertyQuery(filters);

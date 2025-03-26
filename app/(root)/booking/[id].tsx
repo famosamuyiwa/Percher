@@ -17,10 +17,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "@/components/Button";
 import CalendarList from "@/components/CalendarList";
 import { useGlobalStore } from "@/store/store";
+import { ChargeType } from "@/constants/enums";
+import { Booking as BookingInterface } from "@/interfaces";
 
 const Booking = () => {
-  const { id } = useLocalSearchParams<{ id?: string }>();
-  const { property, saveBookingState } = useGlobalStore();
+  const { id, chargeType } = useLocalSearchParams<{
+    id: string;
+    chargeType: ChargeType;
+  }>();
+  const { property, saveBookingState, resetBookingState } = useGlobalStore();
 
   const [arrivalDate, setArrivalDate] = useState<Date | "">("");
   const [departureDate, setDepartureDate] = useState<Date | "">("");
@@ -38,9 +43,19 @@ const Booking = () => {
   }, []);
 
   const handleOnContinue = () => {
-    // saveBookingState({
+    if (arrivalDate === "" || departureDate === "" || !property) return;
 
-    // })
+    const booking: Partial<BookingInterface> = {
+      startDate: arrivalDate,
+      endDate: departureDate,
+      checkIn: checkInTime,
+      checkOut: checkOutTime,
+      chargeType,
+      propertyId: property?.id,
+      hostId: property?.host?.id!,
+    };
+
+    saveBookingState(undefined, booking);
     router.push(`/booking/confirmation/${id}`);
   };
 
@@ -124,12 +139,15 @@ const Booking = () => {
                           fontSize: 18, // Set font size
                         }}
                       >
-                        <Picker.Item label="05:50 AM" value="05:50 AM" />
-                        <Picker.Item label="06:00 AM" value="06:00 AM" />
-                        <Picker.Item label="06:10 AM" value="06:10 AM" />
-                        <Picker.Item label="06:20 AM" value="06:20 AM" />
-                        <Picker.Item label="06:30 AM" value="06:30 AM" />
-                        <Picker.Item label="06:40 AM" value="06:40 AM" />
+                        {property?.checkInPeriods?.map(
+                          (period: string, index: number) => (
+                            <Picker.Item
+                              key={index}
+                              label={period}
+                              value={period}
+                            />
+                          )
+                        )}
                       </Picker>
                       <Button
                         title="Done"

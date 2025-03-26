@@ -1,0 +1,3 @@
+export const GUEST_SERVICE_FEE_PERCENTAGE = Number(
+  process.env.EXPO_PUBLIC_GUEST_SERVICE_FEE_PERCENTAGE!
+);

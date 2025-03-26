@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 import { Image } from "expo-image";
 import { TextField } from "@/components/Textfield";
 import {
@@ -7,17 +13,16 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-// import useImagePicker from "@/hooks/useImagePicker";
-import { MaterialIndicator } from "react-native-indicators";
 import { Colors } from "@/constants/common";
 import SettingsHeader from "@/components/SettingsHeader";
 import useImagePicker from "@/hooks/useImagePicker";
 import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
 import { useUpdateUserMutation } from "@/hooks/mutation/useUserMutation";
 import { useGlobalContext } from "@/lib/global-provider";
+import { ToastType } from "@/constants/enums";
 
 const ProfileScreen = () => {
-  const { user, refetch } = useGlobalContext();
+  const { user, refetch, displayToast } = useGlobalContext();
 
   const [isEditing, setIsEditing] = useState(false);
   const [avatar, setAvatar] = useState(user?.avatar);
@@ -34,7 +39,6 @@ const ProfileScreen = () => {
 
   const handleSave = () => {
     setIsSaving(true);
-    // if (avatar !== authQuery.data?.data.avatar) {
     if (user?.avatar !== avatar) {
       uploadAndMutate();
     } else {
@@ -55,29 +59,38 @@ const ProfileScreen = () => {
     if (!isEditing) return;
     try {
       const image: any = await pickMultimedia(false, true);
-      setAvatar(image.uri);
+      setAvatar(image.uri[0]);
     } catch {}
   };
 
   const uploadAndMutate = async () => {
-    await uploadMultimedia(
-      [
-        {
-          uri: avatar,
-        },
-      ],
-      (downloadUrls: string[]) => {
-        console.log("dowloadUrls: ", downloadUrls);
-        // updateUserMutation.mutate(
-        //   {
-        //     id: authQuery.data?.data.id,
-        //     name,
-        //     avatar: downloadUrl || avatar,
-        //   },
-        //   { onSettled, onSuccess }
-        // );
-      }
-    );
+    try {
+      await uploadMultimedia(
+        [
+          {
+            uri: avatar,
+          },
+        ],
+        (downloadUrls: string[]) => {
+          console.log("dowloadUrls: ", downloadUrls);
+          updateUserMutation.mutate(
+            {
+              id: user?.id,
+              name,
+              avatar: downloadUrls[0] || avatar,
+              phone: phoneNumber,
+            },
+            { onSettled, onSuccess }
+          );
+        }
+      );
+    } catch (err: any) {
+      displayToast({
+        type: ToastType.ERROR,
+        description: err.message,
+      });
+      setIsSaving(false);
+    }
   };
 
   const mutate = () => {
@@ -162,8 +175,8 @@ const ProfileScreen = () => {
             </View>
           )}
           {isEditing && isSaving && (
-            <View className="flex-row items-center my-4">
-              <MaterialIndicator color={tintColor} size={20} />
+            <View className="flex-row items-center my-4 ">
+              <ActivityIndicator color={tintColor} size="small" />
             </View>
           )}
         </View>

@@ -1,6 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import React from "react";
-import { MaterialIndicator } from "react-native-indicators";
 
 const CustomButton = ({
   label,
@@ -27,7 +32,7 @@ const CustomButton = ({
        rounded-full py-3 h-12`}
         >
           {isLoading ? (
-            <MaterialIndicator color={"white"} size={20} />
+            <ActivityIndicator color={"white"} size="small" />
           ) : (
             <Text className="text-white text-center font-plus-jakarta-bold">
               {label}
@@ -42,7 +47,7 @@ const CustomButton = ({
           className={`items-center justify-center bg-gray-300 rounded-full py-3 h-12`}
         >
           {isLoading ? (
-            <MaterialIndicator color={"white"} size={20} />
+            <ActivityIndicator color={"white"} size="small" />
           ) : (
             <Text className="text-white text-center font-plus-jakarta-bold">
               {label}

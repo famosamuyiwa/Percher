@@ -100,3 +100,28 @@ export async function getToken(key: string) {
 export async function removeToken(key: string) {
   await SecureStore.deleteItemAsync(key);
 }
+
+export function convertToInternationalPhoneNumber(
+  phoneNumber: string | undefined
+) {
+  if (!phoneNumber) return "-";
+  // Remove any non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, "");
+
+  let localNumber = cleaned;
+  // If the number starts with "0", remove it
+  if (localNumber.startsWith("0")) {
+    localNumber = localNumber.slice(1);
+  } else if (localNumber.startsWith("234")) {
+    // If it already starts with "234", remove it as well
+    localNumber = localNumber.slice(3);
+  }
+
+  // Now we assume localNumber is 10 digits (e.g., "8033044770")
+  // Format as: +234 (first 3 digits) (space) (next 3 digits)-(last 4 digits)
+  const formatted = `+234 (${localNumber.slice(0, 3)}) ${localNumber.slice(
+    3,
+    6
+  )}-${localNumber.slice(6)}`;
+  return formatted;
+}

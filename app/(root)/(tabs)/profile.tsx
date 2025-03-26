@@ -24,10 +24,10 @@ import { useGlobalContext } from "@/lib/global-provider";
 import { logout } from "@/api/api.service";
 import images from "@/constants/images";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
-import { ToastType } from "@/constants/enums";
+import { Screens, ToastType } from "@/constants/enums";
 
 const Profile = () => {
-  const { user, refetch, displayToast } = useGlobalContext();
+  const { user, refetch, displayToast, alertComingSoon } = useGlobalContext();
 
   const handleLogout = async () => {
     const result = await logout();
@@ -59,6 +59,29 @@ const Profile = () => {
       ],
       { cancelable: true } // Allows dismissing the alert by tapping outside of it
     );
+  };
+
+  const handleNavigation = (screen: Screens) => {
+    let route: any;
+    switch (screen) {
+      case Screens.NOTIFICATIONS:
+      case Screens.APPEARANCE:
+      case Screens.SECURITY:
+      case Screens.HELP:
+      case Screens.REFERRALS:
+        alertComingSoon();
+        break;
+      case Screens.MY_PERCHS:
+        route = "/(root)/(settings)/my-perchs";
+        break;
+      case Screens.PAYMENTS:
+        route = "/(root)/(settings)/payments";
+        break;
+      default:
+        route = "/";
+    }
+    if (!route) return;
+    router.navigate(route);
   };
 
   return (
@@ -115,9 +138,7 @@ const Profile = () => {
                   />
                 }
                 title="Notifications"
-                onPress={() =>
-                  router.navigate("/(root)/(settings)/notification")
-                }
+                onPress={() => handleNavigation(Screens.NOTIFICATIONS)}
               />
             </TouchableOpacity>
             <View style={styles.borderedItem} className="pt-2">
@@ -130,7 +151,7 @@ const Profile = () => {
                   />
                 }
                 title="My Perchs"
-                onPress={() => router.navigate("/(root)/(settings)/my-perchs")}
+                onPress={() => handleNavigation(Screens.MY_PERCHS)}
               />
             </View>
             <View className="pt-2">
@@ -143,7 +164,7 @@ const Profile = () => {
                   />
                 }
                 title="Payments"
-                onPress={() => router.navigate("/(root)/(settings)/payments")}
+                onPress={() => handleNavigation(Screens.PAYMENTS)}
               />
             </View>
           </View>
@@ -159,7 +180,7 @@ const Profile = () => {
                 }
                 title="Appearance"
                 subtitle="System Settings"
-                onPress={() => router.navigate("/(root)/(settings)/appearance")}
+                onPress={() => handleNavigation(Screens.APPEARANCE)}
               />
             </View>
             <View>
@@ -168,6 +189,7 @@ const Profile = () => {
                   <MaterialIcons name="lock" color={Colors.primary} size={20} />
                 }
                 title="Security"
+                onPress={() => handleNavigation(Screens.SECURITY)}
               />
             </View>
           </View>
@@ -182,7 +204,7 @@ const Profile = () => {
                   />
                 }
                 title="Help"
-                onPress={() => router.navigate("/(root)/(settings)/help")}
+                onPress={() => handleNavigation(Screens.HELP)}
               />
             </View>
             <View className="pt-2">
@@ -195,7 +217,7 @@ const Profile = () => {
                   />
                 }
                 title="Referrals"
-                onPress={() => router.navigate("/(root)/(settings)/referrals")}
+                onPress={() => handleNavigation(Screens.REFERRALS)}
               />
             </View>
           </View>

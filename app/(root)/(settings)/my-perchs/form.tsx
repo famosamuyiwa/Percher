@@ -16,7 +16,7 @@ import { ToastType } from "@/constants/enums";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useCreatePropertyMutation } from "@/hooks/mutation/usePropertyMutation";
 import { router, useLocalSearchParams } from "expo-router";
-import { usePropertyByIdQuery } from "@/hooks/query/usePropertyQuery";
+import { usePropertyQuery } from "@/hooks/query/usePropertyQuery";
 
 const Form = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,7 +24,7 @@ const Form = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { displayToast } = useGlobalContext();
   const createPropertyMutation = useCreatePropertyMutation();
-  const propertyQuery = usePropertyByIdQuery(Number(id));
+  const propertyQuery = usePropertyQuery(Number(id));
 
   const handleRegisterClick = async (formData: PerchRegistrationFormData) => {
     let loadingMessage = "Preparing perch details...";

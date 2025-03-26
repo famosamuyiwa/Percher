@@ -4,7 +4,7 @@ import { useAuthQuery } from "@/hooks/query/useAuthQuery";
 import { ToastProps, User } from "@/interfaces";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { Toast } from "@/components/animation-toast/components";
-import { View } from "react-native";
+import Loader from "@/components/Loader";
 
 interface GlobalContextType {
   isLoggedIn: boolean;
@@ -14,6 +14,9 @@ interface GlobalContextType {
     options?: RefetchOptions | undefined
   ) => Promise<QueryObserverResult>;
   displayToast: (toast: ToastProps) => void;
+  showLoader: () => void;
+  hideLoader: () => void;
+  alertComingSoon: () => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -23,6 +26,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const user = data?.data;
   let isLoggedIn = !!user;
   const toastRef = useRef<any>({});
+  const loaderRef = useRef<any>({});
 
   if (isError) {
     console.log("GlobalContextException: ", error);
@@ -41,11 +45,33 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const showLoader = () => {
+    loaderRef.current.show();
+  };
+
+  const hideLoader = () => {
+    loaderRef.current.hide();
+  };
+
+  const alertComingSoon = () => {
+    alert("This feature is not yet available. Coming Soon 🚀");
+  };
+
   return (
     <GlobalContext.Provider
-      value={{ isLoggedIn, user, loading: isLoading, refetch, displayToast }}
+      value={{
+        isLoggedIn,
+        user,
+        loading: isLoading,
+        refetch,
+        displayToast,
+        showLoader,
+        hideLoader,
+        alertComingSoon,
+      }}
     >
       {children}
+      <Loader ref={loaderRef} />
       <Toast ref={toastRef} />
     </GlobalContext.Provider>
   );

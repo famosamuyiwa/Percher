@@ -26,7 +26,7 @@ const ReferralsScreen = () => {
   const copyToClipboard = async () => {
     // if (!authQuery.data?.data?.referralCode) return;
     // await Clipboard.setStringAsync(authQuery.data.data.referralCode);
-    alert("Text copied to clipboard!");
+    // alert("Text copied to clipboard!");
   };
 
   const shareInviteLink = async () => {

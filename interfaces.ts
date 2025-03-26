@@ -1,6 +1,8 @@
 import { DateValues } from "date-fns/types";
 import {
+  BookingStatus,
   Category,
+  ChargeType,
   Facility,
   LoginProvider,
   PerchTypes,
@@ -33,12 +35,6 @@ export interface Property {
   host?: User;
   category: Category;
   reviews?: any;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface Booking {
-  id: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -86,15 +82,25 @@ export interface AuthState {
 export interface BookingState {
   property: Property | undefined;
   booking: Booking | undefined;
-  saveBookingState: (booking: Partial<Property>) => void;
+  saveBookingState: (
+    property: Partial<Property> | undefined,
+    booking: Partial<Booking> | undefined
+  ) => void;
   resetBookingState: () => void;
 }
 
 export interface Booking {
+  id: number;
   startDate: Date;
   endDate: Date;
   checkIn: string;
   checkOut: string;
+  chargeType: ChargeType;
+  propertyId: number;
+  hostId: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  property?: Property;
 }
 
 export interface User {
@@ -142,9 +148,10 @@ export interface ToastProps {
 }
 
 export interface Filter {
-  location: string;
-  type: PerchTypes | null;
-  limit: number;
-  category: Category | null;
-  from: UserType;
+  location?: string;
+  type?: PerchTypes;
+  limit?: number;
+  category?: Category;
+  from?: UserType;
+  bookingStatus?: BookingStatus;
 }

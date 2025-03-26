@@ -245,9 +245,35 @@ export const getAllProperties = async (
   }
 };
 
+export const getAllBookings = async (
+  pageParam: number | null = null,
+  filters: Filter
+) => {
+  try {
+    const { data: payload } = await api.get(`${API_BASE_URL}/booking`, {
+      params: {
+        cursor: pageParam,
+        ...filters,
+      },
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
 export const getPropertyById = async (id: number) => {
   try {
     const { data: payload } = await api.get(`${API_BASE_URL}/property/${id}`);
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const getBookingById = async (id: number) => {
+  try {
+    const { data: payload } = await api.get(`${API_BASE_URL}/booking/${id}`);
     return payload;
   } catch (error: any) {
     handleApiError(error);

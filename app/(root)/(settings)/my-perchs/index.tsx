@@ -14,7 +14,7 @@ import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   useOwnedPropertyQuery,
-  usePropertyQuery,
+  usePropertiesQuery,
 } from "@/hooks/query/usePropertyQuery";
 import { Filter } from "@/interfaces";
 import SearchBar from "@/components/SearchBar";
@@ -25,9 +25,7 @@ import { Colors } from "@/constants/common";
 const MyPerchs = () => {
   const [filters, setFilters] = useState<Filter>({
     location: "",
-    type: null,
     limit: 10,
-    category: null,
     from: UserType.HOST,
   });
 
@@ -41,9 +39,7 @@ const MyPerchs = () => {
   };
 
   // Memoize derived data
-  const propertiesQuery = useOwnedPropertyQuery({
-    ...filters,
-  });
+  const propertiesQuery = useOwnedPropertyQuery(filters);
 
   const properties = useMemo(
     () => propertiesQuery.data?.pages.flatMap((page) => page.data) || [],
@@ -70,46 +66,47 @@ const MyPerchs = () => {
           <SearchBar />
         </View>
       )}
-      <ScrollView keyboardShouldPersistTaps="handled">
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <View className="pb-5" style={{ flex: 1 }}>
-          <View style={styles.itemsContainer} className="my-4 py-4">
-            <FlashList
-              data={properties}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={1}
-              contentContainerClassName="pb-32"
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item, index }) => (
-                <View className="mx-5">
-                  <Card item={item} onPress={() => handleCardPress(item.id)} />
-                </View>
-              )}
-              ListHeaderComponent={listHeader}
-              ListEmptyComponent={
-                propertiesQuery.isLoading ? (
-                  <ActivityIndicator
-                    size="small"
-                    className="text-primary-300 mt-5"
+          <FlashList
+            data={properties}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={1}
+            contentContainerClassName="pb-32"
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => (
+              <View className="mx-5">
+                <Card item={item} onPress={() => handleCardPress(item.id)} />
+              </View>
+            )}
+            ListHeaderComponent={listHeader}
+            ListEmptyComponent={
+              propertiesQuery.isLoading ? (
+                <ActivityIndicator
+                  size="small"
+                  className="text-primary-300 mt-5"
+                />
+              ) : (
+                <View className="items-center justify-center mt-52">
+                  <GradientCard
+                    onPress={() => router.push("/my-perchs/form")}
+                    bgColor={"#F5F5F5"}
                   />
-                ) : (
-                  <View className="items-center justify-center mt-52">
-                    <GradientCard
-                      onPress={() => router.push("/my-perchs/form")}
-                      bgColor={"#F5F5F5"}
-                    />
-                  </View>
-                )
-              }
-              scrollEventThrottle={16}
-              estimatedItemSize={200}
-            />
-          </View>
+                </View>
+              )
+            }
+            scrollEventThrottle={16}
+            estimatedItemSize={200}
+          />
         </View>
       </ScrollView>
       {properties.length > 0 && (
         <TouchableOpacity
           onPress={() => router.push("/my-perchs/form")}
-          className="absolutew-full items-end px-10 bottom-20 shadow-sm"
+          className="absolute w-full items-end px-10 bottom-16 shadow-sm"
         >
           <AntDesign name="pluscircle" size={60} color={Colors.primary} />
         </TouchableOpacity>
@@ -123,7 +120,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
   },
   itemsContainer: {
-    paddingVertical: 10,
     borderRadius: 15,
     height: "100%",
   },

@@ -23,6 +23,7 @@ import {
   Platform,
 } from "react-native";
 import { Image } from "expo-image";
+import { useGlobalContext } from "@/lib/global-provider";
 
 const Banks = () => {
   const params = useLocalSearchParams<{ query?: string }>();
@@ -35,6 +36,8 @@ const Banks = () => {
   const [accountDetails, setAccountDetails] = useState<any>();
   const [filteredBanks, setFilteredBanks] = useState<any>([]);
   const [banksModalVisible, setBanksModalVisible] = useState(false);
+
+  const { showLoader, hideLoader } = useGlobalContext();
 
   const filterBanks = () => {
     const filterBanks: any = banks.filter((b: any) =>
@@ -93,7 +96,9 @@ const Banks = () => {
     setBanksModalVisible(true);
   };
 
-  const handleSetWithdrawalBank = () => {};
+  const handleSetWithdrawalBank = () => {
+    showLoader();
+  };
 
   return (
     <ScrollView style={styles.container} className="flex-1">

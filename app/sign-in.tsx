@@ -57,7 +57,7 @@ const SignIn = () => {
 
   async function onHandleLoginWithGoogle() {
     setIsLoading(true);
-    signIn((error: any, userInfo: any) => {
+    await signIn((error: any, userInfo: any) => {
       if (error) {
         displayToast({
           type: ToastType.ERROR,

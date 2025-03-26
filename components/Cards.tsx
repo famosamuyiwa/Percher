@@ -8,9 +8,9 @@ import {
 import React from "react";
 import images from "@/constants/images";
 import icons from "../constants/icons";
-import { Property } from "../interfaces";
+import { Booking, Property } from "../interfaces";
 import { Image } from "expo-image";
-import { Commafy } from "@/utils/common";
+import { Commafy, formatDate } from "@/utils/common";
 import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,7 +22,7 @@ interface Props {
 }
 
 interface BookingProps {
-  item: any; //for now
+  item: Booking;
   onPress?: () => void;
 }
 
@@ -111,17 +111,20 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
     >
       <View className="flex-row justify-between px-4 py-2">
         <Text className="text-white font-plus-jakarta-bold text-xs">
-          Famosa Hightowers
+          {item.property?.name}
         </Text>
       </View>
 
       <View className="bg-white flex-row py-4 rounded-b-3xl">
-        <Image source={images.newYork} style={styles.bookingCardGuestImg} />
+        <Image
+          source={{ uri: item.property?.header }}
+          style={styles.bookingCardGuestImg}
+        />
         <View className="flex-1 pr-4 gap-2">
           <View className="flex-row justify-between p-r-4">
             <Text className="font-plus-jakarta-regular text-xs">Arrival</Text>
             <Text className="font-plus-jakarta-regular text-xs">
-              Wed, Dec 03, 2025. 2:00pm
+              {formatDate(item.startDate)}
             </Text>
           </View>
           <View className="flex-row justify-between">
@@ -129,13 +132,13 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
               Departure
             </Text>
             <Text className=" font-plus-jakarta-regular text-xs">
-              Thur, Dec 04, 2025. 2:00pm
+              {formatDate(item.endDate)}
             </Text>
           </View>
           <View className="flex-row justify-between">
             <Entypo name="location" size={14} color={Colors.accent} />
             <Text className=" font-plus-jakarta-regular text-xs">
-              Lagos, Nigeria
+              {item.property?.location}
             </Text>
           </View>
           <View className="flex-row justify-end">

@@ -27,22 +27,28 @@ import { Colors } from "@/constants/common";
 import { Commafy } from "@/utils/common";
 
 import CustomButton from "@/components/Button";
-import { usePropertyByIdQuery } from "@/hooks/query/usePropertyQuery";
+import { usePropertyQuery } from "@/hooks/query/usePropertyQuery";
 import { useGlobalStore } from "@/store/store";
 
 const Property = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { saveBookingState } = useGlobalStore();
   const windowHeight = Dimensions.get("window").height;
-  const propertyQuery = usePropertyByIdQuery(Number(id));
+  const propertyQuery = usePropertyQuery(Number(id));
 
   const handleOnPerchClick = () => {
-    router.push(`/booking/${id}`);
+    router.push({
+      pathname: `/booking/[id]`,
+      params: {
+        id: Number(id),
+        chargeType: propertyQuery.data?.data?.chargeType,
+      },
+    });
   };
 
   useEffect(() => {
     if (propertyQuery.data?.data) {
-      saveBookingState(propertyQuery.data.data);
+      saveBookingState(propertyQuery.data.data, undefined);
     }
   }, [propertyQuery.data?.data]);
 

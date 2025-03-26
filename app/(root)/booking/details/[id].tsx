@@ -28,8 +28,11 @@ import { useGlobalContext } from "@/lib/global-provider";
 
 const Details = () => {
   const windowHeight = Dimensions.get("window").height;
-  const { id, userType } = useLocalSearchParams();
-
+  const { id, userType } = useLocalSearchParams<{
+    id?: string;
+    userType?: UserType;
+  }>();
+  console.log("usertype: ", userType);
   const { user, displayToast } = useGlobalContext();
 
   const handleApproval = async (choice: ApprovalActions) => {

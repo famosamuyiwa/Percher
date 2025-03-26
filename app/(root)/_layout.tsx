@@ -19,7 +19,7 @@ export default function AppLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="booking/[id]" />
+      <Stack.Screen name="booking" />
       <Stack.Screen name="notifications/index" />
       <Stack.Screen name="properties/[id]" />
       <Stack.Screen name="(settings)" />

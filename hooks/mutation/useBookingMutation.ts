@@ -1,5 +1,5 @@
 import { createBooking } from "@/api/api.service";
-import { USE_BOOKING_QUERY_KEY } from "@/constants/common";
+import { USE_BOOKINGS_QUERY_KEY } from "@/constants/common";
 import { ToastType } from "@/constants/enums";
 import { ApiResponse } from "@/interfaces";
 import { useGlobalContext } from "@/lib/global-provider";
@@ -10,11 +10,7 @@ export const useCreateBookingMutation = () => {
   const { displayToast } = useGlobalContext();
 
   const onUseCreateBookingMutationSuccess = (payload: ApiResponse) => {
-    queryClient.invalidateQueries({ queryKey: USE_BOOKING_QUERY_KEY });
-    displayToast({
-      type: ToastType.SUCCESS,
-      description: "Perch awaiting approval",
-    });
+    queryClient.invalidateQueries({ queryKey: USE_BOOKINGS_QUERY_KEY });
   };
 
   const onUseCreateBookingMutationError = (error: Error) => {

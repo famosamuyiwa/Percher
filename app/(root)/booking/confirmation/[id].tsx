@@ -6,7 +6,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
@@ -20,19 +20,66 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
-import { Paystack } from "react-native-paystack-webview";
 import PaystackCheckout from "@/hooks/usePaystack";
 import CustomButton from "@/components/Button";
+import { useCreateBookingMutation } from "@/hooks/mutation/useBookingMutation";
+import { useGlobalStore } from "@/store/store";
+import { useGlobalContext } from "@/lib/global-provider";
+import {
+  Commafy,
+  convertToInternationalPhoneNumber,
+  formatDate,
+} from "@/utils/common";
+import { GUEST_SERVICE_FEE_PERCENTAGE } from "@/environment";
 
 const BookingConfirmation = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
-
+  const { booking, property } = useGlobalStore();
+  const { user } = useGlobalContext();
+  const createBookingMutation = useCreateBookingMutation();
+  const [invoice, setInvoice] = useState({
+    price: 0,
+    totalPrice: 0,
+    cautionFee: 0,
+    subTotal: 0,
+    serviceFee: 0,
+    total: 0,
+  });
   const [isClicked, setIsClicked] = useState(false);
 
-  const newEmail: any = "barrakudadev@gmail.com";
   const handleOnMakePayment = () => {
-    if (newEmail) setIsClicked(true);
+    if (!booking) return;
+    createBookingMutation.mutate(booking, { onSettled, onSuccess });
   };
+
+  const onSettled = () => {};
+
+  const onSuccess = () => {
+    if (user?.email) setIsClicked(true);
+  };
+
+  const handleOnPaymentSuccess = () => {
+    router.replace("/bookings");
+  };
+
+  useEffect(() => {
+    if (!booking || !property) return;
+
+    const price = Number(property.price);
+    const totalPrice = price * 2; //change 2 to stay period in digit
+    const cautionFee = Number(property.cautionFee);
+    const subTotal = totalPrice + cautionFee;
+    const serviceFee = subTotal * (GUEST_SERVICE_FEE_PERCENTAGE / 100);
+    const total = subTotal + serviceFee;
+    setInvoice({
+      price,
+      totalPrice,
+      cautionFee,
+      subTotal,
+      serviceFee,
+      total,
+    });
+  }, [booking, property]);
 
   return (
     <SafeAreaView className="pb-5 flex-1 bg-white">
@@ -52,23 +99,23 @@ const BookingConfirmation = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View className="flex-row gap-5 px-5">
             <Image
               style={styles.propertyImg}
-              source={images.newYork}
+              source={{ uri: property?.header }}
               contentFit="cover"
             />
             <View className="flex-1">
               <View className="flex-1 justify-around">
                 <View className="flex-row justify-between">
                   <Text className="font-plus-jakarta-bold text-sm">
-                    Famosa Hightowers
+                    {property?.name}
                   </Text>
                   <View className="flex-row gap-1 items-center">
                     <AntDesign name="star" size={14} color="gold" />
                     <Text className="font-plus-jakarta-regular text-sm ">
-                      5.0
+                      {property?.rating ?? 0}
                     </Text>
                   </View>
                 </View>
@@ -82,7 +129,7 @@ const BookingConfirmation = () => {
                       />
                     </View>
                     <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-1">
-                      3
+                      {property?.bed}
                     </Text>
                   </View>
                   <View className="flex-row">
@@ -94,7 +141,7 @@ const BookingConfirmation = () => {
                       />
                     </View>
                     <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-1">
-                      2
+                      {property?.bathroom}
                     </Text>
                   </View>
                 </View>
@@ -102,14 +149,17 @@ const BookingConfirmation = () => {
                 <View className="flex-row gap-2 items-baseline">
                   <Entypo name="location" size={14} color={Colors.accent} />
                   <Text className="font-plus-jakarta-regular text-sm">
-                    Lagos, Nigeria
+                    {property?.location}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
                   <Text className="font-plus-jakarta-bold text-accent-300 text-sm">
-                    ₦150,000.00
+                    {Commafy(property?.price ?? 0)}
                   </Text>
-                  <Text className="text-xs text-gray-400"> per night</Text>
+                  <Text className="text-xs text-gray-400">
+                    {" "}
+                    {property?.chargeType?.toLowerCase()}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -131,22 +181,26 @@ const BookingConfirmation = () => {
               <Text className="font-plus-jakarta-regular">Check-In Date</Text>
             </View>
             <Text className="font-plus-jakarta-semibold">
-              Wed, Dec 03, 2025
+              {formatDate(booking?.startDate ?? "") ?? "-"}
             </Text>
           </View>
-          <View className="flex-row px-5 justify-between items-center mb-5">
-            <View className="flex-row items-center gap-2">
-              <View className="w-8">
-                <MaterialCommunityIcons
-                  name="clock-time-three"
-                  size={22}
-                  color={"darkgrey"}
-                />
+          {booking?.checkIn && (
+            <View className="flex-row px-5 justify-between items-center mb-5">
+              <View className="flex-row items-center gap-2">
+                <View className="w-8">
+                  <MaterialCommunityIcons
+                    name="clock-time-three"
+                    size={22}
+                    color={"darkgrey"}
+                  />
+                </View>
+                <Text className="font-plus-jakarta-regular">Check-In Time</Text>
               </View>
-              <Text className="font-plus-jakarta-regular">Check-In Time</Text>
+              <Text className="font-plus-jakarta-semibold">
+                {booking.checkIn}
+              </Text>
             </View>
-            <Text className="font-plus-jakarta-semibold">2:00 pm</Text>
-          </View>
+          )}
           <View className="flex-row px-5 justify-between items-center mb-5">
             <View className="flex-row items-center gap-2">
               <View className="w-8">
@@ -159,22 +213,28 @@ const BookingConfirmation = () => {
               <Text className="font-plus-jakarta-regular">Check-Out Date</Text>
             </View>
             <Text className="font-plus-jakarta-semibold">
-              Wed, Dec 04, 2025
+              {formatDate(booking?.endDate ?? "") ?? "-"}
             </Text>
           </View>
-          <View className="flex-row px-5 justify-between items-center mb-5">
-            <View className="flex-row items-center gap-2">
-              <View className="w-8">
-                <MaterialCommunityIcons
-                  name="clock-time-nine"
-                  size={22}
-                  color={"darkgrey"}
-                />
+          {booking?.checkOut && (
+            <View className="flex-row px-5 justify-between items-center mb-5">
+              <View className="flex-row items-center gap-2">
+                <View className="w-8">
+                  <MaterialCommunityIcons
+                    name="clock-time-nine"
+                    size={22}
+                    color={"darkgrey"}
+                  />
+                </View>
+                <Text className="font-plus-jakarta-regular">
+                  Check-Out Time
+                </Text>
               </View>
-              <Text className="font-plus-jakarta-regular">Check-Out Time</Text>
+              <Text className="font-plus-jakarta-semibold">
+                {booking.checkOut}
+              </Text>
             </View>
-            <Text className="font-plus-jakarta-semibold">12:00 pm</Text>
-          </View>
+          )}
           <View className="flex-row px-5 justify-between items-center mb-5">
             <View className="flex-row items-center gap-2">
               <View className="w-8">
@@ -182,9 +242,9 @@ const BookingConfirmation = () => {
               </View>
               <Text className="font-plus-jakarta-regular">Type</Text>
             </View>
-            <Text className="font-plus-jakarta-semibold">Apartment</Text>
+            <Text className="font-plus-jakarta-semibold">{property?.type}</Text>
           </View>
-          <View className="flex-row px-5 justify-between items-center mb-5">
+          {/* <View className="flex-row px-5 justify-between items-center mb-5">
             <View className="flex-row items-center gap-2">
               <View className="w-8">
                 <FontAwesome5 name="phone" size={18} color={"darkgrey"} />
@@ -194,22 +254,45 @@ const BookingConfirmation = () => {
             <Text className="font-plus-jakarta-semibold">
               (+234)-803-304-4770
             </Text>
-          </View>
+          </View> */}
 
           <View className="bg-gray-100 py-3 my-5 px-5">
             <Text className="font-plus-jakarta-semibold">Price Details</Text>
           </View>
-          <View className="flex-row px-5 justify-between items-center my-5">
-            <Text className="font-plus-jakarta-regular">Price</Text>
-            <Text className="font-plus-jakarta-semibold">₦150,000.00</Text>
+          <View className="my-5">
+            <View className="flex-row px-5 justify-between items-center pb-2">
+              <Text className="font-plus-jakarta-regular">Price</Text>
+              <Text className="font-plus-jakarta-semibold">
+                ₦ {Commafy(invoice.totalPrice)}
+              </Text>
+            </View>
+            <Text className="self-end px-5 text-gray-400 text-xs">
+              ₦ {Commafy(invoice.price)} {" x"}2
+            </Text>
+          </View>
+          <View className="flex-row px-5 justify-between items-center mb-5">
+            <Text className="font-plus-jakarta-regular">Caution Fee</Text>
+            <Text className="font-plus-jakarta-semibold">
+              ₦ {Commafy(invoice.cautionFee)}
+            </Text>
+          </View>
+          <View className="flex-row px-5 justify-between items-center mb-5">
+            <Text className="font-plus-jakarta-regular">SubTotal</Text>
+            <Text className="font-plus-jakarta-semibold">
+              ₦ {Commafy(invoice.subTotal)}
+            </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Service Fee</Text>
-            <Text className="font-plus-jakarta-semibold">₦10,000.00</Text>
+            <Text className="font-plus-jakarta-semibold">
+              ₦ {Commafy(invoice.serviceFee)}
+            </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-bold">Total</Text>
-            <Text className="font-plus-jakarta-bold">₦160,000.00</Text>
+            <Text className="font-plus-jakarta-bold text-xl">
+              ₦ {Commafy(invoice.total)}
+            </Text>
           </View>
 
           <View className="bg-gray-100 py-3 my-5 px-5">
@@ -217,18 +300,16 @@ const BookingConfirmation = () => {
           </View>
           <View className="flex-row px-5 justify-between items-center my-5">
             <Text className="font-plus-jakarta-regular">Name</Text>
-            <Text className="font-plus-jakarta-semibold">Muyiwa</Text>
+            <Text className="font-plus-jakarta-semibold">{user?.name}</Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Mail</Text>
-            <Text className="font-plus-jakarta-semibold">
-              nenling@gmail.com
-            </Text>
+            <Text className="font-plus-jakarta-semibold">{user?.email}</Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Phone Number</Text>
             <Text className="font-plus-jakarta-semibold">
-              (+234)-816-784-5287
+              {convertToInternationalPhoneNumber(user?.phone)}
             </Text>
           </View>
 
@@ -239,16 +320,16 @@ const BookingConfirmation = () => {
         {isClicked && (
           <PaystackCheckout
             billingDetail={{
-              amount: 50000,
-              billingEmail: newEmail,
-              billingName: "Nen Ling",
-              billingMobile: "08033044770",
+              amount: invoice.total,
+              billingEmail: user?.email!,
+              billingName: user?.name!,
+              billingMobile: user?.phone!,
             }}
             clicked={isClicked}
             onEnd={() => {
               setIsClicked(false);
             }}
-            onSuccess={() => router.replace("/bookings")}
+            onSuccess={handleOnPaymentSuccess}
           />
         )}
       </View>

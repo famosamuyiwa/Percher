@@ -10,7 +10,6 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
-import images from "@/constants/images";
 import {
   AntDesign,
   Entypo,
@@ -22,64 +21,78 @@ import {
 import { Colors } from "@/constants/common";
 import PaystackCheckout from "@/hooks/usePaystack";
 import CustomButton from "@/components/Button";
-import { useCreateBookingMutation } from "@/hooks/mutation/useBookingMutation";
+import {
+  useCreateBookingMutation,
+  useDiscardBookingMutation,
+} from "@/hooks/mutation/useBookingMutation";
 import { useGlobalStore } from "@/store/store";
 import { useGlobalContext } from "@/lib/global-provider";
 import {
   Commafy,
   convertToInternationalPhoneNumber,
   formatDate,
+  generateUniqueId,
 } from "@/utils/common";
-import { GUEST_SERVICE_FEE_PERCENTAGE } from "@/environment";
+import { ApiResponse, Booking, Payment } from "@/interfaces";
+import { useVerifyPaymentMutation } from "@/hooks/mutation/usePaymentMutation";
 
 const BookingConfirmation = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { booking, property } = useGlobalStore();
-  const { user } = useGlobalContext();
+  const { user, showLoader, hideLoader } = useGlobalContext();
   const createBookingMutation = useCreateBookingMutation();
-  const [invoice, setInvoice] = useState({
-    price: 0,
-    totalPrice: 0,
-    cautionFee: 0,
-    subTotal: 0,
-    serviceFee: 0,
-    total: 0,
-  });
+  const verifyPaymentMutation = useVerifyPaymentMutation();
   const [isClicked, setIsClicked] = useState(false);
+  const [transactionRef, setTransactionRef] = useState(generateUniqueId());
+  const [savedBooking, setSavedBooking] = useState<Booking | undefined>(
+    undefined
+  );
 
   const handleOnMakePayment = () => {
-    if (!booking) return;
-    createBookingMutation.mutate(booking, { onSettled, onSuccess });
+    if (!booking || !booking.invoice) return;
+    const newTransactionRef = generateUniqueId();
+    setTransactionRef(newTransactionRef);
+    const transaction: Payment[] = [
+      {
+        reference: newTransactionRef,
+      },
+    ];
+
+    booking.invoice.payments = transaction;
+    createBookingMutation.mutate(booking, {
+      onSettled: onBookingSettled,
+      onSuccess: onBookingSuccess,
+    });
   };
 
-  const onSettled = () => {};
+  const onBookingSettled = () => {};
 
-  const onSuccess = () => {
+  const onBookingSuccess = (payload: ApiResponse<Booking>) => {
+    setSavedBooking(payload.data);
     if (user?.email) setIsClicked(true);
   };
 
   const handleOnPaymentSuccess = () => {
-    router.replace("/bookings");
+    verifyPaymentMutation.mutate(transactionRef, {
+      onSettled: onPaymentSettled,
+      onSuccess: onPaymentSuccess,
+    });
+    showLoader();
   };
 
-  useEffect(() => {
-    if (!booking || !property) return;
+  const handleOnPaymentCanceled = () => {
+    setIsClicked(false);
+  };
 
-    const price = Number(property.price);
-    const totalPrice = price * 2; //change 2 to stay period in digit
-    const cautionFee = Number(property.cautionFee);
-    const subTotal = totalPrice + cautionFee;
-    const serviceFee = subTotal * (GUEST_SERVICE_FEE_PERCENTAGE / 100);
-    const total = subTotal + serviceFee;
-    setInvoice({
-      price,
-      totalPrice,
-      cautionFee,
-      subTotal,
-      serviceFee,
-      total,
-    });
-  }, [booking, property]);
+  const onPaymentSettled = () => {
+    // simulate delay to prevent glitches
+    setTimeout(() => {
+      router.replace("/bookings");
+      hideLoader();
+    }, 1000);
+  };
+
+  const onPaymentSuccess = () => {};
 
   return (
     <SafeAreaView className="pb-5 flex-1 bg-white">
@@ -184,23 +197,22 @@ const BookingConfirmation = () => {
               {formatDate(booking?.startDate ?? "") ?? "-"}
             </Text>
           </View>
-          {booking?.checkIn && (
-            <View className="flex-row px-5 justify-between items-center mb-5">
-              <View className="flex-row items-center gap-2">
-                <View className="w-8">
-                  <MaterialCommunityIcons
-                    name="clock-time-three"
-                    size={22}
-                    color={"darkgrey"}
-                  />
-                </View>
-                <Text className="font-plus-jakarta-regular">Check-In Time</Text>
+
+          <View className="flex-row px-5 justify-between items-center mb-5">
+            <View className="flex-row items-center gap-2">
+              <View className="w-8">
+                <MaterialCommunityIcons
+                  name="clock-time-three"
+                  size={22}
+                  color={"darkgrey"}
+                />
               </View>
-              <Text className="font-plus-jakarta-semibold">
-                {booking.checkIn}
-              </Text>
+              <Text className="font-plus-jakarta-regular">Check-In Time</Text>
             </View>
-          )}
+            <Text className="font-plus-jakarta-semibold">
+              {booking?.checkIn || "--"}
+            </Text>
+          </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <View className="flex-row items-center gap-2">
               <View className="w-8">
@@ -216,25 +228,22 @@ const BookingConfirmation = () => {
               {formatDate(booking?.endDate ?? "") ?? "-"}
             </Text>
           </View>
-          {booking?.checkOut && (
-            <View className="flex-row px-5 justify-between items-center mb-5">
-              <View className="flex-row items-center gap-2">
-                <View className="w-8">
-                  <MaterialCommunityIcons
-                    name="clock-time-nine"
-                    size={22}
-                    color={"darkgrey"}
-                  />
-                </View>
-                <Text className="font-plus-jakarta-regular">
-                  Check-Out Time
-                </Text>
+
+          <View className="flex-row px-5 justify-between items-center mb-5">
+            <View className="flex-row items-center gap-2">
+              <View className="w-8">
+                <MaterialCommunityIcons
+                  name="clock-time-nine"
+                  size={22}
+                  color={"darkgrey"}
+                />
               </View>
-              <Text className="font-plus-jakarta-semibold">
-                {booking.checkOut}
-              </Text>
+              <Text className="font-plus-jakarta-regular">Check-Out Time</Text>
             </View>
-          )}
+            <Text className="font-plus-jakarta-semibold">
+              {booking?.checkOut || "--"}
+            </Text>
+          </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <View className="flex-row items-center gap-2">
               <View className="w-8">
@@ -263,35 +272,38 @@ const BookingConfirmation = () => {
             <View className="flex-row px-5 justify-between items-center pb-2">
               <Text className="font-plus-jakarta-regular">Price</Text>
               <Text className="font-plus-jakarta-semibold">
-                ₦ {Commafy(invoice.totalPrice)}
+                ₦ {Commafy(booking?.invoice?.price)}
               </Text>
             </View>
-            <Text className="self-end px-5 text-gray-400 text-xs">
-              ₦ {Commafy(invoice.price)} {" x"}2
-            </Text>
+            {(booking?.invoice?.period ?? 0) > 1 && (
+              <Text className="self-end px-5 text-gray-400 text-xs">
+                ₦ {Commafy(booking?.invoice?.subPrice)} {" x"}{" "}
+                {booking?.invoice?.period}
+              </Text>
+            )}
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Caution Fee</Text>
             <Text className="font-plus-jakarta-semibold">
-              ₦ {Commafy(invoice.cautionFee)}
+              ₦ {Commafy(booking?.invoice?.cautionFee)}
             </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">SubTotal</Text>
             <Text className="font-plus-jakarta-semibold">
-              ₦ {Commafy(invoice.subTotal)}
+              ₦ {Commafy(booking?.invoice?.subTotal)}
             </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Service Fee</Text>
             <Text className="font-plus-jakarta-semibold">
-              ₦ {Commafy(invoice.serviceFee)}
+              ₦ {Commafy(booking?.invoice?.guestServiceFee)}
             </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-bold">Total</Text>
             <Text className="font-plus-jakarta-bold text-xl">
-              ₦ {Commafy(invoice.total)}
+              ₦ {Commafy(booking?.invoice?.guestTotal)}
             </Text>
           </View>
 
@@ -317,21 +329,18 @@ const BookingConfirmation = () => {
             <CustomButton label="Make payment" onPress={handleOnMakePayment} />
           </View>
         </ScrollView>
-        {isClicked && (
-          <PaystackCheckout
-            billingDetail={{
-              amount: invoice.total,
-              billingEmail: user?.email!,
-              billingName: user?.name!,
-              billingMobile: user?.phone!,
-            }}
-            clicked={isClicked}
-            onEnd={() => {
-              setIsClicked(false);
-            }}
-            onSuccess={handleOnPaymentSuccess}
-          />
-        )}
+        <PaystackCheckout
+          billingDetail={{
+            amount: booking?.invoice?.guestTotal!,
+            billingEmail: user?.email!,
+            billingName: user?.name!,
+            billingMobile: user?.phone!,
+            refNumber: transactionRef,
+          }}
+          clicked={isClicked}
+          onEnd={handleOnPaymentCanceled}
+          onSuccess={handleOnPaymentSuccess}
+        />
       </View>
     </SafeAreaView>
   );

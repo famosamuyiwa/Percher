@@ -1,13 +1,19 @@
-import { SplashScreen, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import "./global.css";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import React from "react";
 import GlobalProvider from "../lib/global-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as SplashScreen from "expo-splash-screen";
 
+SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const queryClient = new QueryClient();
+  SplashScreen.setOptions({
+    duration: 1000,
+    fade: true,
+  });
 
   const [fontsLoaded] = useFonts({
     "Plus-Jakarta-Regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),

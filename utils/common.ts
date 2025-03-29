@@ -5,8 +5,8 @@ import {
 import { useGlobalStore } from "@/store/store";
 import * as SecureStore from "expo-secure-store";
 
-export const Commafy = (value: number) => {
-  if (!value) return;
+export const Commafy = (value: any) => {
+  if (!value) return "--";
   return Number(value).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -104,7 +104,7 @@ export async function removeToken(key: string) {
 export function convertToInternationalPhoneNumber(
   phoneNumber: string | undefined
 ) {
-  if (!phoneNumber) return "-";
+  if (!phoneNumber) return "--";
   // Remove any non-digit characters
   const cleaned = phoneNumber.replace(/\D/g, "");
 
@@ -124,4 +124,8 @@ export function convertToInternationalPhoneNumber(
     6
   )}-${localNumber.slice(6)}`;
   return formatted;
+}
+
+export function generateUniqueId() {
+  return "" + Math.floor(Math.random() * 1000000000 + 1);
 }

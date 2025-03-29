@@ -9,6 +9,7 @@ interface PayStackProps {
     billingEmail: string;
     billingMobile: string;
     amount: number;
+    refNumber: string;
   };
   clicked: boolean;
   onEnd: () => void;
@@ -21,66 +22,42 @@ export default function PaystackCheckout({
   onEnd,
   onSuccess,
 }: PayStackProps) {
-  const [pay, setPay] = useState(false);
-
-  useEffect(() => {
-    if (clicked) {
-      handleSubmit();
-    }
-  }, [clicked]);
-
-  const handleSubmit = () => {
-    if (
-      billingDetail.billingName &&
-      billingDetail.billingEmail &&
-      billingDetail.billingMobile &&
-      billingDetail.amount
-    ) {
-      setPay(true);
-    }
-  };
-
   return (
-    <View>
-      {pay && (
-        <View style={{ flex: 1 }}>
-          <Paystack
-            paystackKey={process.env.EXPO_PUBLIC_PAYSTACK_TEST_PUBLIC_KEY!}
-            amount={billingDetail.amount}
-            billingEmail={billingDetail.billingEmail}
-            phone={billingDetail.billingMobile}
-            activityIndicatorColor={Colors.primary}
-            onCancel={(e) => {
-              // handle response here
-              setPay(false);
-              onEnd();
-              console.log("Transaction Canceled!!");
-            }}
-            onSuccess={(response: any) => {
-              // handle response here
-              console.log("response: ", response);
-              const responseObject = response["transactionRef"]["message"];
-              if (responseObject === "Approved") {
-                onSuccess();
-                console.log("Transaction Approved!!");
-              }
-              onEnd();
-            }}
-            autoStart={pay}
-            currency="NGN"
-            channels={[
-              "card",
-              "bank",
-              "ussd",
-              "qr",
-              "mobile_money",
-              "bank_transfer",
-              "eft",
-              "apple_pay",
-            ]}
-          />
-        </View>
-      )}
+    <View style={{ flex: 1 }}>
+      <Paystack
+        paystackKey={process.env.EXPO_PUBLIC_PAYSTACK_TEST_PUBLIC_KEY!}
+        amount={billingDetail.amount}
+        billingEmail={billingDetail.billingEmail}
+        phone={billingDetail.billingMobile}
+        activityIndicatorColor={Colors.primary}
+        onCancel={(e) => {
+          // handle response here
+          onEnd();
+          console.log("Transaction Canceled!!");
+        }}
+        onSuccess={(response: any) => {
+          // handle response here
+          console.log("response: ", response);
+          const responseObject = response["transactionRef"]["message"];
+          if (responseObject === "Approved") {
+            onSuccess();
+            console.log("Transaction Approved!!");
+          }
+        }}
+        autoStart={clicked}
+        currency="NGN"
+        channels={[
+          "card",
+          "bank",
+          "ussd",
+          "qr",
+          "mobile_money",
+          "bank_transfer",
+          "eft",
+          "apple_pay",
+        ]}
+        refNumber={billingDetail.refNumber}
+      />
     </View>
   );
 }

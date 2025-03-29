@@ -32,11 +32,6 @@ export enum FilterCategoryKey {
   BOOKINGS = "Bookings",
 }
 
-export enum ApprovalActions {
-  APPROVE = "Approve",
-  REJECT = "Reject",
-}
-
 export enum TransactionType {
   DEBIT = "Debit",
   CREDIT = "Credit",
@@ -147,4 +142,31 @@ export enum BookingStatus {
   COMPLETED = "Completed",
   REJECTED = "Rejected",
   CANCELLED = "Cancelled",
+  DRAFT = "Draft",
+}
+
+export enum PropertyScreenMode {
+  VIEW_ONLY = "VIEW_ONLY",
+}
+
+export enum TransactionStatus {
+  PENDING = "Pending",
+  COMPLETED = "Completed",
+  FAILED = "Failed",
+}
+
+export enum TransactionType {
+  DEPOSIT = "Deposit",
+  WITHDRAWAL = "Withdrawal",
+  BOOKING = "Booking",
+  REFUND = "Refund",
+}
+
+export enum PaymentStatus {
+  SUCCESS = "success",
+}
+
+export enum ReviewAction {
+  APPROVE = "Approve",
+  REJECT = "Reject",
 }

@@ -1,14 +1,13 @@
 import { View, Text, StyleSheet } from "react-native";
 
 import icons from "@/constants/icons";
-import { Models } from "react-native-appwrite";
 import React from "react";
 import { Image } from "expo-image";
 import { FontAwesome } from "@expo/vector-icons";
 import images from "@/constants/images";
 
 interface Props {
-  item: Models.Document;
+  item: any;
 }
 
 const Comment = ({ item }: Props) => {

@@ -5,9 +5,11 @@ import {
   ChargeType,
   Facility,
   LoginProvider,
+  PaymentStatus,
   PerchTypes,
-  PropertyType,
   RegistrationStatus,
+  ReviewAction,
+  TransactionType,
   UserType,
 } from "./constants/enums";
 
@@ -101,6 +103,11 @@ export interface Booking {
   createdAt?: Date;
   updatedAt?: Date;
   property?: Property;
+  invoice?: Invoice;
+  host?: User;
+  guest?: User;
+  transactionRef: string;
+  status?: BookingStatus;
 }
 
 export interface User {
@@ -154,4 +161,42 @@ export interface Filter {
   category?: Category;
   from?: UserType;
   bookingStatus?: BookingStatus;
+}
+
+export interface Invoice {
+  price: number;
+  subPrice: number;
+  period: number;
+  subTotal: number;
+  guestServiceFee: number;
+  hostServiceFee: number;
+  cautionFee: number;
+  guestTotal?: number;
+  hostTotal?: number;
+  booking?: Booking;
+  payments?: Payment[];
+  [key: string]: any; // Allows dynamic keys
+}
+
+export interface Payment {
+  wallet?: Wallet;
+  amount?: number;
+  type?: TransactionType;
+  status?: PaymentStatus;
+  reference: string;
+  invoice?: Invoice;
+}
+
+export interface Wallet {
+  user: User;
+  balance: number;
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  payments: Payment[];
+}
+
+export interface ReviewBookingRequest {
+  id: number;
+  action: ReviewAction;
 }

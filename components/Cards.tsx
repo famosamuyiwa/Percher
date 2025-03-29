@@ -124,7 +124,7 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
           <View className="flex-row justify-between p-r-4">
             <Text className="font-plus-jakarta-regular text-xs">Arrival</Text>
             <Text className="font-plus-jakarta-regular text-xs">
-              {formatDate(item.startDate)}
+              {formatDate(item.startDate)} {item.checkIn}
             </Text>
           </View>
           <View className="flex-row justify-between">
@@ -132,7 +132,7 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
               Departure
             </Text>
             <Text className=" font-plus-jakarta-regular text-xs">
-              {formatDate(item.endDate)}
+              {formatDate(item.endDate)} {item.checkOut}
             </Text>
           </View>
           <View className="flex-row justify-between">
@@ -143,7 +143,7 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
           </View>
           <View className="flex-row justify-end">
             <Text className=" font-plus-jakarta-extrabold text-primary-300">
-              ₦750,000.00
+              ₦ {Commafy(item.invoice?.guestTotal)}
             </Text>
           </View>
         </View>
@@ -160,17 +160,20 @@ export const BookingCardHost = ({ item, onPress }: BookingProps) => {
     >
       <View className="flex-row justify-between px-4 py-2">
         <Text className="text-white font-plus-jakarta-bold text-xs">
-          Famosa Hightowers
+          {item.property?.name}
         </Text>
       </View>
 
       <View className="bg-white flex-row py-4 rounded-b-3xl">
-        <Image source={images.avatar} style={styles.bookingCardHostImg} />
+        <Image
+          source={{ uri: item.guest?.avatar }}
+          style={styles.bookingCardHostImg}
+        />
         <View className="flex-1 pr-4 gap-2">
           <View className="flex-row justify-between p-r-4">
             <Text className="font-plus-jakarta-regular text-xs">Arrival</Text>
             <Text className="font-plus-jakarta-regular text-xs">
-              Wed, Dec 03, 2025. 2:00pm
+              {formatDate(item.startDate)} {item.checkIn}
             </Text>
           </View>
           <View className="flex-row justify-between">
@@ -178,16 +181,18 @@ export const BookingCardHost = ({ item, onPress }: BookingProps) => {
               Departure
             </Text>
             <Text className=" font-plus-jakarta-regular text-xs">
-              Thur, Dec 04, 2025. 2:00pm
+              {formatDate(item.endDate)} {item.checkOut}
             </Text>
           </View>
           <View className="flex-row justify-between">
             <Ionicons name="person" size={14} color={Colors.accent} />
-            <Text className=" font-plus-jakarta-regular text-xs">Horus</Text>
+            <Text className=" font-plus-jakarta-regular text-xs">
+              {item.guest?.name}
+            </Text>
           </View>
           <View className="flex-row justify-end">
             <Text className=" font-plus-jakarta-extrabold text-primary-300">
-              ₦200,000.00
+              ₦ {Commafy(item.invoice?.guestTotal)}
             </Text>
           </View>
         </View>

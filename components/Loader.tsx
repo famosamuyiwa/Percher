@@ -2,7 +2,7 @@ import React, { useState, useImperativeHandle, forwardRef } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { Colors } from "@/constants/common";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, View, Text } from "react-native";
 
 const Loader = forwardRef(({}, ref) => {
   const [visibility, setVisibility] = useState(false);
@@ -32,7 +32,10 @@ const Loader = forwardRef(({}, ref) => {
           entering={FadeIn.duration(500)}
           className="w-full h-full absolute items-center justify-center bg-black/50"
         >
-          <ActivityIndicator color={Colors.primary} size="large" />
+          <View className=" bg-white rounded-xl p-5 flex-row items-center justify-center gap-5">
+            <ActivityIndicator color={Colors.primary} size="large" />
+            <Text className="font-plus-jakarta-semibold">Please wait...</Text>
+          </View>
         </Animated.View>
       )}
     </>

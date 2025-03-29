@@ -9,7 +9,7 @@ import {
   Button,
   Alert,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   AntDesign,
@@ -23,35 +23,55 @@ import {
 import { Image } from "expo-image";
 import images from "@/constants/images";
 import { Colors } from "@/constants/common";
-import { ApprovalActions, ToastType, UserType } from "@/constants/enums";
+import {
+  BookingStatus,
+  PropertyScreenMode,
+  ReviewAction,
+  ToastType,
+  UserType,
+} from "@/constants/enums";
 import { useGlobalContext } from "@/lib/global-provider";
+import { useBookingQuery } from "@/hooks/query/useBookingQuery";
+import {
+  Commafy,
+  convertToInternationalPhoneNumber,
+  formatDate,
+} from "@/utils/common";
+import { Invoice } from "@/interfaces";
+import { useReviewBookingMutation } from "@/hooks/mutation/useBookingMutation";
 
 const Details = () => {
   const windowHeight = Dimensions.get("window").height;
   const { id, userType } = useLocalSearchParams<{
-    id?: string;
+    id: string;
     userType?: UserType;
   }>();
-  console.log("usertype: ", userType);
-  const { user, displayToast } = useGlobalContext();
+  const { user, displayToast, showLoader, hideLoader } = useGlobalContext();
+  const bookingQuery = useBookingQuery(Number(id));
+  const reviewBookingMutation = useReviewBookingMutation();
 
-  const handleApproval = async (choice: ApprovalActions) => {
-    if (true) {
-      displayToast({
-        type: ToastType.SUCCESS,
-        description: `You have successfully ${
-          choice === ApprovalActions.APPROVE ? "approved" : "rejected"
-        } this request`,
-      });
-    } else {
-      displayToast({
-        type: ToastType.ERROR,
-        description: "An error occurred. Try again later",
-      });
-    }
+  const handleApproval = async (choice: ReviewAction) => {
+    showLoader();
+    reviewBookingMutation.mutate(
+      { action: choice, id: Number(id) },
+      { onSuccess: () => onSuccess(choice), onSettled }
+    );
   };
 
-  const showPrompt = (choice: ApprovalActions) => {
+  const onSuccess = (choice: ReviewAction) => {
+    displayToast({
+      type: ToastType.SUCCESS,
+      description: `You have successfully ${
+        choice === ReviewAction.APPROVE ? "approved" : "rejected"
+      } this request`,
+    });
+  };
+
+  const onSettled = () => {
+    hideLoader();
+  };
+
+  const showPrompt = (choice: ReviewAction) => {
     Alert.alert(
       "Confirmation", // Title of the alert
       `Are you sure you want to ${choice} this request?`, // Message
@@ -70,6 +90,18 @@ const Details = () => {
     );
   };
 
+  const handleOnViewProperty = () => {
+    router.push({
+      pathname: `/properties/[id]`,
+      params: {
+        id: bookingQuery.data?.data?.property?.id!,
+        mode: PropertyScreenMode.VIEW_ONLY,
+      },
+    });
+  };
+
+  useEffect(() => {}, [bookingQuery.data?.data]);
+
   return (
     <View className="bg-white">
       <ScrollView
@@ -78,7 +110,7 @@ const Details = () => {
       >
         <View className="relative w-full" style={{ height: windowHeight / 5 }}>
           <Image
-            source={images.newYork}
+            source={{ uri: bookingQuery.data?.data?.property?.header }}
             style={styles.propertyImg}
             contentFit="cover"
           />
@@ -98,9 +130,7 @@ const Details = () => {
 
               {userType === UserType.GUEST && (
                 <TouchableOpacity
-                  onPress={() =>
-                    router.push(`/properties/${"67c443e900042ef21474"}`)
-                  }
+                  onPress={handleOnViewProperty}
                   className="flex flex-row rounded-full size-11 items-center justify-center bg-white"
                 >
                   <MaterialCommunityIcons name="home-search" size={20} />
@@ -112,11 +142,17 @@ const Details = () => {
         <View className="mt-7 flex gap-2">
           <View className="px-5 flex-row justify-between items-center">
             <Text className="text-2xl font-plus-jakarta-extrabold">
-              Famosa HighTowers
+              {bookingQuery.data?.data?.property?.name}
             </Text>
 
-            {(userType === UserType.GUEST ||
-              (userType === UserType.HOST && false)) && ( // check if approval action has not been taken on record yet
+            {((userType === UserType.GUEST &&
+              bookingQuery.data?.data?.status !== BookingStatus.REJECTED) ||
+              (userType === UserType.HOST &&
+                !(
+                  bookingQuery.data?.data?.status === BookingStatus.PENDING ||
+                  bookingQuery.data?.data?.status === BookingStatus.DRAFT
+                ) &&
+                bookingQuery.data?.data.status !== BookingStatus.REJECTED)) && ( // check if approval action has not been taken on record yet
               <View className="flex flex-row items-center gap-5">
                 <Ionicons
                   name="chatbox-ellipses"
@@ -128,10 +164,10 @@ const Details = () => {
             )}
 
             {userType === UserType.HOST &&
-              true && ( // check if approval action has not been taken on record yet
+              bookingQuery.data?.data?.status === BookingStatus.PENDING && ( // check if approval action has not been taken on record yet
                 <View className="flex flex-row items-center gap-5">
                   <TouchableOpacity
-                    onPress={() => showPrompt(ApprovalActions.APPROVE)}
+                    onPress={() => showPrompt(ReviewAction.APPROVE)}
                   >
                     <Ionicons
                       name="checkmark-circle"
@@ -140,12 +176,24 @@ const Details = () => {
                     />
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => showPrompt(ApprovalActions.REJECT)}
+                    onPress={() => showPrompt(ReviewAction.REJECT)}
                   >
                     <Ionicons name="close-circle" size={40} color={"red"} />
                   </TouchableOpacity>
                 </View>
               )}
+
+            {bookingQuery.data?.data?.status === BookingStatus.REJECTED && (
+              <View
+                style={{ backgroundColor: "red" }}
+                className="border-secondary-300 p-2 rounded-full flex-row items-center gap-2"
+              >
+                <View className="size-2 rounded-full bg-white " />
+                <Text className="text-xs font-plus-jakarta-bold text-white">
+                  Rejected
+                </Text>
+              </View>
+            )}
           </View>
 
           <View className="flex flex-row items-center px-5">
@@ -153,20 +201,26 @@ const Details = () => {
               <FontAwesome5 name="bed" size={16} color={Colors.accent} />
             </View>
             <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-2">
-              3 Bed(s)
+              {bookingQuery.data?.data?.property?.bed}{" "}
+              {(bookingQuery.data?.data?.property?.bed ?? 0) > 1
+                ? "Beds"
+                : "Bed"}
             </Text>
             <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 ml-7">
               <FontAwesome name="bath" size={16} color={Colors.accent} />
             </View>
             <Text className="text-black-300 text-sm font-plus-jakarta-medium ml-2">
-              4 Bathroom(s)
+              {bookingQuery.data?.data?.property?.bathroom}{" "}
+              {(bookingQuery.data?.data?.property?.bathroom ?? 0) > 1
+                ? "Bathrooms"
+                : "Bathroom"}
             </Text>
           </View>
 
           <View className="flex flex-row items-center justify-start gap-2 px-5">
             <Entypo name="location" size={16} color={Colors.accent} />
             <Text className="text-black-200 text-sm font-plus-jakarta-medium">
-              23, omighodalo street ogudu GRA, ojota. Lagos, Nigeria.
+              {bookingQuery.data?.data?.property?.location}
             </Text>
           </View>
 
@@ -186,7 +240,7 @@ const Details = () => {
               <Text className="font-plus-jakarta-regular">Check-In Date</Text>
             </View>
             <Text className="font-plus-jakarta-semibold">
-              Wed, Dec 03, 2025
+              {formatDate(bookingQuery.data?.data?.startDate ?? "")}
             </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
@@ -200,7 +254,9 @@ const Details = () => {
               </View>
               <Text className="font-plus-jakarta-regular">Check-In Time</Text>
             </View>
-            <Text className="font-plus-jakarta-semibold">2:00 pm</Text>
+            <Text className="font-plus-jakarta-semibold">
+              {bookingQuery.data?.data?.checkIn || "--"}
+            </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <View className="flex-row items-center gap-2">
@@ -214,7 +270,7 @@ const Details = () => {
               <Text className="font-plus-jakarta-regular">Check-Out Date</Text>
             </View>
             <Text className="font-plus-jakarta-semibold">
-              Wed, Dec 04, 2025
+              {formatDate(bookingQuery.data?.data?.endDate ?? "")}
             </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
@@ -228,7 +284,9 @@ const Details = () => {
               </View>
               <Text className="font-plus-jakarta-regular">Check-Out Time</Text>
             </View>
-            <Text className="font-plus-jakarta-semibold">12:00 pm</Text>
+            <Text className="font-plus-jakarta-semibold">
+              {bookingQuery.data?.data?.checkOut || "--"}
+            </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <View className="flex-row items-center gap-2">
@@ -237,7 +295,9 @@ const Details = () => {
               </View>
               <Text className="font-plus-jakarta-regular">Type</Text>
             </View>
-            <Text className="font-plus-jakarta-semibold">Apartment</Text>
+            <Text className="font-plus-jakarta-semibold">
+              {bookingQuery.data?.data?.property?.type}
+            </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <View className="flex-row items-center gap-2">
@@ -247,24 +307,60 @@ const Details = () => {
               <Text className="font-plus-jakarta-regular">Phone</Text>
             </View>
             <Text className="font-plus-jakarta-semibold">
-              (+234)-803-304-4770
+              {convertToInternationalPhoneNumber(
+                bookingQuery.data?.data?.host?.phone
+              )}
             </Text>
           </View>
 
           <View className="bg-gray-100 py-3 my-5 px-5">
             <Text className="font-plus-jakarta-semibold">Price Details</Text>
           </View>
-          <View className="flex-row px-5 justify-between items-center my-5">
-            <Text className="font-plus-jakarta-regular">Price</Text>
-            <Text className="font-plus-jakarta-semibold">₦150,000.00</Text>
+          <View className="my-5">
+            <View className="flex-row px-5 justify-between items-center pb-2">
+              <Text className="font-plus-jakarta-regular">Price</Text>
+              <Text className="font-plus-jakarta-semibold">
+                ₦ {Commafy(bookingQuery.data?.data?.invoice?.price)}
+              </Text>
+            </View>
+            <Text className="self-end px-5 text-gray-400 text-xs">
+              ₦ {Commafy(bookingQuery.data?.data?.invoice?.subPrice)} {" x"}{" "}
+              {bookingQuery.data?.data?.invoice?.period}
+            </Text>
+          </View>
+          <View className="flex-row px-5 justify-between items-center mb-5">
+            <Text className="font-plus-jakarta-regular">Caution Fee</Text>
+            <Text className="font-plus-jakarta-semibold">
+              ₦ {Commafy(bookingQuery.data?.data?.invoice?.cautionFee)}
+            </Text>
+          </View>
+          <View className="flex-row px-5 justify-between items-center mb-5">
+            <Text className="font-plus-jakarta-regular">SubTotal</Text>
+            <Text className="font-plus-jakarta-semibold">
+              ₦ {Commafy(bookingQuery.data?.data?.invoice?.subTotal)}
+            </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Service Fee</Text>
-            <Text className="font-plus-jakarta-semibold">₦10,000.00</Text>
+            <Text className="font-plus-jakarta-semibold">
+              ₦{" "}
+              {Commafy(
+                bookingQuery.data?.data?.invoice?.[
+                  userType?.toLowerCase() + "ServiceFee"
+                ]
+              )}
+            </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-bold">Total</Text>
-            <Text className="font-plus-jakarta-bold">₦160,000.00</Text>
+            <Text className="font-plus-jakarta-bold text-xl">
+              ₦{" "}
+              {Commafy(
+                bookingQuery.data?.data?.invoice?.[
+                  userType?.toLowerCase() + "Total"
+                ]
+              )}
+            </Text>
           </View>
 
           <View className="bg-gray-100 py-3 my-5 px-5">
@@ -272,22 +368,29 @@ const Details = () => {
           </View>
 
           <View className="flex-row px-5 justify-center items-center my-5">
-            <Image source={images.avatar} style={styles.guestImg} />
+            <Image
+              source={{ uri: bookingQuery.data?.data?.guest?.avatar }}
+              style={styles.guestImg}
+            />
           </View>
           <View className="flex-row px-5 justify-between items-center my-5">
             <Text className="font-plus-jakarta-regular">Name</Text>
-            <Text className="font-plus-jakarta-semibold">Muyiwa</Text>
+            <Text className="font-plus-jakarta-semibold">
+              {bookingQuery.data?.data?.guest?.name}
+            </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Mail</Text>
             <Text className="font-plus-jakarta-semibold">
-              nenling@gmail.com
+              {bookingQuery.data?.data?.guest?.email}
             </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Phone Number</Text>
             <Text className="font-plus-jakarta-semibold">
-              (+234)-816-784-5287
+              {convertToInternationalPhoneNumber(
+                bookingQuery.data?.data?.guest?.phone
+              )}
             </Text>
           </View>
           {userType === UserType.GUEST && (

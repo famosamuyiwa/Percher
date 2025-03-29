@@ -4,6 +4,7 @@ import {
   OAuthRequest,
   PerchRegistrationFormData,
   ResetPasswordRequest,
+  ReviewBookingRequest,
   SignupRequest,
   User,
 } from "@/interfaces";
@@ -13,6 +14,7 @@ import { Platform } from "react-native";
 import api from "./axios";
 import * as SecureStore from "expo-secure-store";
 import { signOut } from "@/hooks/useGoogleOAuth";
+import { ReviewAction } from "@/constants/enums";
 
 let API_BASE_URL: string;
 const PAYSTACK_SECRET_KEY = process.env.EXPO_PUBLIC_PAYSTACK_TEST_SECRET_KEY!;
@@ -228,6 +230,28 @@ export const createBooking = async (credentials: Booking) => {
   }
 };
 
+export const discardBooking = async (id: number) => {
+  try {
+    const { data: payload } = await api.delete(`${API_BASE_URL}/booking/${id}`);
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const reviewBooking = async (credentials: ReviewBookingRequest) => {
+  const { id, action } = credentials;
+  console.log("action: ", action);
+  try {
+    const { data: payload } = await api.post(
+      `${API_BASE_URL}/booking/review/${id}?action=${action}`
+    );
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
 export const getAllProperties = async (
   pageParam: number | null = null,
   filters: Filter
@@ -299,6 +323,17 @@ export const updateUser = async (credentials: Partial<User>) => {
     const { data: payload } = await api.put(`${API_BASE_URL}/user/${id}`, {
       ...credentials,
     });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const verifyPayment = async (transactionRef: string) => {
+  try {
+    const { data: payload } = await api.get(
+      `${API_BASE_URL}/payment/verify/${transactionRef}`
+    );
     return payload;
   } catch (error: any) {
     handleApiError(error);

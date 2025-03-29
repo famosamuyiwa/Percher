@@ -16,7 +16,7 @@ import {
 } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 import { Colors } from "@/constants/common";
-import { Commafy, formatCurrency } from "@/utils/common";
+import { Commafy, formatCurrency, generateUniqueId } from "@/utils/common";
 import SettingsHeader from "@/components/SettingsHeader";
 import PaystackCheckout from "@/hooks/usePaystack";
 import { TextWithIcon } from "@/components/text-with-icon";
@@ -150,6 +150,7 @@ export default function Payments() {
                   billingEmail: "nenling19@gmail.com",
                   billingName: "Nen Ling",
                   billingMobile: "08033044770",
+                  refNumber: generateUniqueId(),
                 }}
                 clicked={isClicked}
                 onEnd={() => {

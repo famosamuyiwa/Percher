@@ -19,6 +19,11 @@ import CalendarList from "@/components/CalendarList";
 import { useGlobalStore } from "@/store/store";
 import { ChargeType } from "@/constants/enums";
 import { Booking as BookingInterface } from "@/interfaces";
+import {
+  GUEST_SERVICE_FEE_PERCENTAGE,
+  HOST_SERVICE_FEE_PERCENTAGE,
+} from "@/environment";
+import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays";
 
 const Booking = () => {
   const { id, chargeType } = useLocalSearchParams<{
@@ -45,6 +50,28 @@ const Booking = () => {
   const handleOnContinue = () => {
     if (arrivalDate === "" || departureDate === "" || !property) return;
 
+    const subPrice = Number(property.price);
+    const period = differenceInCalendarDays(departureDate, arrivalDate);
+    const price = subPrice * period;
+    const cautionFee = Number(property.cautionFee);
+    const subTotal = price + cautionFee;
+    const guestServiceFee = subPrice * (GUEST_SERVICE_FEE_PERCENTAGE / 100);
+    const hostServiceFee = subPrice * (HOST_SERVICE_FEE_PERCENTAGE / 100);
+    const hostTotal = subTotal - hostServiceFee;
+    const guestTotal = subTotal + guestServiceFee;
+
+    const invoice = {
+      price,
+      subPrice,
+      period,
+      cautionFee,
+      subTotal,
+      guestServiceFee,
+      hostServiceFee,
+      hostTotal,
+      guestTotal,
+    };
+
     const booking: Partial<BookingInterface> = {
       startDate: arrivalDate,
       endDate: departureDate,
@@ -53,6 +80,7 @@ const Booking = () => {
       chargeType,
       propertyId: property?.id,
       hostId: property?.host?.id!,
+      invoice,
     };
 
     saveBookingState(undefined, booking);

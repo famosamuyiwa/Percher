@@ -29,9 +29,13 @@ import { Commafy } from "@/utils/common";
 import CustomButton from "@/components/Button";
 import { usePropertyQuery } from "@/hooks/query/usePropertyQuery";
 import { useGlobalStore } from "@/store/store";
+import { PropertyScreenMode } from "@/constants/enums";
 
 const Property = () => {
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { id, mode } = useLocalSearchParams<{
+    id?: string;
+    mode?: PropertyScreenMode;
+  }>();
   const { saveBookingState } = useGlobalStore();
   const windowHeight = Dimensions.get("window").height;
   const propertyQuery = usePropertyQuery(Number(id));
@@ -266,24 +270,26 @@ const Property = () => {
         </View>
       </ScrollView>
 
-      <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 p-7">
-        <View className="flex flex-row items-center justify-between gap-10">
-          <View className="flex flex-col items-start">
-            <Text className="text-black-200 text-xs font-plus-jakarta-medium">
-              Price
-            </Text>
-            <Text
-              numberOfLines={1}
-              className="text-primary-300 text-start text-2xl font-plus-jakarta-bold"
-            >
-              ₦{Commafy(propertyQuery?.data?.data?.price ?? 0)}
-            </Text>
-          </View>
-          <View className="flex-1">
-            <CustomButton label="Perch Now" onPress={handleOnPerchClick} />
+      {mode !== PropertyScreenMode.VIEW_ONLY && (
+        <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 p-7">
+          <View className="flex flex-row items-center justify-between gap-10">
+            <View className="flex flex-col items-start">
+              <Text className="text-black-200 text-xs font-plus-jakarta-medium">
+                Price
+              </Text>
+              <Text
+                numberOfLines={1}
+                className="text-primary-300 text-start text-2xl font-plus-jakarta-bold"
+              >
+                ₦{Commafy(propertyQuery?.data?.data?.price ?? 0)}
+              </Text>
+            </View>
+            <View className="flex-1">
+              <CustomButton label="Perch Now" onPress={handleOnPerchClick} />
+            </View>
           </View>
         </View>
-      </View>
+      )}
     </View>
   );
 };

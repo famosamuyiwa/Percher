@@ -14,7 +14,7 @@ import { Picker } from "@react-native-picker/picker";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { Colors } from "@/constants/common";
-import { FilterCategoryKey, UserType } from "@/constants/enums";
+import { BookingStatus, FilterCategoryKey, UserType } from "@/constants/enums";
 import Filters from "@/components/Filters";
 import EmptyBookings from "@/components/empty-screens/bookings";
 import {
@@ -29,9 +29,14 @@ import { useBookingsQuery } from "@/hooks/query/useBookingQuery";
 import { useOwnedPropertyQuery } from "@/hooks/query/usePropertyQuery";
 
 const Bookings = () => {
+  const params = useLocalSearchParams<{
+    query?: string;
+    categoryFilter?: BookingStatus;
+  }>();
   const [filters, setFilters] = useState<Filter>({
     limit: 10,
     from: UserType.GUEST,
+    bookingStatus: params.categoryFilter ?? BookingStatus.CURRENT,
   });
   const bookingsQuery = useBookingsQuery(filters);
   const [userType, setUserType] = useState<UserType>(UserType.GUEST);
@@ -118,14 +123,15 @@ const Bookings = () => {
         {userType === UserType.GUEST && <EmptyBookings />}
       </Animated.View>
     );
-  }, [bookingsQuery.isLoading, userType]);
+  }, [bookingsQuery.isLoading, userType, properties.length]);
 
   useEffect(() => {
     setFilters((prevData) => ({
       ...prevData,
       from: userType,
+      bookingStatus: params.categoryFilter ?? BookingStatus.CURRENT,
     }));
-  }, [userType]);
+  }, [userType, params.categoryFilter]);
 
   return (
     <Animated.View

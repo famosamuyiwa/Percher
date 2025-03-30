@@ -1,4 +1,10 @@
-import { Booking, BookingState, Property } from "@/interfaces";
+import {
+  Booking,
+  BookingState,
+  Property,
+  Wallet,
+  WalletState,
+} from "@/interfaces";
 
 export const saveAuthState = (jwt: string) => ({
   jwt,
@@ -24,4 +30,16 @@ export const saveBookingState = (
 export const resetBookingState = () => ({
   property: undefined,
   booking: undefined,
+});
+
+export const saveWalletState = (
+  state: WalletState,
+  wallet: Partial<Wallet>
+) => ({
+  wallet: { ...state, ...wallet },
+});
+
+export const resetWalletState = () => ({
+  id: 0,
+  withdrawalBank: "",
 });

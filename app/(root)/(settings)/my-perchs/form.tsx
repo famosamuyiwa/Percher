@@ -22,11 +22,12 @@ const Form = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { uploadMultimedia, progress } = useStorageBucket();
   const [isLoading, setIsLoading] = useState(false);
-  const { displayToast } = useGlobalContext();
+  const { displayToast, showLoader, hideLoader } = useGlobalContext();
   const createPropertyMutation = useCreatePropertyMutation();
   const propertyQuery = usePropertyQuery(Number(id));
 
   const handleRegisterClick = async (formData: PerchRegistrationFormData) => {
+    showLoader();
     let loadingMessage = "Preparing perch details...";
     try {
       const header = await uploadAndUpdateFormMediaURLs([formData.header]);
@@ -56,6 +57,8 @@ const Form = () => {
         type: ToastType.ERROR,
         description: err.message,
       });
+    } finally {
+      hideLoader();
     }
   };
 

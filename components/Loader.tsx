@@ -30,10 +30,10 @@ const Loader = forwardRef(({}, ref) => {
         <Animated.View
           layout={LinearTransition}
           entering={FadeIn.duration(500)}
-          className="w-full h-full absolute items-center justify-center bg-black/50"
+          className="w-full h-full absolute items-center justify-center bg-black/50 z-50"
         >
           <View className=" bg-white rounded-xl p-5 flex-row items-center justify-center gap-5">
-            <ActivityIndicator color={Colors.primary} size="large" />
+            <ActivityIndicator color={Colors.primary} size="small" />
             <Text className="font-plus-jakarta-semibold">Please wait...</Text>
           </View>
         </Animated.View>

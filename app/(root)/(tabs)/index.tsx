@@ -34,20 +34,24 @@ import {
 } from "@/hooks/query/usePropertyQuery";
 
 export default function Index() {
+  const params = useLocalSearchParams<{
+    query?: string;
+    categoryFilter?: PerchTypes;
+  }>();
   const [filters, setFilters] = useState<Filter>({
     location: "",
     limit: 10,
     from: UserType.GUEST,
+    perchType: params.categoryFilter,
   });
   const { user } = useGlobalContext();
-  const params = useLocalSearchParams<{ query?: string; filter?: string }>();
 
   const propertiesQuery = usePropertiesQuery({
     ...filters,
     category: Category.RECOMMENDATION,
   });
   const featuredPropertiesQuery = useFeaturedPropertyQuery({
-    ...filters,
+    limit: 5,
     category: Category.FEATURED,
   });
 
@@ -63,7 +67,13 @@ export default function Index() {
     [featuredPropertiesQuery.data]
   );
 
-  useEffect(() => {}, [params.filter, params.query]);
+  useEffect(() => {
+    setFilters((prevData) => ({
+      ...prevData,
+      perchType: params.categoryFilter,
+      searchTerm: params.query,
+    }));
+  }, [params.categoryFilter, params.query]);
 
   const handleCardPress = (id: number) => router.push(`/properties/${id}`);
 

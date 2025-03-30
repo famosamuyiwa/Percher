@@ -18,7 +18,7 @@ import {
 } from "@/hooks/query/usePropertyQuery";
 import { Filter } from "@/interfaces";
 import SearchBar from "@/components/SearchBar";
-import { UserType } from "@/constants/enums";
+import { Screens, UserType } from "@/constants/enums";
 import { AntDesign } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 
@@ -79,7 +79,11 @@ const MyPerchs = () => {
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => (
               <View className="mx-5">
-                <Card item={item} onPress={() => handleCardPress(item.id)} />
+                <Card
+                  item={item}
+                  source={Screens.MY_PERCHS}
+                  onPress={() => handleCardPress(item.id)}
+                />
               </View>
             )}
             ListHeaderComponent={listHeader}

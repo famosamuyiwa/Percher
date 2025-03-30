@@ -57,8 +57,8 @@ const schema = z.object({
     message: "You must accept the terms and conditions.",
   }),
   facilities: z.array(z.string()).default([]), // Ensures it's always an array
-  checkInTimes: z.array(z.string()).default([]), // Ensures it's always an array
-  checkOutTime: z.string().default(""),
+  checkInTimes: z.array(z.string()).min(1, "Required").default([]), // Ensures it's always an array
+  checkOutTime: z.string().min(1, "Required").default(""),
 });
 
 export default function PerchRegistrationForm({
@@ -578,99 +578,97 @@ export default function PerchRegistrationForm({
           )}
         </View>
 
-        {chargeType === ChargeType.NIGHTLY && (
-          <View className="flex-row gap-5">
-            <View className="w-5/12">
-              <Controller
-                control={control}
-                name="checkInTimes"
-                render={({ field: { onChange, value, onBlur } }) => (
-                  <View>
-                    <Text className="text-xs font-plus-jakarta-regular pb-3">
-                      Check-In periods
-                    </Text>
-                    <MultiPicker
-                      options={Object.values(CheckInTime)} // Options
-                      selectedValues={checkInTimes} // Initially selected
-                      onChange={onChange} // Callback function
-                    />
-                  </View>
-                )}
-              />
-              {errors.checkInTimes && (
-                <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
-                  {errors.checkInTimes.message}
-                </Text>
+        <View className="flex-row gap-5">
+          <View className="w-5/12">
+            <Controller
+              control={control}
+              name="checkInTimes"
+              render={({ field: { onChange, value, onBlur } }) => (
+                <View>
+                  <Text className="text-xs font-plus-jakarta-regular pb-3">
+                    Check-In periods
+                  </Text>
+                  <MultiPicker
+                    options={Object.values(CheckInTime)} // Options
+                    selectedValues={checkInTimes} // Initially selected
+                    onChange={onChange} // Callback function
+                  />
+                </View>
               )}
-            </View>
-            <View className="w-5/12">
-              <Controller
-                control={control}
-                name="checkOutTime"
-                render={({ field: { onChange, value, onBlur } }) => (
-                  <View>
-                    <Text className="text-xs font-plus-jakarta-regular pb-3">
-                      Check-Out period
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => setCheckOutPeriodModalVisible(true)}
-                      style={styles.pickerBtn}
-                    >
-                      <Modal
-                        visible={checkOutPeriodModalVisible}
-                        transparent
-                        animationType="slide"
-                      >
-                        <View style={styles.modalContainer}>
-                          <View style={styles.pickerContainer}>
-                            <Picker
-                              selectedValue={checkOutTime}
-                              onValueChange={(itemValue) =>
-                                setValue("checkOutTime", itemValue)
-                              }
-                              itemStyle={{
-                                color: "black", // Set text color
-                                fontSize: 18, // Set font size
-                              }}
-                            >
-                              {Object.values(CheckOutTime).map((type) => (
-                                <Picker.Item
-                                  key={type}
-                                  label={type}
-                                  value={type}
-                                />
-                              ))}
-                            </Picker>
-                            <Button
-                              title="Done"
-                              onPress={() => {
-                                setCheckOutPeriodModalVisible(false);
-                              }}
-                            />
-                          </View>
-                        </View>
-                      </Modal>
-                      <Text className="font-plus-jakarta-regular">
-                        {checkOutTime ?? "-- Select --"}
-                      </Text>
-                      <Entypo
-                        name="chevron-down"
-                        size={16}
-                        color={"darkgrey"}
-                        className="absolute right-0 px-5"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                )}
-              />
-              {errors.checkOutTime && (
-                <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
-                  {errors.checkOutTime.message}
-                </Text>
-              )}
-            </View>
+            />
+            {errors.checkInTimes && (
+              <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
+                {errors.checkInTimes.message}
+              </Text>
+            )}
           </View>
-        )}
+          <View className="w-5/12">
+            <Controller
+              control={control}
+              name="checkOutTime"
+              render={({ field: { onChange, value, onBlur } }) => (
+                <View>
+                  <Text className="text-xs font-plus-jakarta-regular pb-3">
+                    Check-Out period
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setCheckOutPeriodModalVisible(true)}
+                    style={styles.pickerBtn}
+                  >
+                    <Modal
+                      visible={checkOutPeriodModalVisible}
+                      transparent
+                      animationType="slide"
+                    >
+                      <View style={styles.modalContainer}>
+                        <View style={styles.pickerContainer}>
+                          <Picker
+                            selectedValue={checkOutTime}
+                            onValueChange={(itemValue) =>
+                              setValue("checkOutTime", itemValue)
+                            }
+                            itemStyle={{
+                              color: "black", // Set text color
+                              fontSize: 18, // Set font size
+                            }}
+                          >
+                            {Object.values(CheckOutTime).map((type) => (
+                              <Picker.Item
+                                key={type}
+                                label={type}
+                                value={type}
+                              />
+                            ))}
+                          </Picker>
+                          <Button
+                            title="Done"
+                            onPress={() => {
+                              setCheckOutPeriodModalVisible(false);
+                            }}
+                          />
+                        </View>
+                      </View>
+                    </Modal>
+                    <Text className="font-plus-jakarta-regular">
+                      {checkOutTime ?? "-- Select --"}
+                    </Text>
+                    <Entypo
+                      name="chevron-down"
+                      size={16}
+                      color={"darkgrey"}
+                      className="absolute right-0 px-5"
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+            {errors.checkOutTime && (
+              <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
+                {errors.checkOutTime.message}
+              </Text>
+            )}
+          </View>
+        </View>
 
         <View>
           <Controller

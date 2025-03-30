@@ -8,17 +8,27 @@ import SearchBar from "../../../components/SearchBar";
 import { Card } from "../../../components/Cards";
 import Filters from "../../../components/Filters";
 import NoResults from "../../../components/NoResults";
-import { FilterCategoryKey, PerchTypes, UserType } from "@/constants/enums";
+import {
+  BookingStatus,
+  FilterCategoryKey,
+  PerchTypes,
+  UserType,
+} from "@/constants/enums";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { Skeleton } from "moti/skeleton";
 import { useExplorePropertyQuery } from "@/hooks/query/usePropertyQuery";
 import { Filter } from "@/interfaces";
 
 export default function Explore() {
+  const params = useLocalSearchParams<{
+    query?: string;
+    categoryFilter?: PerchTypes;
+  }>();
   const [filters, setFilters] = useState<Filter>({
     location: "",
     limit: 10,
     from: UserType.GUEST,
+    perchType: params.categoryFilter,
   });
   const propertiesQuery = useExplorePropertyQuery(filters);
 
@@ -48,6 +58,14 @@ export default function Explore() {
     </View>
   );
 
+  useEffect(() => {
+    setFilters((prevData) => ({
+      ...prevData,
+      perchType: params.categoryFilter,
+      searchTerm: params.query,
+    }));
+  }, [params.categoryFilter, params.query]);
+
   return (
     <Animated.View
       layout={LinearTransition}
@@ -61,7 +79,7 @@ export default function Explore() {
           <Text className="font-plus-jakarta-bold self-center text-lg">
             Explore
           </Text>
-          <SearchBar />
+          <SearchBar placeholder="Search for perchs or locations" />
 
           <View className="my-5">
             <Filters categoryKey={FilterCategoryKey.PERCHTYPE} />

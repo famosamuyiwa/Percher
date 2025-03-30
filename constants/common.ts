@@ -8,6 +8,7 @@ export const USE_EXPLORE_PROPERTIES_QUERY_KEY = ["property", "explore"];
 export const USE_PROPERTY_QUERY_KEY = ["property"];
 export const USE_BOOKINGS_QUERY_KEY = ["bookings"];
 export const USE_BOOKING_QUERY_KEY = ["booking"];
+export const USE_WALLET_QUERY_KEY = ["wallet"];
 
 export const Colors = {
   primary: "#00BFFF",

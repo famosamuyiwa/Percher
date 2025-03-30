@@ -1,24 +1,63 @@
-import { FilterCategoryKey } from "./enums";
+import { FilterCategoryKey, PerchTypes, Facility } from "./enums";
 import icons from "./icons";
 
 export const filterCategories = [
   { title: "All", category: "All", key: FilterCategoryKey.PERCHTYPE },
-  { title: "Houses", category: "House", key: FilterCategoryKey.PERCHTYPE },
-  { title: "Condos", category: "Condos", key: FilterCategoryKey.PERCHTYPE },
-  { title: "Duplexes", category: "Duplexes", key: FilterCategoryKey.PERCHTYPE },
-  { title: "Studios", category: "Studios", key: FilterCategoryKey.PERCHTYPE },
-  { title: "Villas", category: "Villa", key: FilterCategoryKey.PERCHTYPE },
   {
-    title: "Apartments",
-    category: "Apartments",
+    title: PerchTypes.APARTMENT,
+    category: PerchTypes.APARTMENT,
     key: FilterCategoryKey.PERCHTYPE,
   },
   {
-    title: "Townhomes",
-    category: "Townhomes",
+    title: PerchTypes.HOUSE,
+    category: PerchTypes.HOUSE,
     key: FilterCategoryKey.PERCHTYPE,
   },
-  { title: "Others", category: "Others", key: FilterCategoryKey.PERCHTYPE },
+  {
+    title: PerchTypes.VILLA,
+    category: PerchTypes.VILLA,
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  {
+    title: PerchTypes.MANSION,
+    category: PerchTypes.MANSION,
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  {
+    title: PerchTypes.PENTHOUSE,
+    category: PerchTypes.PENTHOUSE,
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  {
+    title: PerchTypes.SELF_CONTAINED,
+    category: PerchTypes.SELF_CONTAINED,
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  {
+    title: PerchTypes.BOYS_QUARTERS,
+    category: PerchTypes.BOYS_QUARTERS,
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  {
+    title: PerchTypes.OFFICE_SPACE,
+    category: PerchTypes.OFFICE_SPACE,
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  {
+    title: PerchTypes.WAREHOUSE,
+    category: PerchTypes.WAREHOUSE,
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  {
+    title: PerchTypes.EVENT_CENTER,
+    category: PerchTypes.EVENT_CENTER,
+    key: FilterCategoryKey.PERCHTYPE,
+  },
+  {
+    title: PerchTypes.OTHERS,
+    category: PerchTypes.OTHERS,
+    key: FilterCategoryKey.PERCHTYPE,
+  },
   { title: "Current", category: "Current", key: FilterCategoryKey.BOOKINGS },
   { title: "Upcoming", category: "Upcoming", key: FilterCategoryKey.BOOKINGS },
   { title: "Pending", category: "Pending", key: FilterCategoryKey.BOOKINGS },
@@ -37,23 +76,43 @@ export const filterCategories = [
 
 export const facilities = [
   {
-    title: "Laundry",
+    title: Facility.LAUNDRY,
     icon: "shirt",
   },
   {
-    title: "Garage",
+    title: Facility.GARAGE,
     icon: "car",
   },
   {
-    title: "Gym",
+    title: Facility.GYM,
     icon: "barbell",
   },
   {
-    title: "Swimming pool",
-    icon: icons.swim,
+    title: Facility.POOL,
+    icon: "water",
   },
   {
-    title: "Wifi",
+    title: Facility.WIFI,
     icon: "wifi",
+  },
+  {
+    title: Facility.ELECTRICITY_24_7,
+    icon: "bulb",
+  },
+  {
+    title: Facility.CCTV,
+    icon: "videocam-sharp",
+  },
+  {
+    title: Facility.PET_FRIENDLY,
+    icon: "paw",
+  },
+  {
+    title: Facility.FURNISHED,
+    icon: "tv",
+  },
+  {
+    title: Facility.ESTATE_SECURITY,
+    icon: "shield-checkmark",
   },
 ];

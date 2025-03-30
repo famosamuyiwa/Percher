@@ -9,12 +9,18 @@ import {
   PerchTypes,
   RegistrationStatus,
   ReviewAction,
+  TransactionMode,
   TransactionType,
   UserType,
 } from "./constants/enums";
 
-export interface Property {
+export interface BaseEntity {
   id: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface Property extends BaseEntity {
   name: string;
   bed: number;
   bathroom: number;
@@ -37,8 +43,6 @@ export interface Property {
   host?: User;
   category: Category;
   reviews?: any;
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
 export interface PerchRegistrationFormData {
@@ -81,6 +85,12 @@ export interface AuthState {
   resetAuthState: () => void;
 }
 
+export interface WalletState {
+  wallet: Wallet | undefined;
+  saveWalletState: (wallet: Partial<Wallet>) => void;
+  resetWalletState: () => void;
+}
+
 export interface BookingState {
   property: Property | undefined;
   booking: Booking | undefined;
@@ -91,8 +101,7 @@ export interface BookingState {
   resetBookingState: () => void;
 }
 
-export interface Booking {
-  id: number;
+export interface Booking extends BaseEntity {
   startDate: Date;
   endDate: Date;
   checkIn: string;
@@ -100,8 +109,6 @@ export interface Booking {
   chargeType: ChargeType;
   propertyId: number;
   hostId: number;
-  createdAt?: Date;
-  updatedAt?: Date;
   property?: Property;
   invoice?: Invoice;
   host?: User;
@@ -110,8 +117,7 @@ export interface Booking {
   status?: BookingStatus;
 }
 
-export interface User {
-  id: number;
+export interface User extends BaseEntity {
   email: string;
   name: string;
   phone: string;
@@ -121,8 +127,7 @@ export interface User {
   referredBy: User;
   referredUsers: User[];
   referralCode?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  wallet?: Wallet;
 }
 
 export enum ResponseStatus {
@@ -161,6 +166,8 @@ export interface Filter {
   category?: Category;
   from?: UserType;
   bookingStatus?: BookingStatus;
+  perchType?: PerchTypes;
+  searchTerm?: string;
 }
 
 export interface Invoice {
@@ -174,7 +181,7 @@ export interface Invoice {
   guestTotal?: number;
   hostTotal?: number;
   booking?: Booking;
-  payments?: Payment[];
+  payment?: Payment;
   [key: string]: any; // Allows dynamic keys
 }
 
@@ -185,18 +192,37 @@ export interface Payment {
   status?: PaymentStatus;
   reference: string;
   invoice?: Invoice;
+  transactionType?: TransactionType;
 }
 
-export interface Wallet {
+export interface Wallet extends BaseEntity {
   user: User;
   balance: number;
-  bankName: string;
-  accountNumber: string;
-  accountName: string;
-  payments: Payment[];
+  bankName?: string;
+  accountNumber?: string;
+  accountName?: string;
+  bankCode?: string;
+  bankLogo?: string;
+  payments?: Payment[];
+  transactions?: Transaction[];
 }
 
 export interface ReviewBookingRequest {
   id: number;
   action: ReviewAction;
+}
+
+export interface Transaction extends BaseEntity {
+  payment?: Payment;
+  wallet?: Wallet;
+  amount: number;
+  type: TransactionType;
+  mode?: TransactionMode | null;
+  description?: string;
+}
+
+export interface CreatePaymentRequest {
+  amount: number;
+  reference: string;
+  transactionType: TransactionType;
 }

@@ -21,10 +21,7 @@ import {
 import { Colors } from "@/constants/common";
 import PaystackCheckout from "@/hooks/usePaystack";
 import CustomButton from "@/components/Button";
-import {
-  useCreateBookingMutation,
-  useDiscardBookingMutation,
-} from "@/hooks/mutation/useBookingMutation";
+import { useCreateBookingMutation } from "@/hooks/mutation/useBookingMutation";
 import { useGlobalStore } from "@/store/store";
 import { useGlobalContext } from "@/lib/global-provider";
 import {
@@ -35,49 +32,52 @@ import {
 } from "@/utils/common";
 import { ApiResponse, Booking, Payment } from "@/interfaces";
 import { useVerifyPaymentMutation } from "@/hooks/mutation/usePaymentMutation";
+import { ToastType, TransactionType } from "@/constants/enums";
 
 const BookingConfirmation = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { booking, property } = useGlobalStore();
-  const { user, showLoader, hideLoader } = useGlobalContext();
+  const { user, showLoader, hideLoader, displayToast } = useGlobalContext();
   const createBookingMutation = useCreateBookingMutation();
   const verifyPaymentMutation = useVerifyPaymentMutation();
   const [isClicked, setIsClicked] = useState(false);
   const [transactionRef, setTransactionRef] = useState(generateUniqueId());
-  const [savedBooking, setSavedBooking] = useState<Booking | undefined>(
-    undefined
-  );
 
   const handleOnMakePayment = () => {
     if (!booking || !booking.invoice) return;
     const newTransactionRef = generateUniqueId();
     setTransactionRef(newTransactionRef);
-    const transaction: Payment[] = [
-      {
-        reference: newTransactionRef,
-      },
-    ];
+    const payment: Payment = {
+      amount: booking.invoice.guestTotal,
+      reference: newTransactionRef,
+      wallet: user?.wallet,
+      transactionType: TransactionType.BOOKING,
+    };
 
-    booking.invoice.payments = transaction;
+    showLoader();
+    booking.invoice.payment = payment;
+    console.log("booking", booking.invoice.payment);
     createBookingMutation.mutate(booking, {
       onSettled: onBookingSettled,
       onSuccess: onBookingSuccess,
     });
   };
 
-  const onBookingSettled = () => {};
+  const onBookingSettled = () => {
+    hideLoader();
+  };
 
   const onBookingSuccess = (payload: ApiResponse<Booking>) => {
-    setSavedBooking(payload.data);
     if (user?.email) setIsClicked(true);
   };
 
   const handleOnPaymentSuccess = () => {
+    setIsClicked(false);
+    showLoader();
     verifyPaymentMutation.mutate(transactionRef, {
       onSettled: onPaymentSettled,
       onSuccess: onPaymentSuccess,
     });
-    showLoader();
   };
 
   const handleOnPaymentCanceled = () => {
@@ -87,12 +87,17 @@ const BookingConfirmation = () => {
   const onPaymentSettled = () => {
     // simulate delay to prevent glitches
     setTimeout(() => {
-      router.replace("/bookings");
       hideLoader();
     }, 1000);
   };
 
-  const onPaymentSuccess = () => {};
+  const onPaymentSuccess = () => {
+    // simulate delay to prevent glitches
+    setTimeout(() => {
+      router.replace("/bookings");
+      hideLoader();
+    }, 1000);
+  };
 
   return (
     <SafeAreaView className="pb-5 flex-1 bg-white">
@@ -297,7 +302,7 @@ const BookingConfirmation = () => {
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Service Fee</Text>
             <Text className="font-plus-jakarta-semibold">
-              ₦ {Commafy(booking?.invoice?.guestServiceFee)}
+              - ₦ {Commafy(booking?.invoice?.guestServiceFee)}
             </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">

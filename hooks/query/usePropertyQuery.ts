@@ -19,7 +19,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 export const usePropertiesQuery = (filters: Filter) => {
   return useInfiniteQuery<PropertiesCache>({
-    queryKey: USE_PROPERTIES_QUERY_KEY,
+    queryKey: [USE_PROPERTIES_QUERY_KEY, filters],
     queryFn: ({ pageParam = null }: any) =>
       getAllProperties(pageParam, filters),
     retry: 3,
@@ -57,7 +57,7 @@ export const useOwnedPropertyQuery = (filters: Filter) => {
 
 export const useExplorePropertyQuery = (filters: Filter) => {
   return useInfiniteQuery<explorePropertiesCache>({
-    queryKey: USE_EXPLORE_PROPERTIES_QUERY_KEY,
+    queryKey: [USE_EXPLORE_PROPERTIES_QUERY_KEY, filters],
     queryFn: ({ pageParam = null }: any) =>
       getAllProperties(pageParam, filters),
     retry: 3,

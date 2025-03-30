@@ -6,7 +6,7 @@ import { useGlobalStore } from "@/store/store";
 import * as SecureStore from "expo-secure-store";
 
 export const Commafy = (value: any) => {
-  if (!value) return "--";
+  if (!value) return 0;
   return Number(value).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -20,6 +20,15 @@ export const formatDate = (date: Date | "") => {
     day: "2-digit", // 03
     month: "short", // March
     year: "numeric", // 2025
+  });
+};
+
+export const formatTime = (date: Date | string) => {
+  if (!date) return "";
+  return new Date(date).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
   });
 };
 

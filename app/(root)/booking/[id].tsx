@@ -24,6 +24,7 @@ import {
   HOST_SERVICE_FEE_PERCENTAGE,
 } from "@/environment";
 import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays";
+import { useGlobalContext } from "@/lib/global-provider";
 
 const Booking = () => {
   const { id, chargeType } = useLocalSearchParams<{
@@ -39,6 +40,7 @@ const Booking = () => {
   const [checkOutTime, setCheckOutTime] = useState("");
   const [checkInModalVisible, setCheckInModalVisible] = useState(false);
   const [checkOutModalVisible, setCheckOutModalVisible] = useState(false);
+  const { user } = useGlobalContext();
 
   useEffect(() => {
     setArrivalDate("");

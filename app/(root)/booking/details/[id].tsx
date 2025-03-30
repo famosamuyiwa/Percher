@@ -343,7 +343,7 @@ const Details = () => {
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Service Fee</Text>
             <Text className="font-plus-jakarta-semibold">
-              ₦{" "}
+              - ₦{" "}
               {Commafy(
                 bookingQuery.data?.data?.invoice?.[
                   userType?.toLowerCase() + "ServiceFee"

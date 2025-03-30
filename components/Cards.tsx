@@ -1,23 +1,17 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
-import images from "@/constants/images";
 import icons from "../constants/icons";
-import { Booking, Property } from "../interfaces";
+import { Booking, Property, Transaction } from "../interfaces";
 import { Image } from "expo-image";
-import { Commafy, formatDate } from "@/utils/common";
+import { Commafy, formatDate, formatTime } from "@/utils/common";
 import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 import { LinearGradient } from "expo-linear-gradient";
-import { TransactionType } from "@/constants/enums";
+import { Screens, TransactionMode, TransactionType } from "@/constants/enums";
 
 interface Props {
   item: Property;
+  source?: Screens;
   onPress?: () => void;
 }
 
@@ -27,7 +21,7 @@ interface BookingProps {
 }
 
 interface TransactionCardProps {
-  item: any; //for now
+  item: Transaction; //for now
   onPress?: () => void;
 }
 
@@ -63,17 +57,17 @@ export const FeaturedCard = ({ item, onPress }: Props) => {
   );
 };
 
-export const Card = ({ item, onPress }: Props) => {
+export const Card = ({ item, source, onPress }: Props) => {
   return (
     <TouchableOpacity
       className="flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative"
       onPress={onPress}
     >
-      {item.reviews && (
+      {item.rating && (
         <View className="flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50">
           <Image source={icons.star} style={styles.starSm} />
           <Text className="text-xs font-plus-jakarta-bold text-primary-300 ml-0.5">
-            {item.reviews}
+            {item.rating}
           </Text>
         </View>
       )}
@@ -88,16 +82,22 @@ export const Card = ({ item, onPress }: Props) => {
           {item.location}
         </Text>
 
-        <View className="flex flex-row items-center justify-between mt-2">
-          <Text className="text-base font-plus-jakarta-bold text-primary-300">
-            ₦{Commafy(item.price)}
-          </Text>
-          <Image
-            source={icons.heart}
-            className="w-5 h-5 mr-2"
-            tintColor="#191D31"
-          />
-        </View>
+        {source === Screens.MY_PERCHS && (
+          <View className="flex flex-row items-center justify-between mt-2">
+            <Text className="text-base font-plus-jakarta-bold text-primary-300">
+              ₦{Commafy(item.price)}
+            </Text>
+            <View
+              style={{ backgroundColor: Colors.secondary }}
+              className="border-secondary-300 p-2 rounded-full flex-row items-center gap-2"
+            >
+              <View className="size-2 rounded-full bg-white " />
+              <Text className="text-xs font-plus-jakarta-bold text-white">
+                {item.status}
+              </Text>
+            </View>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -192,7 +192,7 @@ export const BookingCardHost = ({ item, onPress }: BookingProps) => {
           </View>
           <View className="flex-row justify-end">
             <Text className=" font-plus-jakarta-extrabold text-primary-300">
-              ₦ {Commafy(item.invoice?.guestTotal)}
+              ₦ {Commafy(item.invoice?.hostTotal)}
             </Text>
           </View>
         </View>
@@ -203,12 +203,9 @@ export const BookingCardHost = ({ item, onPress }: BookingProps) => {
 
 export const TransactionCard = ({ item, onPress }: TransactionCardProps) => {
   return (
-    <TouchableOpacity
-      className="flex-1 w-full mt-4 rounded-3xl"
-      onPress={onPress}
-    >
+    <TouchableOpacity className="flex-1 w-full mt-4" onPress={onPress}>
       <View className="flex-row py-4 rounded-3xl">
-        {item.type === TransactionType.CREDIT && (
+        {item.mode === TransactionMode.CREDIT && (
           <View className="px-2">
             <MaterialCommunityIcons
               name="cash-plus"
@@ -218,7 +215,7 @@ export const TransactionCard = ({ item, onPress }: TransactionCardProps) => {
           </View>
         )}
 
-        {item.type === TransactionType.DEBIT && (
+        {item.mode === TransactionMode.DEBIT && (
           <View className="px-2">
             <MaterialCommunityIcons
               name="cash-minus"
@@ -230,8 +227,12 @@ export const TransactionCard = ({ item, onPress }: TransactionCardProps) => {
 
         <View className="flex-1 pr-4 gap-2">
           <View className="flex-row justify-between">
-            <Text className=" font-plus-jakarta-semibold text-xs">Deposit</Text>
-            <Text className=" font-plus-jakarta-regular text-xs">2:00pm</Text>
+            <Text className=" font-plus-jakarta-semibold text-xs">
+              {item.mode}
+            </Text>
+            <Text className=" font-plus-jakarta-regular text-xs">
+              {item.createdAt ? formatTime(item.createdAt) : ""}
+            </Text>
           </View>
           <View className="flex-row justify-between">
             <Text className=" font-plus-jakarta-regular text-xs">
@@ -239,12 +240,13 @@ export const TransactionCard = ({ item, onPress }: TransactionCardProps) => {
             </Text>
             <Text
               className={`font-plus-jakarta-extrabold ${
-                item.type === TransactionType.CREDIT
+                item.mode === TransactionMode.CREDIT
                   ? "text-green-500"
                   : "text-red-500"
               } text-sm`}
             >
-              {item.type === TransactionType.CREDIT ? "+ " : "-"} ₦200,000.00
+              {item.mode === TransactionMode.CREDIT ? "+ " : "-"} ₦
+              {Commafy(item.amount)}
             </Text>
           </View>
         </View>

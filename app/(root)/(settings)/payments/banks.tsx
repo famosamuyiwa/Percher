@@ -24,20 +24,25 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { useGlobalContext } from "@/lib/global-provider";
+import { useUpdateWalletMutation } from "@/hooks/mutation/useWalletMutation";
+import { useGlobalStore } from "@/store/store";
+import { ToastType } from "@/constants/enums";
 
 const Banks = () => {
-  const params = useLocalSearchParams<{ query?: string }>();
-
+  const params = useLocalSearchParams<{ id: string; query?: string }>();
+  const { wallet } = useGlobalStore();
   const [banks, setBanks] = useState<any>([]);
   const [selectedBank, setSelectedBank] = useState<any>();
-  const [selectedBankName, setSelectedBankName] = useState();
-  const [selectedBankLogo, setSelectedBankLogo] = useState();
+  const [selectedBankName, setSelectedBankName] = useState<any>();
+  const [selectedBankLogo, setSelectedBankLogo] = useState<any>();
   const [accountNumber, setAccountNumber] = useState("");
   const [accountDetails, setAccountDetails] = useState<any>();
   const [filteredBanks, setFilteredBanks] = useState<any>([]);
   const [banksModalVisible, setBanksModalVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const { showLoader, hideLoader } = useGlobalContext();
+  const { showLoader, hideLoader, displayToast } = useGlobalContext();
+  const updateWalletMutation = useUpdateWalletMutation();
 
   const filterBanks = () => {
     const filterBanks: any = banks.filter((b: any) =>
@@ -67,8 +72,11 @@ const Banks = () => {
         code
       );
       if (data.status) setAccountDetails(data.data);
-    } catch (error) {
-      console.log("error:", error);
+    } catch (error: any) {
+      displayToast({
+        description: error.message,
+        type: ToastType.ERROR,
+      });
     }
   };
 
@@ -77,6 +85,19 @@ const Banks = () => {
       const data = await fetchBankFromNigerianBanksApi();
       setBanks(data);
     };
+    if (wallet?.accountNumber) {
+      setSelectedBank(wallet.bankCode);
+      setSelectedBankName(wallet.bankName);
+      setSelectedBankLogo(wallet.bankLogo);
+      setAccountNumber(wallet.accountNumber);
+      setAccountDetails({
+        account_name: wallet.accountName,
+        account_number: wallet.accountNumber,
+      });
+    } else {
+      resetDetails();
+      setIsEditing(true);
+    }
 
     getBanks();
   }, []);
@@ -88,6 +109,7 @@ const Banks = () => {
   }, [params.query]);
 
   const openBanksModal = () => {
+    if (!isEditing) return;
     if (!selectedBank && banks.length > 0) {
       setSelectedBank(banks[0].code); // Set the first bank as default
       setSelectedBankName(banks[0].name);
@@ -97,7 +119,48 @@ const Banks = () => {
   };
 
   const handleSetWithdrawalBank = () => {
+    if (!selectedBank || !accountDetails) return;
     showLoader();
+    const payload = {
+      id: Number(params.id),
+      bankName: selectedBank.name,
+      bankCode: selectedBank.code,
+      accountNumber: accountDetails.account_number,
+      accountName: accountDetails.account_name,
+      bankLogo: selectedBank.logo,
+    };
+    updateWalletMutation.mutate(payload, { onSuccess, onSettled });
+  };
+
+  const onSuccess = () => {
+    setIsEditing(false);
+  };
+
+  const onSettled = () => {
+    hideLoader();
+  };
+
+  const handleModalDoneClick = () => {
+    if (!selectedBank) {
+      const bank = params.query ? filteredBanks : banks;
+      setSelectedBank(bank[0]);
+      setSelectedBankName(bank[0].name);
+      setSelectedBankLogo(bank[0].logo);
+    }
+    setBanksModalVisible(false);
+  };
+
+  const handleChangeBank = () => {
+    resetDetails();
+    setIsEditing(true);
+  };
+
+  const resetDetails = () => {
+    setSelectedBank(undefined);
+    setSelectedBankName(undefined);
+    setSelectedBankLogo("");
+    setAccountNumber("");
+    setAccountDetails(undefined);
   };
 
   return (
@@ -110,6 +173,13 @@ const Banks = () => {
         </Text>
 
         <View className="mt-10">
+          {!isEditing && (
+            <TouchableOpacity className="items-end" onPress={handleChangeBank}>
+              <Text className=" font-plus-jakarta-regular pb-3 underline text-primary-300">
+                Change
+              </Text>
+            </TouchableOpacity>
+          )}
           <View>
             <Text className="text-xs font-plus-jakarta-regular pb-3">Bank</Text>
             <TouchableOpacity
@@ -146,8 +216,6 @@ const Banks = () => {
                             const selected: any = banks.find(
                               (bank: any) => bank.code === itemValue
                             );
-                            console.log("itemValue: ", itemValue);
-                            console.log("selected: ", selected);
                             if (selected) {
                               setSelectedBank(selected);
                               setSelectedBankName(selected.name);
@@ -169,12 +237,7 @@ const Banks = () => {
                             )
                           )}
                         </Picker>
-                        <Button
-                          title="Done"
-                          onPress={() => {
-                            setBanksModalVisible(false);
-                          }}
-                        />
+                        <Button title="Done" onPress={handleModalDoneClick} />
                       </View>
                     </View>
                   </KeyboardAvoidingView>
@@ -190,12 +253,14 @@ const Banks = () => {
                 className="absolute right-0 px-5"
               />
             </TouchableOpacity>
-            <View className="items-center justify-center self-end bg-accent-100 rounded-full size-10 my-2">
-              <Image
-                source={{ uri: selectedBankLogo }}
-                style={{ width: 20, height: 20 }}
-              />
-            </View>
+            {selectedBank && (
+              <View className="items-center justify-center self-end bg-accent-100 rounded-full size-10 my-2">
+                <Image
+                  source={{ uri: selectedBankLogo }}
+                  style={{ width: 20, height: 20 }}
+                />
+              </View>
+            )}
           </View>
           {selectedBank && (
             <View className="pb-10">
@@ -211,6 +276,7 @@ const Banks = () => {
                 onBlur={() =>
                   verifyAccountNumber(accountNumber, selectedBank.code)
                 }
+                isEditable={isEditing}
               />
               {accountDetails && (
                 <Text className="text-xs font-plus-jakarta-semibold text-gray-500 self-end py-2">
@@ -220,11 +286,13 @@ const Banks = () => {
             </View>
           )}
 
-          {accountDetails && (
-            <CustomButton
-              label="Set withdrawal bank"
-              onPress={handleSetWithdrawalBank}
-            />
+          {isEditing && (
+            <View className="mt-10">
+              <CustomButton
+                label="Set withdrawal bank"
+                onPress={handleSetWithdrawalBank}
+              />
+            </View>
           )}
         </View>
       </View>

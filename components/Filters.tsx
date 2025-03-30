@@ -5,9 +5,9 @@ import { filterCategories } from "../constants/data";
 import { FilterCategoryKey } from "@/constants/enums";
 
 const Filters = ({ categoryKey }: { categoryKey: FilterCategoryKey }) => {
-  const params = useLocalSearchParams<{ filter?: string }>();
+  const params = useLocalSearchParams<{ categoryFilter?: string }>();
   const [selectedCategory, setSelectedCategory] = useState(
-    params.filter ??
+    params.categoryFilter ??
       (categoryKey === FilterCategoryKey.PERCHTYPE ? "All" : "Current")
   );
 
@@ -16,7 +16,7 @@ const Filters = ({ categoryKey }: { categoryKey: FilterCategoryKey }) => {
       return;
     }
     setSelectedCategory(category);
-    router.setParams({ filter: category });
+    router.setParams({ categoryFilter: category });
   };
 
   return (

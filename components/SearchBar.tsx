@@ -5,7 +5,13 @@ import { useDebouncedCallback } from "use-debounce";
 
 import { Feather, Ionicons } from "@expo/vector-icons";
 
-const SearchBar = ({ isFiltered }: { isFiltered?: boolean }) => {
+const SearchBar = ({
+  isFiltered,
+  placeholder,
+}: {
+  isFiltered?: boolean;
+  placeholder?: string;
+}) => {
   const params = useLocalSearchParams<{ query?: string }>();
   const [search, setSearch] = useState(params.query);
 
@@ -24,7 +30,7 @@ const SearchBar = ({ isFiltered }: { isFiltered?: boolean }) => {
         <TextInput
           value={search}
           onChangeText={handleSearch}
-          placeholder="Search for anything"
+          placeholder={placeholder ?? "Search for anything"}
           placeholderTextColor={"lightgrey"}
           className="text-sm font-plus-jakarta-regular text-black-300 ml-2 flex-1"
         />

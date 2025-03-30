@@ -1,18 +1,14 @@
-export enum PropertyType {
-  HOUSE = "House",
-  CONDO = "Condo",
-  DUPLEX = "Duplex",
-  STUDIO = "Studio",
-  VILLA = "Villa",
-  APARTMENT = "Apartment",
-  OTHERS = "Others",
-}
-
 export enum Facility {
   LAUNDRY = "Laundry",
   GARAGE = "Garage",
   GYM = "Gym",
-  WIFI = "Wifi",
+  WIFI = "WiFi",
+  FURNISHED = "Furnished",
+  PET_FRIENDLY = "Pet Friendly",
+  ESTATE_SECURITY = "Estate Security",
+  POOL = "Pool",
+  ELECTRICITY_24_7 = "24/7 Electricity",
+  CCTV = "CCTV",
 }
 
 export enum Modal {
@@ -32,18 +28,17 @@ export enum FilterCategoryKey {
   BOOKINGS = "Bookings",
 }
 
-export enum TransactionType {
-  DEBIT = "Debit",
-  CREDIT = "Credit",
-}
-
 export enum PerchTypes {
+  APARTMENT = "Apartment", // Serviced or not
   HOUSE = "House",
-  CONDO = "Condo",
-  DUPLEX = "Duplex",
-  STUDIO = "Studio",
   VILLA = "Villa",
-  APARTMENT = "Apartment",
+  MANSION = "Mansion",
+  PENTHOUSE = "Penthouse",
+  SELF_CONTAINED = "Self-Contained",
+  BOYS_QUARTERS = "Boys' Quarters",
+  OFFICE_SPACE = "Office Space",
+  WAREHOUSE = "Warehouse",
+  EVENT_CENTER = "Event Center",
   OTHERS = "Others",
 }
 
@@ -159,7 +154,9 @@ export enum TransactionType {
   DEPOSIT = "Deposit",
   WITHDRAWAL = "Withdrawal",
   BOOKING = "Booking",
-  REFUND = "Refund",
+  REFUND = "Booking Refund",
+  CAUTION_FEE_CASHBACK = "Caution Fee Cashback",
+  OTHER = "Other",
 }
 
 export enum PaymentStatus {
@@ -169,4 +166,9 @@ export enum PaymentStatus {
 export enum ReviewAction {
   APPROVE = "Approve",
   REJECT = "Reject",
+}
+
+export enum TransactionMode {
+  DEBIT = "Debit",
+  CREDIT = "Credit",
 }

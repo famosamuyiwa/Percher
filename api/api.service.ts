@@ -1,5 +1,6 @@
 import {
   Booking,
+  CreatePaymentRequest,
   Filter,
   OAuthRequest,
   PerchRegistrationFormData,
@@ -7,6 +8,7 @@ import {
   ReviewBookingRequest,
   SignupRequest,
   User,
+  Wallet,
 } from "@/interfaces";
 import { getHeaders, handleApiError, saveJwt } from "@/utils/common";
 import axios from "axios";
@@ -256,6 +258,7 @@ export const getAllProperties = async (
   pageParam: number | null = null,
   filters: Filter
 ) => {
+  console.log("filters: ", filters);
   try {
     const { data: payload } = await api.get(`${API_BASE_URL}/property`, {
       params: {
@@ -280,6 +283,32 @@ export const getAllBookings = async (
         ...filters,
       },
     });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const getAllPayments = async (
+  pageParam: number | null = null,
+  filters: Filter
+) => {
+  try {
+    const { data: payload } = await api.get(`${API_BASE_URL}/payment`, {
+      params: {
+        cursor: pageParam,
+        ...filters,
+      },
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const getWallet = async () => {
+  try {
+    const { data: payload } = await api.get(`${API_BASE_URL}/wallet`);
     return payload;
   } catch (error: any) {
     handleApiError(error);
@@ -329,10 +358,50 @@ export const updateUser = async (credentials: Partial<User>) => {
   }
 };
 
+export const updateWallet = async (credentials: Partial<Wallet>) => {
+  const { id } = credentials;
+  delete credentials.id;
+  try {
+    const { data: payload } = await api.put(`${API_BASE_URL}/wallet/${id}`, {
+      ...credentials,
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
 export const verifyPayment = async (transactionRef: string) => {
   try {
     const { data: payload } = await api.get(
       `${API_BASE_URL}/payment/verify/${transactionRef}`
+    );
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const createPayment = async (credentials: CreatePaymentRequest) => {
+  const { amount, reference, transactionType } = credentials;
+  try {
+    const { data: payload } = await api.post(
+      `${API_BASE_URL}/payment/${reference}`,
+      {
+        amount,
+        transactionType,
+      }
+    );
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const updatePayment = async (transactionRef: string) => {
+  try {
+    const { data: payload } = await api.put(
+      `${API_BASE_URL}/payment/${transactionRef}`
     );
     return payload;
   } catch (error: any) {

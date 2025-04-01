@@ -44,7 +44,7 @@ export default function Index() {
     from: UserType.GUEST,
     perchType: params.categoryFilter,
   });
-  const { user } = useGlobalContext();
+  const { user, unreadCount } = useGlobalContext();
 
   const propertiesQuery = usePropertiesQuery({
     ...filters,
@@ -90,11 +90,14 @@ export default function Index() {
               </Text>
             </View>
           </View>
-          <View>
+          <View className="flex flex-row items-center">
             <TouchableOpacity
               onPress={() => router.push("/(root)/notifications")}
             >
               <MaterialIcons name="notifications" size={20} />
+              {unreadCount > 0 && (
+                <View className="absolute -right-1 -top-1 w-4 h-4 bg-accent-300 border-2 border-white rounded-full" />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -128,7 +131,7 @@ export default function Index() {
         </View>
       </View>
     ),
-    [featuredProperties, featuredPropertiesQuery.isLoading, user]
+    [featuredProperties, featuredPropertiesQuery.isLoading, user, unreadCount]
   );
 
   return (

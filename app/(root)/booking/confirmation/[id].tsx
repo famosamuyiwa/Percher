@@ -32,7 +32,7 @@ import {
 } from "@/utils/common";
 import { ApiResponse, Booking, Payment } from "@/interfaces";
 import { useVerifyPaymentMutation } from "@/hooks/mutation/usePaymentMutation";
-import { ToastType, TransactionType } from "@/constants/enums";
+import { TransactionType } from "@/constants/enums";
 
 const BookingConfirmation = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -56,7 +56,6 @@ const BookingConfirmation = () => {
 
     showLoader();
     booking.invoice.payment = payment;
-    console.log("booking", booking.invoice.payment);
     createBookingMutation.mutate(booking, {
       onSettled: onBookingSettled,
       onSuccess: onBookingSuccess,
@@ -302,7 +301,7 @@ const BookingConfirmation = () => {
           <View className="flex-row px-5 justify-between items-center mb-5">
             <Text className="font-plus-jakarta-regular">Service Fee</Text>
             <Text className="font-plus-jakarta-semibold">
-              - ₦ {Commafy(booking?.invoice?.guestServiceFee)}
+              ₦ {Commafy(booking?.invoice?.guestServiceFee)}
             </Text>
           </View>
           <View className="flex-row px-5 justify-between items-center mb-5">

@@ -82,11 +82,11 @@ export const Card = ({ item, source, onPress }: Props) => {
           {item.location}
         </Text>
 
-        {source === Screens.MY_PERCHS && (
-          <View className="flex flex-row items-center justify-between mt-2">
-            <Text className="text-base font-plus-jakarta-bold text-primary-300">
-              ₦{Commafy(item.price)}
-            </Text>
+        <View className="flex flex-row items-center justify-between mt-2">
+          <Text className="text-base font-plus-jakarta-bold text-primary-300">
+            ₦{Commafy(item.price)}
+          </Text>
+          {source === Screens.MY_PERCHS && (
             <View
               style={{ backgroundColor: Colors.secondary }}
               className="border-secondary-300 p-2 rounded-full flex-row items-center gap-2"
@@ -96,8 +96,8 @@ export const Card = ({ item, source, onPress }: Props) => {
                 {item.status}
               </Text>
             </View>
-          </View>
-        )}
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -124,7 +124,7 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
           <View className="flex-row justify-between p-r-4">
             <Text className="font-plus-jakarta-regular text-xs">Arrival</Text>
             <Text className="font-plus-jakarta-regular text-xs">
-              {formatDate(item.startDate)} {item.checkIn}
+              {formatDate(item.startDate)}. {item.checkIn}
             </Text>
           </View>
           <View className="flex-row justify-between">
@@ -132,7 +132,7 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
               Departure
             </Text>
             <Text className=" font-plus-jakarta-regular text-xs">
-              {formatDate(item.endDate)} {item.checkOut}
+              {formatDate(item.endDate)}. {item.checkOut}
             </Text>
           </View>
           <View className="flex-row justify-between">
@@ -173,7 +173,7 @@ export const BookingCardHost = ({ item, onPress }: BookingProps) => {
           <View className="flex-row justify-between p-r-4">
             <Text className="font-plus-jakarta-regular text-xs">Arrival</Text>
             <Text className="font-plus-jakarta-regular text-xs">
-              {formatDate(item.startDate)} {item.checkIn}
+              {formatDate(item.startDate)}. {item.checkIn}
             </Text>
           </View>
           <View className="flex-row justify-between">
@@ -181,7 +181,7 @@ export const BookingCardHost = ({ item, onPress }: BookingProps) => {
               Departure
             </Text>
             <Text className=" font-plus-jakarta-regular text-xs">
-              {formatDate(item.endDate)} {item.checkOut}
+              {formatDate(item.endDate)}. {item.checkOut}
             </Text>
           </View>
           <View className="flex-row justify-between">

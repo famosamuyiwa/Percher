@@ -10,23 +10,14 @@ import {
   User,
   Wallet,
 } from "@/interfaces";
-import { getHeaders, handleApiError, saveJwt } from "@/utils/common";
+import { handleApiError } from "@/utils/common";
 import axios from "axios";
-import { Platform } from "react-native";
 import api from "./axios";
 import * as SecureStore from "expo-secure-store";
 import { signOut } from "@/hooks/useGoogleOAuth";
-import { ReviewAction } from "@/constants/enums";
+import { API_BASE_URL } from "@/environment";
 
-let API_BASE_URL: string;
 const PAYSTACK_SECRET_KEY = process.env.EXPO_PUBLIC_PAYSTACK_TEST_SECRET_KEY!;
-
-if (Platform.OS === "android") {
-  // Use 10.0.2.2 for accessing localhost on Android emulatorr
-  API_BASE_URL = "http://10.0.2.2:3000"; // Replace with your actual port number
-} else {
-  API_BASE_URL = "http://localhost:3000"; // Replace with your actual port number
-}
 
 export const login = async (credentials: {
   email: string;
@@ -258,7 +249,6 @@ export const getAllProperties = async (
   pageParam: number | null = null,
   filters: Filter
 ) => {
-  console.log("filters: ", filters);
   try {
     const { data: payload } = await api.get(`${API_BASE_URL}/property`, {
       params: {
@@ -298,6 +288,20 @@ export const getAllPayments = async (
       params: {
         cursor: pageParam,
         ...filters,
+      },
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const getAllNotifications = async (pageParam: number | null = null) => {
+  try {
+    const { data: payload } = await api.get(`${API_BASE_URL}/notifications`, {
+      params: {
+        cursor: pageParam,
+        limit: 10,
       },
     });
     return payload;

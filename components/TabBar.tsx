@@ -9,10 +9,12 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Colors } from "@/constants/common";
+import { useGlobalContext } from "@/lib/global-provider";
 
 type RouteName = "index" | "explore" | "bookings" | "profile"; // Define valid route names
 
 const TabBar = ({ state, descriptors, navigation }: any) => {
+  const { unreadCount } = useGlobalContext();
   const tabIconDefault = "#666876";
   const tabIconSelected = Colors.primary;
   const icons = {
@@ -20,7 +22,12 @@ const TabBar = ({ state, descriptors, navigation }: any) => {
       let name = "home";
       if (!props.isFocused) name = "home-outline";
       return (
-        <Ionicons name={name} size={26} color={tabIconDefault} {...props} />
+        <View>
+          <Ionicons name={name} size={26} color={tabIconDefault} {...props} />
+          {unreadCount > 0 && (
+            <View className="absolute -right-1 -top-1 w-4 h-4 bg-accent-300 border-2 border-white rounded-full" />
+          )}
+        </View>
       );
     },
     explore: (props: any) => {

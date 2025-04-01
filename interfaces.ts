@@ -5,6 +5,8 @@ import {
   ChargeType,
   Facility,
   LoginProvider,
+  NotificationStatus,
+  NotificationType,
   PaymentStatus,
   PerchTypes,
   RegistrationStatus,
@@ -225,4 +227,16 @@ export interface CreatePaymentRequest {
   amount: number;
   reference: string;
   transactionType: TransactionType;
+}
+
+export interface INotification<T> {
+  id: number;
+  user: number;
+  type: NotificationType;
+  status: NotificationStatus;
+  title: string;
+  message: string;
+  data?: T;
+  createdAt: Date;
+  modifiedAt: Date;
 }

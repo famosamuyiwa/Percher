@@ -129,6 +129,13 @@ const Property = () => {
             </Text>
           </View>
 
+          <View className="flex flex-row items-center justify-start mt-4 gap-2">
+            <Entypo name="location" size={16} color={Colors.accent} />
+            <Text className="text-black-200 text-sm font-plus-jakarta-medium">
+              {propertyQuery?.data?.data?.location}
+            </Text>
+          </View>
+
           <View className="w-full border-t border-primary-200 pt-7 mt-5">
             <Text className="text-black-300 text-xl font-plus-jakarta-bold">
               Agent
@@ -222,27 +229,25 @@ const Property = () => {
                 keyExtractor={(item) => item}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                renderItem={({ item }) => (
-                  <Image source={{ uri: item }} style={styles.galleryImg} />
+                renderItem={({ item, index }) => (
+                  <TouchableOpacity
+                    onPress={() =>
+                      router.push({
+                        pathname: "/properties/gallery",
+                        params: {
+                          id: Number(index),
+                        },
+                      })
+                    }
+                  >
+                    <Image source={{ uri: item }} style={styles.galleryImg} />
+                  </TouchableOpacity>
                 )}
                 contentContainerClassName="flex gap-4 mt-3"
+                scrollEventThrottle={16}
               />
             </View>
           )}
-
-          <View className="mt-7">
-            <Text className="text-black-300 text-xl font-plus-jakarta-bold">
-              Location
-            </Text>
-            <View className="flex flex-row items-center justify-start mt-4 gap-2">
-              <Entypo name="location" size={28} color={Colors.accent} />
-              <Text className="text-black-200 text-sm font-plus-jakarta-medium">
-                {propertyQuery?.data?.data?.location}
-              </Text>
-            </View>
-
-            <Image source={images.map} style={styles.locationImg} />
-          </View>
 
           {propertyQuery?.data?.data?.reviews?.length > 0 && (
             <View className="mt-7">
@@ -313,8 +318,8 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
   },
   galleryImg: {
-    height: 160,
-    width: 160,
+    height: 250,
+    width: 250,
     borderRadius: 12,
   },
   locationImg: {

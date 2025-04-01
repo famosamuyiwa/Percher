@@ -1,6 +1,7 @@
 import {
   ApiResponse,
   Booking,
+  INotification,
   Payment,
   Property,
   User,
@@ -16,3 +17,4 @@ export type PropertyCache = ApiResponse<Property>;
 export type BookingsCache = ApiResponse<Booking[]>;
 export type BookingCache = ApiResponse<Booking>;
 export type WalletCache = ApiResponse<Wallet>;
+export type NotificationsCache = ApiResponse<INotification<any>[]>;

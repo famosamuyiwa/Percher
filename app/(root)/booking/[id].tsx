@@ -1,12 +1,4 @@
-import {
-  View,
-  StyleSheet,
-  Text,
-  Pressable,
-  Button,
-  TouchableOpacity,
-  Modal,
-} from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { Entypo, FontAwesome5, Ionicons } from "@expo/vector-icons";
@@ -20,7 +12,9 @@ import {
 } from "@/environment";
 import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays";
 import BookingForm from "@/components/forms/Booking";
-import { splitAndTrim } from "@/utils/common";
+import { addMonths } from "date-fns/addMonths";
+import { addYears } from "date-fns/addYears";
+import { addDays } from "date-fns/addDays";
 
 const Booking = () => {
   const { id, chargeType } = useLocalSearchParams<{
@@ -30,13 +24,30 @@ const Booking = () => {
   const { property, saveBookingState, resetBookingState } = useGlobalStore();
 
   const handleOnContinue = (formData: BookingFormData) => {
-    if (!property || !formData.departureDate || !formData.arrivalDate) return;
+    if (!property) return;
+
+    if (chargeType === ChargeType.MONTHLY && formData.periodInDigits > 0) {
+      const endDate = addMonths(formData.arrivalDate, formData.periodInDigits);
+      formData.departureDate = addDays(endDate, 1);
+    }
+
+    if (chargeType === ChargeType.YEARLY && formData.periodInDigits > 0) {
+      const endDate = addYears(formData.arrivalDate, formData.periodInDigits);
+      formData.departureDate = addDays(endDate, 1);
+    }
+
+    let period = 0;
+
+    if (chargeType === ChargeType.NIGHTLY) {
+      period = differenceInCalendarDays(
+        formData.departureDate,
+        formData.arrivalDate
+      );
+    } else {
+      period = formData.periodInDigits;
+    }
 
     const subPrice = Number(property.price);
-    const period = differenceInCalendarDays(
-      formData.departureDate,
-      formData.arrivalDate
-    );
     const price = subPrice * period;
     const cautionFee = Number(property.cautionFee);
     const subTotal = price + cautionFee;

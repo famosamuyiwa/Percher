@@ -69,8 +69,8 @@ export interface PerchRegistrationFormData {
 
 export interface BookingFormData {
   periodOfStay: string;
-  arrivalDate?: Date;
-  departureDate?: Date;
+  arrivalDate: Date;
+  departureDate: Date;
   checkInTime: string;
   checkOutTime: string;
   periodInDigits: number;

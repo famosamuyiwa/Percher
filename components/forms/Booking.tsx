@@ -74,7 +74,6 @@ export default function BookingForm({
   const checkOutTime = watch("checkOutTime"); // Automatically updates when changed
 
   const handleOnSubmit = async (data: any) => {
-    console.log("data: ", data);
     try {
       onSubmit(data);
     } catch (err: any) {
@@ -104,7 +103,6 @@ export default function BookingForm({
     if (startDate) {
       setValue("periodOfStay", `${formatDate(startDate)}`);
       setValue("arrivalDate", startDate);
-      // setValue("departureDate", endDate);
     }
     resetModal();
   };
@@ -329,146 +327,4 @@ export default function BookingForm({
       </Modal>
     </View>
   );
-}
-
-{
-  /* <View>
-<View className=" gap-5 mb-8 ">
-  <Text className=" font-plus-jakarta-semibold ">Period of Stay</Text>
-  <TouchableOpacity
-    onPress={() => setCalendarModalVisible(true)}
-    className="h-10 rounded-lg border-primary-300 flex-row items-center px-2 gap-2"
-    style={{ borderWidth: 0.4 }}
-  >
-    <FontAwesome5
-      name="calendar-day"
-      size={16}
-      color={Colors.primary}
-    />
-    <Text className="text-sm font-plus-jakarta-regular w-10/12 text-center">
-      {formatDate(arrivalDate)} {"   "} - {"   "}{" "}
-      {formatDate(departureDate)}
-    </Text>
-  </TouchableOpacity>
-</View>
-<Modal
-  visible={calendarModalVisible}
-  transparent
-  animationType="slide"
->
-  <View style={styles.calendarModalContainer}>
-      <CalendarList onBack={handleOnCalendarModalDismiss} />
-    </View>
-</Modal>
-</View>
-<View className="flex-row justify-between">
-<View className="w-5/12">
-  <View className="gap-5 mb-8 ">
-    <Text className=" font-plus-jakarta-semibold">Check-In Time</Text>
-    <TouchableOpacity
-      onPress={() => setCheckInModalVisible(true)}
-      className="h-10 rounded-lg border-primary-300 flex-row items-center px-2 gap-2"
-      style={{ borderWidth: 0.4 }}
-    >
-      <Entypo name="back-in-time" size={16} color={Colors.primary} />
-      <Modal
-        visible={checkInModalVisible}
-        transparent
-        animationType="slide"
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={checkInTime}
-              onValueChange={(itemValue) => setCheckInTime(itemValue)}
-              itemStyle={{
-                color: "black", // Set text color
-                fontSize: 18, // Set font size
-              }}
-            >
-              {property?.checkInPeriods?.map(
-                (period: string, index: number) => (
-                  <Picker.Item
-                    key={index}
-                    label={period}
-                    value={period}
-                  />
-                )
-              )}
-            </Picker>
-            <Button
-              title="Done"
-              onPress={() => setCheckInModalVisible(false)}
-            />
-          </View>
-        </View>
-      </Modal>
-      <Text className="text-sm font-plus-jakarta-regular w-10/12">
-        {checkInTime}
-      </Text>
-    </TouchableOpacity>
-  </View>
-</View>
-
-<View className="w-5/12">
-  <View className=" gap-5 mb-8 ">
-    <Text className=" font-plus-jakarta-semibold">
-      Check-Out Time
-    </Text>
-    <TouchableOpacity
-      onPress={() => setCheckOutModalVisible(true)}
-      className="h-10 rounded-lg border-primary-300 flex-row items-center px-2 gap-2"
-      style={{ borderWidth: 0.4 }}
-    >
-      <Entypo name="back-in-time" size={16} color={Colors.primary} />
-      <Modal
-        visible={checkOutModalVisible}
-        transparent
-        animationType="slide"
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={checkOutTime}
-              onValueChange={(itemValue) =>
-                setCheckOutTime(itemValue)
-              }
-              itemStyle={{
-                color: "black", // Set text color
-                fontSize: 18, // Set font size
-              }}
-            >
-              <Picker.Item
-                label={property?.checkOutPeriod}
-                value={property?.checkOutPeriod}
-              />
-            </Picker>
-            <Button
-              title="Done"
-              onPress={() => setCheckOutModalVisible(false)}
-            />
-          </View>
-        </View>
-      </Modal>
-      <Text className="text-sm font-plus-jakarta-regular w-10/12">
-        {checkOutTime}
-      </Text>
-    </TouchableOpacity>
-  </View>
-</View>
-</View>
-{/* <View className="flex-row items-center gap-5 mb-5 justify-between">
-<Text className=" font-plus-jakarta-semibold">
-  Availability Status
-</Text>
-<View className="border-secondary-300 bg-green-500 p-2 rounded-full flex-row items-center gap-2">
-  <View className="size-2 rounded-full bg-white " />
-  <Text className="text-xs font-plus-jakarta-bold text-white">
-    Available
-  </Text>
-</View>
-</View> 
-
-<View className="flex-1 justify-end py-10">
-<CustomButton label="Continue" onPress={handleOnContinue} /> */
 }

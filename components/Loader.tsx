@@ -1,6 +1,10 @@
 import React, { useState, useImperativeHandle, forwardRef } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 import { Colors } from "@/constants/common";
 import { ActivityIndicator, View, Text } from "react-native";
 
@@ -30,6 +34,7 @@ const Loader = forwardRef(({}, ref) => {
         <Animated.View
           layout={LinearTransition}
           entering={FadeIn.duration(500)}
+          exiting={FadeOut.duration(500)}
           className="w-full h-full absolute items-center justify-center bg-black/50 z-50"
         >
           <View className=" bg-white rounded-xl p-5 flex-row items-center justify-center gap-5">

@@ -15,6 +15,7 @@ class NotificationService {
     unreadCount: [],
     recentNotifications: [],
   };
+  private isConnecting = true;
 
   async connect() {
     try {
@@ -34,27 +35,43 @@ class NotificationService {
         transports: ["websocket"],
         autoConnect: true,
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: Infinity, // Try indefinitely
         reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000, // Max delay between attempts
+        timeout: 20000, // Connection timeout
+        forceNew: true, // Force a new connection
+        path: "/socket.io/", // Socket.io path
       });
 
       // Handle connection events
       this.socket.once("connect", () => {
         console.log("Connected to notification server");
+        this.isConnecting = false;
         // Set up all listeners after successful connection
         this.setupListeners();
       });
 
       this.socket.on("connect_error", (error) => {
         console.error("Connection error:", error);
+        this.isConnecting = false;
       });
 
-      this.socket.on("disconnect", () => {
-        console.log("Disconnected from notification server");
+      this.socket.on("disconnect", (reason) => {
+        console.log("Disconnected from notification server. Reason:", reason);
+        this.isConnecting = false;
+      });
+
+      this.socket.on("reconnect_attempt", (attemptNumber) => {
+        console.log(`Attempting to reconnect (attempt ${attemptNumber})`);
+      });
+
+      this.socket.on("reconnect_failed", () => {
+        console.log("Reconnection failed, will keep trying...");
       });
 
       this.socket.on("error", (error) => {
         console.error("Socket error:", error);
+        this.isConnecting = false;
       });
     } catch (error) {
       console.error("Failed to connect to notification server:", error);

@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import PerchRegistrationForm from "@/components/Forms";
+import PerchRegistrationForm from "@/components/forms/PerchRegistration";
 import { PerchRegistrationFormData } from "@/interfaces";
 import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
 import { useState } from "react";
@@ -151,10 +151,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 15,
     height: "100%",
-  },
-  borderedItem: {
-    borderBottomWidth: 1,
-    borderColor: "#F4F4F4",
   },
 });
 

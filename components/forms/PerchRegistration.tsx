@@ -3,14 +3,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   Button,
   Modal,
   ScrollView,
 } from "react-native";
 import * as z from "zod";
-import { TextField } from "./Textfield";
+import { TextField } from "../Textfield";
 import { useState } from "react";
 import {
   Entypo,
@@ -32,11 +31,12 @@ import {
   PerchTypes,
   ToastType,
 } from "@/constants/enums";
-import MiniGalleryItem from "./GalleryItem";
-import MultiPicker from "./MultiPicker";
-import { PerchRegistrationFormProps } from "@/interfaces";
-import CustomButton from "./Button";
+import MiniGalleryItem from "../GalleryItem";
+import MultiPicker from "../MultiPicker";
+import CustomButton from "../Button";
 import { useGlobalContext } from "@/lib/global-provider";
+import { FormProps, PerchRegistrationFormData } from "@/interfaces";
+import { formStyles } from "./styles";
 
 // Validation Schema
 const schema = z.object({
@@ -64,7 +64,7 @@ const schema = z.object({
 export default function PerchRegistrationForm({
   data,
   onSubmit,
-}: PerchRegistrationFormProps) {
+}: FormProps<PerchRegistrationFormData, any>) {
   const [height, setHeight] = useState(20);
   const [perchTypeModalVisible, setPerchTypeModalVisible] = useState(false);
   const [chargeTypeModalVisible, setChargeTypeModalVisible] = useState(false);
@@ -194,7 +194,7 @@ export default function PerchRegistrationForm({
                 placeholder="e.g Transcorp Hilton"
                 value={value}
                 onValueChange={onChange}
-                style={styles.input}
+                style={formStyles.input}
                 onBlur={onBlur}
                 placeholderColor="darkgrey"
               />
@@ -219,7 +219,7 @@ export default function PerchRegistrationForm({
                   placeholder="e.g 2"
                   value={value}
                   onValueChange={(text: string) => onChange(Number(text))}
-                  style={styles.input}
+                  style={formStyles.input}
                   onBlur={onBlur}
                   keyboardType="numeric"
                   placeholderColor="darkgrey"
@@ -243,7 +243,7 @@ export default function PerchRegistrationForm({
                   placeholder="e.g 3"
                   value={value}
                   onValueChange={(text: string) => onChange(Number(text))}
-                  style={styles.input}
+                  style={formStyles.input}
                   onBlur={onBlur}
                   keyboardType="numeric"
                   placeholderColor="darkgrey"
@@ -294,15 +294,15 @@ export default function PerchRegistrationForm({
                 </Text>
                 <TouchableOpacity
                   onPress={() => setPerchTypeModalVisible(true)}
-                  style={styles.pickerBtn}
+                  style={formStyles.pickerBtn}
                 >
                   <Modal
                     visible={perchTypeModalVisible}
                     transparent
                     animationType="slide"
                   >
-                    <View style={styles.modalContainer}>
-                      <View style={styles.pickerContainer}>
+                    <View style={formStyles.modalContainer}>
+                      <View style={formStyles.pickerContainer}>
                         <Picker
                           selectedValue={perchType}
                           onValueChange={(itemValue) =>
@@ -357,7 +357,10 @@ export default function PerchRegistrationForm({
                 placeholder="e.g describe the experience living here"
                 value={value}
                 onValueChange={onChange}
-                style={[styles.input, { height, minHeight: 40, padding: 10 }]}
+                style={[
+                  formStyles.input,
+                  { height, minHeight: 40, padding: 10 },
+                ]}
                 onContentSizeChange={(event: any) =>
                   setHeight(event.nativeEvent.contentSize.height)
                 }
@@ -438,7 +441,7 @@ export default function PerchRegistrationForm({
                 placeholder="e.g Ogudu G.R.A, Lagos"
                 value={value}
                 onValueChange={onChange}
-                style={styles.input}
+                style={formStyles.input}
                 onBlur={onBlur}
                 placeholderColor="darkgrey"
               />
@@ -525,15 +528,15 @@ export default function PerchRegistrationForm({
                 </Text>
                 <TouchableOpacity
                   onPress={() => setChargeTypeModalVisible(true)}
-                  style={styles.pickerBtn}
+                  style={formStyles.pickerBtn}
                 >
                   <Modal
                     visible={chargeTypeModalVisible}
                     transparent
                     animationType="slide"
                   >
-                    <View style={styles.modalContainer}>
-                      <View style={styles.pickerContainer}>
+                    <View style={formStyles.modalContainer}>
+                      <View style={formStyles.pickerContainer}>
                         <Picker
                           selectedValue={chargeType}
                           onValueChange={(itemValue) =>
@@ -613,15 +616,15 @@ export default function PerchRegistrationForm({
                   </Text>
                   <TouchableOpacity
                     onPress={() => setCheckOutPeriodModalVisible(true)}
-                    style={styles.pickerBtn}
+                    style={formStyles.pickerBtn}
                   >
                     <Modal
                       visible={checkOutPeriodModalVisible}
                       transparent
                       animationType="slide"
                     >
-                      <View style={styles.modalContainer}>
-                        <View style={styles.pickerContainer}>
+                      <View style={formStyles.modalContainer}>
+                        <View style={formStyles.pickerContainer}>
                           <Picker
                             selectedValue={checkOutTime}
                             onValueChange={(itemValue) =>
@@ -694,7 +697,7 @@ export default function PerchRegistrationForm({
                       onChange(Number(rawValue)); // Store raw number (without commas)
                     }
                   }}
-                  style={styles.currencyInput}
+                  style={formStyles.currencyInput}
                   onBlur={onBlur}
                   keyboardType={"numeric"}
                   isCurrency={true}
@@ -733,7 +736,7 @@ export default function PerchRegistrationForm({
                       onChange(Number(rawValue)); // Store raw number (without commas)
                     }
                   }}
-                  style={styles.currencyInput}
+                  style={formStyles.currencyInput}
                   onBlur={onBlur}
                   keyboardType={"numeric"}
                   isCurrency={true}
@@ -897,55 +900,3 @@ export default function PerchRegistrationForm({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  input: {
-    height: 40,
-    paddingVertical: 0,
-    borderWidth: 0,
-    fontSize: 14,
-    color: "darkgrey",
-    backgroundColor: "lightgrey",
-    justifyContent: "center",
-  },
-
-  multiLine: {
-    paddingVertical: 10,
-    borderWidth: 0,
-    fontSize: 14,
-    color: "darkgrey",
-    backgroundColor: "lightgrey",
-    justifyContent: "center",
-  },
-
-  currencyInput: {
-    height: 40,
-    paddingVertical: 0,
-    borderWidth: 0,
-    fontSize: 14,
-    color: "darkgrey",
-    backgroundColor: "lightgrey",
-    justifyContent: "center",
-    paddingHorizontal: 25,
-  },
-
-  modalContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.5)",
-    color: "black",
-  },
-  pickerContainer: {
-    backgroundColor: "white",
-    paddingBottom: 20,
-    color: "black",
-  },
-  pickerBtn: {
-    backgroundColor: "lightgrey",
-    borderRadius: 10,
-    height: 40,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-  },
-});

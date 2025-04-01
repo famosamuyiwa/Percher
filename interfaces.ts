@@ -67,9 +67,19 @@ export interface PerchRegistrationFormData {
   checkOutTime: string;
 }
 
-export interface PerchRegistrationFormProps {
-  data: PerchRegistrationFormData;
-  onSubmit: (formData: PerchRegistrationFormData) => void;
+export interface BookingFormData {
+  periodOfStay: string;
+  arrivalDate?: Date;
+  departureDate?: Date;
+  checkInTime: string;
+  checkOutTime: string;
+  periodInDigits: number;
+}
+
+export interface FormProps<T, S> {
+  data: T;
+  staticData?: S;
+  onSubmit: (formData: T) => void;
 }
 
 export interface ApiResponse<T = any> {

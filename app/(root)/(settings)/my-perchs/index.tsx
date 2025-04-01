@@ -12,10 +12,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import {
-  useOwnedPropertyQuery,
-  usePropertiesQuery,
-} from "@/hooks/query/usePropertyQuery";
+import { useOwnedPropertyQuery } from "@/hooks/query/usePropertyQuery";
 import { Filter } from "@/interfaces";
 import SearchBar from "@/components/SearchBar";
 import { Screens, UserType } from "@/constants/enums";

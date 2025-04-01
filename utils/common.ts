@@ -1,7 +1,4 @@
-import {
-  PerchRegistrationFormData,
-  PerchRegistrationFormProps,
-} from "@/interfaces";
+import { PerchRegistrationFormData } from "@/interfaces";
 import { useGlobalStore } from "@/store/store";
 import * as SecureStore from "expo-secure-store";
 
@@ -137,4 +134,8 @@ export function convertToInternationalPhoneNumber(
 
 export function generateUniqueId() {
   return "" + Math.floor(Math.random() * 1000000000 + 1);
+}
+
+export function splitAndTrim(str: string) {
+  return str.split("-").map((part) => part.trim());
 }

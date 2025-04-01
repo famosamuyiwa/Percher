@@ -1,20 +1,17 @@
-import type { CalendarListProps as FlashCalendarListProps } from "@marceloterreiro/flash-calendar";
 import {
-  Calendar,
+  Calendar as FlashCalendar,
   fromDateId,
   toDateId,
-  useDateRange,
 } from "@marceloterreiro/flash-calendar";
-import { useCallback, useMemo, memo } from "react";
+import { useCallback, useMemo, memo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { format } from "date-fns/fp";
 import { CalendarRangeTheme } from "@/constants/common";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { addDays } from "date-fns/addDays";
 
-interface CalendarListComponentProps {
-  onBack: (startDate: Date | undefined, endDate: Date | undefined) => void;
+interface CalendarProps {
+  onBack: (date: Date | undefined) => void;
 }
 
 // Memoized header component to prevent unnecessary re-renders
@@ -28,72 +25,48 @@ const Header = memo(({ onBack }: { onBack: () => void }) => (
   </View>
 ));
 
-export default function CalendarList({ onBack }: CalendarListComponentProps) {
-  // Memoize initial props
-  const calendarListProps = useMemo<Partial<FlashCalendarListProps>>(() => {
-    const today = new Date();
-    return {
-      calendarInitialMonthId: toDateId(today),
-      calendarMinDateId: toDateId(today),
-    };
-  }, []);
-
-  // Memoize date range hook
-  const {
-    isDateRangeValid,
-    onClearDateRange,
-    calendarActiveDateRanges,
-    dateRange,
-    onCalendarDayPress,
-  } = useDateRange();
-
-  // Memoize disabled dates
-  const calendarDisabledDateIds = useMemo(
-    () => ["2025-03-14", "2025-03-15"],
-    []
-  );
+export default function Calendar({ onBack }: CalendarProps) {
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const today = useMemo(() => toDateId(new Date()), []);
 
   // Memoize week day format
   const weekDayFormat = useMemo(() => format("EE"), []);
 
   // Memoize back handler
   const handleOnBack = useCallback(() => {
-    if (!dateRange.startId) {
-      onBack(undefined, undefined);
-      return;
+    if (selectedDate) {
+      onBack(fromDateId(selectedDate));
+    } else {
+      onBack(undefined);
     }
-
-    onBack(
-      fromDateId(dateRange.startId),
-      addDays(fromDateId(dateRange.endId ?? dateRange.startId), 1)
-    );
-  }, [dateRange.startId, dateRange.endId, onBack]);
+  }, [selectedDate, onBack]);
 
   // Memoize calendar component props
   const calendarProps = useMemo(
     () => ({
-      ...calendarListProps,
-      calendarActiveDateRanges,
-      onCalendarDayPress,
+      calendarMonthId: today,
+      calendarActiveDateRanges: selectedDate
+        ? [
+            {
+              startId: selectedDate,
+              endId: selectedDate,
+            },
+          ]
+        : [],
+      onCalendarDayPress: setSelectedDate,
       calendarColorScheme: "light" as const,
-      calendarDisabledDateIds,
       theme: CalendarRangeTheme,
       getCalendarWeekDayFormat: weekDayFormat,
+      calendarMinDateId: today,
     }),
-    [
-      calendarListProps,
-      calendarActiveDateRanges,
-      onCalendarDayPress,
-      calendarDisabledDateIds,
-      weekDayFormat,
-    ]
+    [today, selectedDate, weekDayFormat]
   );
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Header onBack={handleOnBack} />
       <View style={styles.calendarContainer}>
-        <Calendar.List {...calendarProps} />
+        <FlashCalendar.List {...calendarProps} />
       </View>
     </SafeAreaView>
   );

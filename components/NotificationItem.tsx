@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import { INotification } from "@/interfaces";
 import { formatDate, formatTime } from "@/utils/common";
-import { Colors } from "@/constants/common";
+import { NotificationStatus } from "@/constants/enums";
 
 const NotificationItem = ({ data }: { data: INotification<any> }) => {
   return (
@@ -11,8 +11,22 @@ const NotificationItem = ({ data }: { data: INotification<any> }) => {
         <View className="flex-row items-center">
           {/* <CategoryIcon categoryEnum={data.category as CategoryIcons} /> */}
           <View className="justify-between px-4 w-full">
-            <Text className="font-plus-jakarta-medium">{data.type}</Text>
-            <Text className="font-plus-jakarta-light text-sm">
+            <Text
+              className={` ${
+                data.status === NotificationStatus.READ
+                  ? "text-gray-500 font-plus-jakarta-light"
+                  : "text-black font-plus-jakarta-medium"
+              }`}
+            >
+              {data.type}
+            </Text>
+            <Text
+              className={`font-plus-jakarta-light text-sm ${
+                data.status === NotificationStatus.READ
+                  ? "text-gray-500"
+                  : "text-black"
+              }`}
+            >
               {data.message}
             </Text>
             <Text

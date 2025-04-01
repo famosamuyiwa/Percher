@@ -32,6 +32,7 @@ import {
   useFeaturedPropertyQuery,
   usePropertiesQuery,
 } from "@/hooks/query/usePropertyQuery";
+import { Colors } from "@/constants/common";
 
 export default function Index() {
   const params = useLocalSearchParams<{
@@ -94,7 +95,11 @@ export default function Index() {
             <TouchableOpacity
               onPress={() => router.push("/(root)/notifications")}
             >
-              <MaterialIcons name="notifications" size={20} />
+              <MaterialIcons
+                name="notifications"
+                color={Colors.secondary}
+                size={20}
+              />
               {unreadCount > 0 && (
                 <View className="absolute -right-1 -top-1 w-4 h-4 bg-accent-300 border-2 border-white rounded-full" />
               )}

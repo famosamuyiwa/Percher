@@ -11,7 +11,6 @@ import { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { LinearTransition } from "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const Notifications = () => {
   const { unreadCount, markAllAsRead } = useGlobalContext();
@@ -37,7 +36,7 @@ const Notifications = () => {
           layout={LinearTransition}
           entering={FadeIn.duration(500)}
           exiting={FadeOut.duration(500)}
-          className="w-full p-5 gap-5"
+          className="w-full p-5 gap-5 mt-5"
         >
           <Skeleton width="100%" height={100} colorMode="light" />
           <Skeleton width="100%" height={100} colorMode="light" />
@@ -64,7 +63,7 @@ const Notifications = () => {
   }, [notificationsQuery]);
 
   return (
-    <SafeAreaView className="px-5 flex-1 py-5" edges={["top"]}>
+    <View className="px-5 flex-1 pb-5 pt-20">
       <View className="mb-8 items-center justify-center">
         <TouchableOpacity onPress={handleOnBack} className="absolute -left-2">
           <Ionicons name="arrow-back-circle-sharp" size={40} />
@@ -87,7 +86,7 @@ const Notifications = () => {
         onEndReachedThreshold={0.1}
         scrollEventThrottle={16}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

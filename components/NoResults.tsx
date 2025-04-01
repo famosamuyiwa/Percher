@@ -10,10 +10,10 @@ const NoResults = () => {
     <Animated.View
       layout={LinearTransition}
       entering={FadeIn.duration(500)}
-      className="flex items-center my-5"
+      className="flex items-center my-10"
     >
       <Image source={images.noResult} style={styles.img} contentFit="contain" />
-      <Text className="text-2xl font-rubik-bold text-black-300 mt-5">
+      <Text className="text-2xl font-rubik-bold text-black-300 mt-10">
         No Results
       </Text>
       <Text className="text-base text-black-100 mt-2">
@@ -26,7 +26,7 @@ const NoResults = () => {
 const styles = StyleSheet.create({
   img: {
     width: "91%",
-    height: 320,
+    height: 200,
   },
 });
 

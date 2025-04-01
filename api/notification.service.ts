@@ -10,10 +10,12 @@ class NotificationService {
     newNotification: Array<(notification: any) => void>;
     unreadCount: Array<(count: number) => void>;
     recentNotifications: Array<(notifications: any[]) => void>;
+    tokenExpired: Array<() => void>;
   } = {
     newNotification: [],
     unreadCount: [],
     recentNotifications: [],
+    tokenExpired: [],
   };
   private isConnecting = true;
 
@@ -26,56 +28,101 @@ class NotificationService {
       }
 
       this.token = accessToken;
-
-      // Initialize socket connection
-      this.socket = io(API_BASE_URL, {
-        auth: {
-          token: `Bearer ${accessToken}`,
-        },
-        transports: ["websocket"],
-        autoConnect: true,
-        reconnection: true,
-        reconnectionAttempts: Infinity, // Try indefinitely
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000, // Max delay between attempts
-        timeout: 20000, // Connection timeout
-        forceNew: true, // Force a new connection
-        path: "/socket.io/", // Socket.io path
-      });
-
-      // Handle connection events
-      this.socket.once("connect", () => {
-        console.log("Connected to notification server");
-        this.isConnecting = false;
-        // Set up all listeners after successful connection
-        this.setupListeners();
-      });
-
-      this.socket.on("connect_error", (error) => {
-        console.error("Connection error:", error);
-        this.isConnecting = false;
-      });
-
-      this.socket.on("disconnect", (reason) => {
-        console.log("Disconnected from notification server. Reason:", reason);
-        this.isConnecting = false;
-      });
-
-      this.socket.on("reconnect_attempt", (attemptNumber) => {
-        console.log(`Attempting to reconnect (attempt ${attemptNumber})`);
-      });
-
-      this.socket.on("reconnect_failed", () => {
-        console.log("Reconnection failed, will keep trying...");
-      });
-
-      this.socket.on("error", (error) => {
-        console.error("Socket error:", error);
-        this.isConnecting = false;
-      });
+      await this.initializeSocket(accessToken);
     } catch (error) {
       console.error("Failed to connect to notification server:", error);
     }
+  }
+
+  private async initializeSocket(accessToken: string) {
+    // Initialize socket connection
+    this.socket = io(API_BASE_URL, {
+      auth: {
+        token: `Bearer ${accessToken}`,
+      },
+      transports: ["websocket"],
+      autoConnect: true,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
+      forceNew: true,
+      path: "/socket.io/",
+    });
+
+    // Handle connection events
+    this.socket.once("connect", () => {
+      console.log("Connected to notification server");
+      this.isConnecting = false;
+      this.setupListeners();
+    });
+
+    this.socket.on("connect_error", (error) => {
+      console.error("Connection error:", error);
+      this.isConnecting = false;
+
+      // Check if error is due to JWT expiry
+      if (
+        error.message?.includes("jwt expired") ||
+        error.message?.includes("invalid token")
+      ) {
+        this.handleTokenExpiry();
+      }
+    });
+
+    this.socket.on("disconnect", (reason) => {
+      console.log("Disconnected from notification server. Reason:", reason);
+      this.isConnecting = false;
+
+      // Check if disconnect is due to JWT expiry
+      if (reason === "io server disconnect" && reason.includes("jwt expired")) {
+        this.handleTokenExpiry();
+      }
+    });
+
+    this.socket.on("reconnect_attempt", (attemptNumber) => {
+      console.log(`Attempting to reconnect (attempt ${attemptNumber})`);
+    });
+
+    this.socket.on("reconnect_failed", () => {
+      console.log("Reconnection failed, will keep trying...");
+    });
+
+    this.socket.on("error", (error) => {
+      console.error("Socket error:", error);
+      this.isConnecting = false;
+    });
+
+    // Handle token refresh confirmation
+    this.socket.on("tokenRefreshConfirmed", (data) => {
+      console.log("Token refresh confirmed:", data);
+      this.isConnecting = false;
+    });
+  }
+
+  private handleTokenExpiry() {
+    console.log("Token expired, notifying listeners");
+    this.listeners.tokenExpired.forEach((callback) => callback());
+  }
+
+  // Method to refresh token
+  async refreshToken(newToken: string) {
+    if (this.socket?.connected) {
+      this.token = newToken;
+      this.socket.auth = { token: `Bearer ${newToken}` };
+      this.socket.emit("refreshToken");
+    } else {
+      console.warn("Socket not connected, cannot refresh token");
+      // Reconnect with new token
+      await this.initializeSocket(newToken);
+    }
+  }
+
+  // Listen for token expiry
+  onTokenExpiry(callback: () => void) {
+    console.log("Setting up token expiry listener");
+    this.listeners.tokenExpired.push(callback);
   }
 
   private setupListeners() {
@@ -126,7 +173,11 @@ class NotificationService {
 
   // Remove listeners
   removeListener(
-    event: "newNotification" | "unreadCount" | "recentNotifications",
+    event:
+      | "newNotification"
+      | "unreadCount"
+      | "recentNotifications"
+      | "tokenExpired",
     callback: any
   ) {
     if (this.socket) {
@@ -169,6 +220,7 @@ class NotificationService {
         newNotification: [],
         unreadCount: [],
         recentNotifications: [],
+        tokenExpired: [],
       };
     }
   }

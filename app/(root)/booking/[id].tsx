@@ -1,10 +1,10 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { Entypo, FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGlobalStore } from "@/store/store";
-import { ChargeType, CheckOutTime } from "@/constants/enums";
+import { ChargeType } from "@/constants/enums";
 import { BookingFormData, Booking as BookingInterface } from "@/interfaces";
 import {
   GUEST_SERVICE_FEE_PERCENTAGE,
@@ -17,10 +17,17 @@ import { addYears } from "date-fns/addYears";
 import { addDays } from "date-fns/addDays";
 
 const Booking = () => {
+  const insets = useSafeAreaInsets();
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
+
   const { id, chargeType } = useLocalSearchParams<{
     id: string;
     chargeType: ChargeType;
   }>();
+
   const { property, saveBookingState, resetBookingState } = useGlobalStore();
 
   const handleOnContinue = (formData: BookingFormData) => {
@@ -84,7 +91,10 @@ const Booking = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 w-full rounded-3xl bg-white">
+    <View
+      className="flex-1 w-full rounded-3xl bg-white"
+      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+    >
       <View className="flex-1 px-5 my-2">
         <View className="mb-2 items-center justify-center">
           <TouchableOpacity
@@ -110,7 +120,7 @@ const Booking = () => {
           />
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

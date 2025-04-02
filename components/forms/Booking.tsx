@@ -116,6 +116,19 @@ export default function BookingForm({
     setModalVisible(false);
   };
 
+  const handleModalDoneClick = (modalContent: ModalType) => {
+    switch (modalContent) {
+      case ModalType.CHECK_IN:
+        if (!checkInTime) setValue("checkInTime", staticData?.checkInPeriod[0]);
+        break;
+      case ModalType.CHECK_OUT:
+        if (!checkOutTime)
+          setValue("checkOutTime", staticData?.checkOutPeriod[0]);
+        break;
+    }
+    resetModal();
+  };
+
   return (
     <View className="gap-10">
       <View className="bg-white rounded-2xl p-5 gap-5">
@@ -318,7 +331,7 @@ export default function BookingForm({
               <Button
                 title="Done"
                 onPress={() => {
-                  setModalVisible(false);
+                  handleModalDoneClick(modalContent);
                 }}
               />
             </View>

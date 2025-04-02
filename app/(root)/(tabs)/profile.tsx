@@ -7,7 +7,7 @@ import {
   Alert,
 } from "react-native";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 
 import {
@@ -22,11 +22,16 @@ import SettingsItem from "@/components/SettingsItem";
 import { Colors } from "@/constants/common";
 import { useGlobalContext } from "@/lib/global-provider";
 import { logout } from "@/api/api.service";
-import images from "@/constants/images";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { Screens, ToastType } from "@/constants/enums";
 
 const Profile = () => {
+  const insets = useSafeAreaInsets();
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
+
   const { user, refetch, displayToast, alertComingSoon } = useGlobalContext();
 
   const handleLogout = async () => {
@@ -88,163 +93,155 @@ const Profile = () => {
     <Animated.View
       layout={LinearTransition}
       entering={FadeIn.duration(500)}
-      className="flex-1"
+      className="flex-1 h-full px-5"
+      style={{
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        backgroundColor: "#F5F5F5",
+      }}
     >
-      <SafeAreaView style={styles.container} className="h-full px-5">
-        <ScrollView
-          className="py-5 "
-          scrollEventThrottle={16}
-          showsVerticalScrollIndicator={false}
+      <ScrollView
+        className="py-5 "
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableOpacity
+          onPress={() => router.navigate("/(root)/(settings)/profile")}
+          className="flex-row items-center justify-between my-2"
+          style={styles.itemsContainer}
         >
-          <TouchableOpacity
-            onPress={() => router.navigate("/(root)/(settings)/profile")}
-            className="flex-row items-center justify-between my-2"
-            style={styles.itemsContainer}
-          >
-            <View className="flex-row">
-              <Image
-                style={styles.avatar}
-                source={{ uri: user?.avatar }}
-                contentFit="cover"
-              />
-              <View className="px-5 justify-center">
-                <Text className="text-xl font-plus-jakarta-medium">
-                  {user?.name}
-                </Text>
-                <Text
-                  className="text-sm font-plus-jakarta-regular"
-                  style={{ color: Colors.primary }}
-                >
-                  Edit profile
-                </Text>
-              </View>
-            </View>
-            <View>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color={Colors.primary}
-              />
-            </View>
-          </TouchableOpacity>
-          <View style={styles.itemsContainer} className="my-4">
-            <TouchableOpacity style={styles.borderedItem}>
-              <SettingsItem
-                icon={
-                  <MaterialCommunityIcons
-                    name="bell-ring-outline"
-                    color={Colors.primary}
-                    size={20}
-                  />
-                }
-                title="Notifications"
-                onPress={() => handleNavigation(Screens.NOTIFICATIONS)}
-              />
-            </TouchableOpacity>
-            <View style={styles.borderedItem} className="pt-2">
-              <SettingsItem
-                icon={
-                  <FontAwesome6
-                    name="house-chimney-user"
-                    color={Colors.primary}
-                    size={18}
-                  />
-                }
-                title="My Perchs"
-                onPress={() => handleNavigation(Screens.MY_PERCHS)}
-              />
-            </View>
-            <View className="pt-2">
-              <SettingsItem
-                icon={
-                  <MaterialIcons
-                    name="currency-exchange"
-                    color={Colors.primary}
-                    size={20}
-                  />
-                }
-                title="Payments"
-                onPress={() => handleNavigation(Screens.PAYMENTS)}
-              />
-            </View>
-          </View>
-          <View style={styles.itemsContainer} className="my-4">
-            <View style={styles.borderedItem}>
-              <SettingsItem
-                icon={
-                  <Ionicons
-                    name="invert-mode-sharp"
-                    color={Colors.primary}
-                    size={20}
-                  />
-                }
-                title="Appearance"
-                subtitle="System Settings"
-                onPress={() => handleNavigation(Screens.APPEARANCE)}
-              />
-            </View>
-            <View>
-              <SettingsItem
-                icon={
-                  <MaterialIcons name="lock" color={Colors.primary} size={20} />
-                }
-                title="Security"
-                onPress={() => handleNavigation(Screens.SECURITY)}
-              />
-            </View>
-          </View>
-          <View style={styles.itemsContainer} className="my-4">
-            <View style={styles.borderedItem}>
-              <SettingsItem
-                icon={
-                  <Feather
-                    name="help-circle"
-                    color={Colors.primary}
-                    size={20}
-                  />
-                }
-                title="Help"
-                onPress={() => handleNavigation(Screens.HELP)}
-              />
-            </View>
-            <View className="pt-2">
-              <SettingsItem
-                icon={
-                  <MaterialIcons
-                    name="group-add"
-                    color={Colors.primary}
-                    size={20}
-                  />
-                }
-                title="Referrals"
-                onPress={() => handleNavigation(Screens.REFERRALS)}
-              />
-            </View>
-          </View>
-          <View style={styles.itemsContainer} className="mt-4 mb-2">
-            <TouchableOpacity onPress={showPrompt} className="flex-row px-2">
-              <Ionicons name="exit-outline" size={20} color="red" />
-              <Text
-                className="px-5 font-plus-jakarta-medium"
-                style={{ color: "red" }}
-              >
-                Logout
+          <View className="flex-row">
+            <Image
+              style={styles.avatar}
+              source={{ uri: user?.avatar }}
+              contentFit="cover"
+            />
+            <View className="px-5 justify-center">
+              <Text className="text-xl font-plus-jakarta-medium">
+                {user?.name}
               </Text>
-            </TouchableOpacity>
+              <Text
+                className="text-sm font-plus-jakarta-regular"
+                style={{ color: Colors.primary }}
+              >
+                Edit profile
+              </Text>
+            </View>
           </View>
-          <Text className="text-xs text-gray-300 font-plus-jakarta-bold px-2 ">
-            V-1.0.0
-          </Text>
-        </ScrollView>
-      </SafeAreaView>
+          <View>
+            <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
+          </View>
+        </TouchableOpacity>
+        <View style={styles.itemsContainer} className="my-4">
+          <TouchableOpacity style={styles.borderedItem}>
+            <SettingsItem
+              icon={
+                <MaterialCommunityIcons
+                  name="bell-ring-outline"
+                  color={Colors.primary}
+                  size={20}
+                />
+              }
+              title="Notifications"
+              onPress={() => handleNavigation(Screens.NOTIFICATIONS)}
+            />
+          </TouchableOpacity>
+          <View style={styles.borderedItem} className="pt-2">
+            <SettingsItem
+              icon={
+                <FontAwesome6
+                  name="house-chimney-user"
+                  color={Colors.primary}
+                  size={18}
+                />
+              }
+              title="My Perchs"
+              onPress={() => handleNavigation(Screens.MY_PERCHS)}
+            />
+          </View>
+          <View className="pt-2">
+            <SettingsItem
+              icon={
+                <MaterialIcons
+                  name="currency-exchange"
+                  color={Colors.primary}
+                  size={20}
+                />
+              }
+              title="Payments"
+              onPress={() => handleNavigation(Screens.PAYMENTS)}
+            />
+          </View>
+        </View>
+        <View style={styles.itemsContainer} className="my-4">
+          <View style={styles.borderedItem}>
+            <SettingsItem
+              icon={
+                <Ionicons
+                  name="invert-mode-sharp"
+                  color={Colors.primary}
+                  size={20}
+                />
+              }
+              title="Appearance"
+              subtitle="System Settings"
+              onPress={() => handleNavigation(Screens.APPEARANCE)}
+            />
+          </View>
+          <View>
+            <SettingsItem
+              icon={
+                <MaterialIcons name="lock" color={Colors.primary} size={20} />
+              }
+              title="Security"
+              onPress={() => handleNavigation(Screens.SECURITY)}
+            />
+          </View>
+        </View>
+        <View style={styles.itemsContainer} className="my-4">
+          <View style={styles.borderedItem}>
+            <SettingsItem
+              icon={
+                <Feather name="help-circle" color={Colors.primary} size={20} />
+              }
+              title="Help"
+              onPress={() => handleNavigation(Screens.HELP)}
+            />
+          </View>
+          <View className="pt-2">
+            <SettingsItem
+              icon={
+                <MaterialIcons
+                  name="group-add"
+                  color={Colors.primary}
+                  size={20}
+                />
+              }
+              title="Referrals"
+              onPress={() => handleNavigation(Screens.REFERRALS)}
+            />
+          </View>
+        </View>
+        <View style={styles.itemsContainer} className="mt-4 mb-2">
+          <TouchableOpacity onPress={showPrompt} className="flex-row px-2">
+            <Ionicons name="exit-outline" size={20} color="red" />
+            <Text
+              className="px-5 font-plus-jakarta-medium"
+              style={{ color: "red" }}
+            >
+              Logout
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <Text className="text-xs text-gray-300 font-plus-jakarta-bold px-2 ">
+          V-1.0.0
+        </Text>
+      </ScrollView>
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#F5F5F5",
-  },
   itemsContainer: {
     backgroundColor: "white",
     paddingHorizontal: 15,

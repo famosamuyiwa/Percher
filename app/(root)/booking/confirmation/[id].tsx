@@ -6,8 +6,8 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import {
@@ -35,6 +35,12 @@ import { useVerifyPaymentMutation } from "@/hooks/mutation/usePaymentMutation";
 import { TransactionType } from "@/constants/enums";
 
 const BookingConfirmation = () => {
+  const insets = useSafeAreaInsets();
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
+
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { booking, property } = useGlobalStore();
   const { user, showLoader, hideLoader, displayToast } = useGlobalContext();
@@ -99,7 +105,7 @@ const BookingConfirmation = () => {
   };
 
   return (
-    <SafeAreaView className="pb-5 flex-1 bg-white">
+    <View className="pb-5 flex-1 bg-white" style={{ paddingTop: insets.top }}>
       <View className="my-2 py-4">
         <View className="pb-8 flex-row justify-between items-baseline px-5">
           <TouchableOpacity onPress={() => router.back()}>
@@ -346,7 +352,7 @@ const BookingConfirmation = () => {
           onSuccess={handleOnPaymentSuccess}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

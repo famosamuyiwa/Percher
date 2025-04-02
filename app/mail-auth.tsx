@@ -13,7 +13,10 @@ import {
 } from "react-native";
 import OTPVerification from "@/components/Otp-verification";
 import { Screens, ToastType } from "@/constants/enums";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { ApiResponse } from "@/interfaces";
 import { HttpStatusCode } from "axios";
 import { Colors } from "@/constants/common";
@@ -32,6 +35,7 @@ import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { Toast } from "@/components/animation-toast/components";
 
 export default function SignInMailScreen() {
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [referralCode, setReferralCode] = useState("");
@@ -68,6 +72,10 @@ export default function SignInMailScreen() {
   );
 
   if (!loading && isLoggedIn) return <Redirect href="/(root)/(tabs)" />;
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
 
   //function to run when button is clicked
   function onButtonClick(otp?: string) {

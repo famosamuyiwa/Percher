@@ -9,7 +9,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { Image } from "expo-image";
 
 import images from "@/constants/images";
@@ -34,8 +37,13 @@ GoogleSignin.configure({
 const SignIn = () => {
   const { refetch, loading, isLoggedIn, displayToast } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
+  const insets = useSafeAreaInsets();
 
   if (!loading && isLoggedIn) return <Redirect href="/(root)/(tabs)" />;
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
 
   const handleLogin = async (provider: LoginProvider) => {
     switch (provider) {

@@ -1,13 +1,22 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const SettingsHeader = ({ title }: { title: string }) => {
+  const insets = useSafeAreaInsets();
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
+
   return (
-    <SafeAreaView edges={["top"]} style={{ backgroundColor: "#F5F5F5" }}>
-      <View className="px-5" style={styles.wrapper}>
+    <View
+      style={{ backgroundColor: "#F5F5F5", paddingTop: insets.top }}
+      className="px-5"
+    >
+      <View style={styles.wrapper}>
         <Pressable onPress={() => router.back()} style={styles.arrowBack}>
           <MaterialIcons name="keyboard-backspace" size={16} color="#9A9A9A" />
         </Pressable>
@@ -15,7 +24,7 @@ const SettingsHeader = ({ title }: { title: string }) => {
           {title}
         </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -11,12 +11,10 @@ import {
 import { AppGradient } from "@/components/AppGradient";
 import { router } from "expo-router";
 import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 // import * as Clipboard from "expo-clipboard";
 import { Colors } from "@/constants/common";
 import { ToastType } from "@/constants/enums";
-import { Toast } from "@/components/animation-toast/components";
 import { useGlobalContext } from "@/lib/global-provider";
 
 const ReferralsScreen = () => {

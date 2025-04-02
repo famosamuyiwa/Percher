@@ -6,6 +6,7 @@ import React from "react";
 import GlobalProvider from "../lib/global-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as SplashScreen from "expo-splash-screen";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
@@ -35,10 +36,12 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="sign-in" />
-          <Stack.Screen name="mail-auth" />
-        </Stack>
+        <SafeAreaProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="sign-in" />
+            <Stack.Screen name="mail-auth" />
+          </Stack>
+        </SafeAreaProvider>
       </GlobalProvider>
     </QueryClientProvider>
   );

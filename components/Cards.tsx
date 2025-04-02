@@ -7,7 +7,8 @@ import { Commafy, formatDate, formatTime } from "@/utils/common";
 import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 import { LinearGradient } from "expo-linear-gradient";
-import { Screens, TransactionMode, TransactionType } from "@/constants/enums";
+import { BookingStatus, Screens, TransactionMode } from "@/constants/enums";
+import Lottie from "lottie-react-native";
 
 interface Props {
   item: Property;
@@ -113,6 +114,18 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
         <Text className="text-white font-plus-jakarta-bold text-xs">
           {item.property?.name}
         </Text>
+        {(item.status === BookingStatus.CURRENT ||
+          item.status === BookingStatus.UPCOMING) && (
+          <Lottie
+            source={require("@/assets/animations/searching.json")}
+            loop={item.status !== BookingStatus.UPCOMING}
+            autoPlay={item.status !== BookingStatus.UPCOMING}
+            style={{
+              width: 20,
+              height: 20,
+            }}
+          />
+        )}
       </View>
 
       <View className="bg-white flex-row py-4 rounded-b-3xl">
@@ -162,6 +175,18 @@ export const BookingCardHost = ({ item, onPress }: BookingProps) => {
         <Text className="text-white font-plus-jakarta-bold text-xs">
           {item.property?.name}
         </Text>
+        {item.status === BookingStatus.CURRENT ||
+          (item.status === BookingStatus.UPCOMING && (
+            <Lottie
+              source={require("@/assets/animations/searching.json")}
+              loop={item.status !== BookingStatus.UPCOMING}
+              autoPlay={item.status !== BookingStatus.UPCOMING}
+              style={{
+                width: 20,
+                height: 20,
+              }}
+            />
+          ))}
       </View>
 
       <View className="bg-white flex-row py-4 rounded-b-3xl">

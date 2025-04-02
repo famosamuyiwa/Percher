@@ -166,6 +166,7 @@ export enum PaymentStatus {
 export enum ReviewAction {
   APPROVE = "Approve",
   REJECT = "Reject",
+  CANCEL = "Cancel",
 }
 
 export enum TransactionMode {
@@ -187,3 +188,11 @@ export enum NotificationStatus {
   UNREAD = "Unread",
   READ = "Read",
 }
+
+export const WEBSOCKET_DISCONNECT_REASON = {
+  AUTHENTICATION_FAILED: "authentication_failed",
+  CONNECTION_ERROR: "connection_error",
+  TOKEN_REFRESH_FAILED: "token_refresh_failed",
+  TOKEN_REFRESH_ERROR: "token_refresh_error",
+  NORMAL_DISCONNECT: "normal_disconnect",
+};

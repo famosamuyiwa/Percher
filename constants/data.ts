@@ -58,6 +58,7 @@ export const filterCategories = [
     category: PerchTypes.OTHERS,
     key: FilterCategoryKey.PERCHTYPE,
   },
+  { title: "All", category: "All", key: FilterCategoryKey.BOOKINGS },
   { title: "Current", category: "Current", key: FilterCategoryKey.BOOKINGS },
   { title: "Upcoming", category: "Upcoming", key: FilterCategoryKey.BOOKINGS },
   { title: "Pending", category: "Pending", key: FilterCategoryKey.BOOKINGS },

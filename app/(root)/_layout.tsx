@@ -1,7 +1,8 @@
 import React from "react";
 import { useGlobalContext } from "../../lib/global-provider";
-import { ActivityIndicator, SafeAreaView } from "react-native";
+import { ActivityIndicator } from "react-native";
 import { Redirect, Stack } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AppLayout() {
   const { loading, isLoggedIn } = useGlobalContext();

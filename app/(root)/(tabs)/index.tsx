@@ -1,13 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 
 import { MaterialIcons } from "@expo/vector-icons";
@@ -32,9 +26,14 @@ import {
   useFeaturedPropertyQuery,
   usePropertiesQuery,
 } from "@/hooks/query/usePropertyQuery";
-import { Colors } from "@/constants/common";
 
 export default function Index() {
+  const insets = useSafeAreaInsets();
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
+
   const params = useLocalSearchParams<{
     query?: string;
     categoryFilter?: PerchTypes;
@@ -95,11 +94,7 @@ export default function Index() {
             <TouchableOpacity
               onPress={() => router.push("/(root)/notifications")}
             >
-              <MaterialIcons
-                name="notifications"
-                color={Colors.secondary}
-                size={20}
-              />
+              <MaterialIcons name="notifications" size={20} />
               {unreadCount > 0 && (
                 <View className="absolute -right-1 -top-1 w-4 h-4 bg-accent-300 border-2 border-white rounded-full" />
               )}
@@ -143,41 +138,40 @@ export default function Index() {
     <Animated.View
       layout={LinearTransition}
       entering={FadeIn.duration(500)}
-      className="flex-1"
+      className="flex-1 bg-white h-full"
+      style={{ paddingTop: insets.top }}
     >
-      <SafeAreaView edges={["top"]} className="bg-white h-full">
-        {featuredPropertiesQuery.isLoading ? (
-          // Conditionally render the skeleton while loading
-          <HomeSkeleton />
-        ) : (
-          // Render the FlashList when data is available
-          <FlashList
-            data={properties}
-            keyExtractor={(item) => item.id.toString()}
-            numColumns={2}
-            contentContainerClassName="pb-32"
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <View className="flex-1 px-2">
-                <Card item={item} onPress={() => handleCardPress(item.id)} />
+      {featuredPropertiesQuery.isLoading ? (
+        // Conditionally render the skeleton while loading
+        <HomeSkeleton />
+      ) : (
+        // Render the FlashList when data is available
+        <FlashList
+          data={properties}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          contentContainerClassName="pb-32"
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View className="flex-1 px-2">
+              <Card item={item} onPress={() => handleCardPress(item.id)} />
+            </View>
+          )}
+          ListHeaderComponent={memoizedListHeader}
+          ListEmptyComponent={
+            propertiesQuery.isLoading ? (
+              <View className="flex-row justify-between w-full p-5">
+                <Skeleton width={160} height={200} colorMode="light" />
+                <Skeleton width={160} height={200} colorMode="light" />
               </View>
-            )}
-            ListHeaderComponent={memoizedListHeader}
-            ListEmptyComponent={
-              propertiesQuery.isLoading ? (
-                <View className="flex-row justify-between w-full p-5">
-                  <Skeleton width={160} height={200} colorMode="light" />
-                  <Skeleton width={160} height={200} colorMode="light" />
-                </View>
-              ) : (
-                <NoResults />
-              )
-            }
-            scrollEventThrottle={16}
-            estimatedItemSize={250}
-          />
-        )}
-      </SafeAreaView>
+            ) : (
+              <NoResults />
+            )
+          }
+          scrollEventThrottle={16}
+          estimatedItemSize={250}
+        />
+      )}
     </Animated.View>
   );
 }

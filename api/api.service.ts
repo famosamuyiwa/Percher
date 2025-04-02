@@ -233,11 +233,10 @@ export const discardBooking = async (id: number) => {
 };
 
 export const reviewBooking = async (credentials: ReviewBookingRequest) => {
-  const { id, action } = credentials;
-  console.log("action: ", action);
+  const { id, action, from } = credentials;
   try {
     const { data: payload } = await api.post(
-      `${API_BASE_URL}/booking/review/${id}?action=${action}`
+      `${API_BASE_URL}/booking/review/${id}?action=${action}&from=${from}`
     );
     return payload;
   } catch (error: any) {

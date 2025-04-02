@@ -7,8 +7,7 @@ import { FilterCategoryKey } from "@/constants/enums";
 const Filters = ({ categoryKey }: { categoryKey: FilterCategoryKey }) => {
   const params = useLocalSearchParams<{ categoryFilter?: string }>();
   const [selectedCategory, setSelectedCategory] = useState(
-    params.categoryFilter ??
-      (categoryKey === FilterCategoryKey.PERCHTYPE ? "All" : "Current")
+    params.categoryFilter ?? "All"
   );
 
   const handleCategoryPress = (category: string) => {

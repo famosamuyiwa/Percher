@@ -10,12 +10,10 @@ class NotificationService {
     newNotification: Array<(notification: any) => void>;
     unreadCount: Array<(count: number) => void>;
     recentNotifications: Array<(notifications: any[]) => void>;
-    tokenExpired: Array<() => void>;
   } = {
     newNotification: [],
     unreadCount: [],
     recentNotifications: [],
-    tokenExpired: [],
   };
   private isConnecting = true;
 
@@ -61,24 +59,11 @@ class NotificationService {
     this.socket.on("connect_error", (error) => {
       console.error("Connection error:", error);
       this.isConnecting = false;
-
-      // Check if error is due to JWT expiry
-      if (
-        error.message?.includes("jwt expired") ||
-        error.message?.includes("invalid token")
-      ) {
-        this.handleTokenExpiry();
-      }
     });
 
     this.socket.on("disconnect", (reason) => {
       console.log("Disconnected from notification server. Reason:", reason);
       this.isConnecting = false;
-
-      // Check if disconnect is due to JWT expiry
-      if (reason === "io server disconnect" && reason.includes("jwt expired")) {
-        this.handleTokenExpiry();
-      }
     });
 
     this.socket.on("reconnect_attempt", (attemptNumber) => {
@@ -101,11 +86,6 @@ class NotificationService {
     });
   }
 
-  private handleTokenExpiry() {
-    console.log("Token expired, notifying listeners");
-    this.listeners.tokenExpired.forEach((callback) => callback());
-  }
-
   // Method to refresh token
   async refreshToken(newToken: string) {
     if (this.socket?.connected) {
@@ -117,12 +97,6 @@ class NotificationService {
       // Reconnect with new token
       await this.initializeSocket(newToken);
     }
-  }
-
-  // Listen for token expiry
-  onTokenExpiry(callback: () => void) {
-    console.log("Setting up token expiry listener");
-    this.listeners.tokenExpired.push(callback);
   }
 
   private setupListeners() {
@@ -173,11 +147,7 @@ class NotificationService {
 
   // Remove listeners
   removeListener(
-    event:
-      | "newNotification"
-      | "unreadCount"
-      | "recentNotifications"
-      | "tokenExpired",
+    event: "newNotification" | "unreadCount" | "recentNotifications",
     callback: any
   ) {
     if (this.socket) {
@@ -220,7 +190,6 @@ class NotificationService {
         newNotification: [],
         unreadCount: [],
         recentNotifications: [],
-        tokenExpired: [],
       };
     }
   }

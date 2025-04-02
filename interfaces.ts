@@ -222,6 +222,7 @@ export interface Wallet extends BaseEntity {
 export interface ReviewBookingRequest {
   id: number;
   action: ReviewAction;
+  from: UserType;
 }
 
 export interface Transaction extends BaseEntity {

@@ -347,20 +347,24 @@ const Details = () => {
   const bookingQuery = useBookingQuery(Number(id));
   const reviewBookingMutation = useReviewBookingMutation();
 
-  const handleApproval = async (choice: ReviewAction) => {
+  const handleReviewAction = async (choice: ReviewAction) => {
     showLoader();
     reviewBookingMutation.mutate(
-      { action: choice, id: Number(id) },
+      { action: choice, id: Number(id), from: userType as UserType },
       { onSuccess: () => onSuccess(choice), onSettled }
     );
   };
 
   const onSuccess = (choice: ReviewAction) => {
+    const actionMessages = {
+      [ReviewAction.APPROVE]: "approved",
+      [ReviewAction.REJECT]: "rejected",
+      [ReviewAction.CANCEL]: "cancelled",
+    };
+
     displayToast({
       type: ToastType.SUCCESS,
-      description: `You have successfully ${
-        choice === ReviewAction.APPROVE ? "approved" : "rejected"
-      } this request`,
+      description: `You have successfully ${actionMessages[choice]} this request`,
     });
   };
 
@@ -374,7 +378,7 @@ const Details = () => {
       `Are you sure you want to ${choice} this request?`,
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Confirm", onPress: () => handleApproval(choice) },
+        { text: "Confirm", onPress: () => handleReviewAction(choice) },
       ],
       { cancelable: true }
     );
@@ -389,6 +393,16 @@ const Details = () => {
       },
     });
   };
+
+  const booking = bookingQuery.data?.data;
+  const property = booking?.property;
+  const guest = booking?.guest;
+
+  const showCancelButton = useMemo(() => {
+    return (
+      userType === UserType.GUEST && booking?.status === BookingStatus.PENDING
+    );
+  }, [userType, booking?.status]);
 
   if (bookingQuery.isLoading) {
     return (
@@ -405,10 +419,6 @@ const Details = () => {
       </View>
     );
   }
-
-  const booking = bookingQuery.data?.data;
-  const property = booking?.property;
-  const guest = booking?.guest;
 
   return (
     <View className="bg-white">
@@ -433,14 +443,16 @@ const Details = () => {
         <PriceDetails invoice={booking?.invoice} userType={userType} />
         <GuestDetails guest={guest} />
 
-        {userType === UserType.GUEST &&
-          booking?.status === BookingStatus.PENDING && (
-            <TouchableOpacity className="py-4 items-center" onPress={() => {}}>
-              <Text className="font-plus-jakarta-semibold text-red-500">
-                Cancel Booking
-              </Text>
-            </TouchableOpacity>
-          )}
+        {showCancelButton && (
+          <TouchableOpacity
+            className="py-4 items-center"
+            onPress={() => showPrompt(ReviewAction.CANCEL)}
+          >
+            <Text className="font-plus-jakarta-semibold text-red-500">
+              Cancel Booking
+            </Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );

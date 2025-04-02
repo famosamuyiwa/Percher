@@ -9,7 +9,7 @@ import { useCallback, useMemo, memo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { format } from "date-fns/fp";
 import { CalendarRangeTheme } from "@/constants/common";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { addDays } from "date-fns/addDays";
 
@@ -29,6 +29,12 @@ const Header = memo(({ onBack }: { onBack: () => void }) => (
 ));
 
 export default function CalendarList({ onBack }: CalendarListComponentProps) {
+  const insets = useSafeAreaInsets();
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
+
   // Memoize initial props
   const calendarListProps = useMemo<Partial<FlashCalendarListProps>>(() => {
     const today = new Date();
@@ -90,12 +96,12 @@ export default function CalendarList({ onBack }: CalendarListComponentProps) {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <View style={styles.container}>
       <Header onBack={handleOnBack} />
       <View style={styles.calendarContainer}>
         <Calendar.List {...calendarProps} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

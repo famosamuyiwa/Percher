@@ -43,7 +43,7 @@ api.interceptors.response.use(
 );
 
 // Refresh token logic
-async function handleRefreshToken(error: any) {
+export async function handleRefreshToken(error: any) {
   try {
     const { refreshToken } = await getStoredTokens();
     if (!refreshToken) throw new Error("No refresh token available");

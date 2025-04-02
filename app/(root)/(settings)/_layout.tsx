@@ -1,6 +1,5 @@
 import React from "react";
-import { ActivityIndicator, SafeAreaView } from "react-native";
-import { Redirect, Slot, Stack } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function AppLayout() {
   return (

@@ -7,7 +7,7 @@ import { useCallback, useMemo, memo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { format } from "date-fns/fp";
 import { CalendarRangeTheme } from "@/constants/common";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 interface CalendarProps {
@@ -26,6 +26,12 @@ const Header = memo(({ onBack }: { onBack: () => void }) => (
 ));
 
 export default function Calendar({ onBack }: CalendarProps) {
+  const insets = useSafeAreaInsets();
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
+
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const today = useMemo(() => toDateId(new Date()), []);
 
@@ -63,12 +69,12 @@ export default function Calendar({ onBack }: CalendarProps) {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <View style={[styles.container]}>
       <Header onBack={handleOnBack} />
       <View style={styles.calendarContainer}>
         <FlashCalendar.List {...calendarProps} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

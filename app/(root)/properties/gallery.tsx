@@ -1,13 +1,14 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import React, { useEffect } from "react";
+import { View, TouchableOpacity } from "react-native";
+import React from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalStore } from "@/store/store";
 import MediaViewer from "@/components/MediaViewer";
-
+import { GalleryType } from "@/constants/enums";
 const Gallery = () => {
-  const { id } = useLocalSearchParams<{
+  const { id, type } = useLocalSearchParams<{
     id: string;
+    type: GalleryType;
   }>();
 
   const { property } = useGlobalStore();
@@ -20,7 +21,7 @@ const Gallery = () => {
       >
         <Ionicons name="arrow-back" size={20} />
       </TouchableOpacity>
-      <MediaViewer defaultIndex={Number(id)} gallery={property?.gallery!} />
+      <MediaViewer defaultIndex={Number(id)} gallery={property?.[type]!} />
     </View>
   );
 };

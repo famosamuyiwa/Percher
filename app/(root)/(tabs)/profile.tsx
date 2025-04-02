@@ -13,6 +13,7 @@ import { Image } from "expo-image";
 import {
   Feather,
   FontAwesome6,
+  Fontisto,
   Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
@@ -81,6 +82,9 @@ const Profile = () => {
         break;
       case Screens.PAYMENTS:
         route = "/(root)/(settings)/payments";
+        break;
+      case Screens.EYE_BALLING:
+        route = "/(root)/(settings)/eyeballing";
         break;
       default:
         route = "/";
@@ -157,6 +161,13 @@ const Profile = () => {
               }
               title="My Perchs"
               onPress={() => handleNavigation(Screens.MY_PERCHS)}
+            />
+          </View>
+          <View style={styles.borderedItem} className="pt-2">
+            <SettingsItem
+              icon={<Fontisto name="eye" color={Colors.primary} size={16} />}
+              title="Eyeballing"
+              onPress={() => handleNavigation(Screens.EYE_BALLING)}
             />
           </View>
           <View className="pt-2">

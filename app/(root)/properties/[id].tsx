@@ -7,6 +7,7 @@ import {
   Dimensions,
   Platform,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
@@ -29,16 +30,102 @@ import { Commafy } from "@/utils/common";
 import CustomButton from "@/components/Button";
 import { usePropertyQuery } from "@/hooks/query/usePropertyQuery";
 import { useGlobalStore } from "@/store/store";
-import { PropertyScreenMode } from "@/constants/enums";
+import {
+  PropertyScreenMode,
+  GalleryType,
+  ReviewAction,
+  ToastType,
+} from "@/constants/enums";
+import { useGlobalContext } from "@/lib/global-provider";
+import { useReviewPropertyMutation } from "@/hooks/mutation/usePropertyMutation";
+
+const ConfidentialDetails = ({
+  mode,
+  propertyQuery,
+}: {
+  mode?: PropertyScreenMode;
+  propertyQuery: any;
+}) => {
+  if (mode === PropertyScreenMode.EYE_BALLING) {
+    return (
+      <View className="px-5">
+        <View className="mt-7">
+          <Text className="text-black-300 text-xl font-plus-jakarta-bold">
+            Proof of Identity
+          </Text>
+          {(propertyQuery?.data?.data?.proofOfIdentity?.length ?? 0) > 0 && (
+            <FlatList
+              contentContainerStyle={{ paddingRight: 20 }}
+              data={propertyQuery?.data?.data?.proofOfIdentity}
+              keyExtractor={(item) => item}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item, index }) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    router.push({
+                      pathname: "/properties/gallery",
+                      params: {
+                        id: Number(index),
+                        type: GalleryType.PROOF_OF_IDENTITY,
+                      },
+                    })
+                  }
+                >
+                  <Image source={{ uri: item }} style={styles.galleryImg} />
+                </TouchableOpacity>
+              )}
+              contentContainerClassName="flex gap-4 mt-3"
+              scrollEventThrottle={16}
+            />
+          )}
+        </View>
+        <View className="mt-7">
+          <Text className="text-black-300 text-xl font-plus-jakarta-bold">
+            Proof of Ownership or Authority
+          </Text>
+          {(propertyQuery?.data?.data?.proofOfOwnership?.length ?? 0) > 0 && (
+            <FlatList
+              contentContainerStyle={{ paddingRight: 20 }}
+              data={propertyQuery?.data?.data?.proofOfOwnership}
+              keyExtractor={(item) => item}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item, index }) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    router.push({
+                      pathname: "/properties/gallery",
+                      params: {
+                        id: Number(index),
+                        type: GalleryType.PROOF_OF_OWNERSHIP,
+                      },
+                    })
+                  }
+                >
+                  <Image source={{ uri: item }} style={styles.galleryImg} />
+                </TouchableOpacity>
+              )}
+              contentContainerClassName="flex gap-4 mt-3"
+              scrollEventThrottle={16}
+            />
+          )}
+        </View>
+      </View>
+    );
+  }
+};
 
 const Property = () => {
   const { id, mode } = useLocalSearchParams<{
     id?: string;
     mode?: PropertyScreenMode;
   }>();
+  const { displayToast, showLoader, hideLoader } = useGlobalContext();
   const { saveBookingState } = useGlobalStore();
   const windowHeight = Dimensions.get("window").height;
   const propertyQuery = usePropertyQuery(Number(id));
+  const reviewPropertyMutation = useReviewPropertyMutation();
 
   const handleOnPerchClick = () => {
     router.push({
@@ -55,6 +142,43 @@ const Property = () => {
       saveBookingState(propertyQuery.data.data, undefined);
     }
   }, [propertyQuery.data?.data]);
+
+  const handleReviewAction = async (choice: ReviewAction) => {
+    showLoader();
+    reviewPropertyMutation.mutate(
+      { action: choice, id: Number(id) },
+      { onSuccess: () => onSuccess(choice), onSettled }
+    );
+  };
+
+  const onSuccess = (choice: ReviewAction) => {
+    const actionMessages = {
+      [ReviewAction.APPROVE]: "approved",
+      [ReviewAction.REJECT]: "rejected",
+      [ReviewAction.CANCEL]: "cancelled",
+    };
+
+    displayToast({
+      type: ToastType.SUCCESS,
+      description: `You have successfully ${actionMessages[choice]} this request`,
+    });
+  };
+
+  const onSettled = () => {
+    hideLoader();
+  };
+
+  const showPrompt = (choice: ReviewAction) => {
+    Alert.alert(
+      "Confirmation",
+      `Are you sure you want to ${choice} this request?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Confirm", onPress: () => handleReviewAction(choice) },
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
     <View>
@@ -94,9 +218,29 @@ const Property = () => {
         </View>
 
         <View className="px-5 mt-7 flex gap-2">
-          <Text className="text-2xl font-plus-jakarta-extrabold">
-            {propertyQuery?.data?.data?.name}
-          </Text>
+          <View className="flex flex-row items-center justify-between">
+            <Text className="text-2xl font-plus-jakarta-extrabold">
+              {propertyQuery?.data?.data?.name}
+            </Text>
+            {mode === PropertyScreenMode.EYE_BALLING && (
+              <View className="flex flex-row items-center gap-5">
+                <TouchableOpacity
+                  onPress={() => showPrompt(ReviewAction.APPROVE)}
+                >
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={40}
+                    color="limegreen"
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => showPrompt(ReviewAction.REJECT)}
+                >
+                  <Ionicons name="close-circle" size={40} color="red" />
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
 
           <View className="flex flex-row items-center gap-3">
             <View className="flex flex-row items-center px-4 py-2 bg-primary-100 rounded-full">
@@ -157,15 +301,6 @@ const Property = () => {
                   </Text>
                 </View>
               </View>
-
-              {/* <View className="flex flex-row items-center gap-5">
-                <Ionicons
-                  name="chatbox-ellipses"
-                  size={28}
-                  color={Colors.primary}
-                />
-                <FontAwesome5 name="phone" size={25} color={Colors.primary} />
-              </View> */}
             </View>
           </View>
 
@@ -236,6 +371,7 @@ const Property = () => {
                         pathname: "/properties/gallery",
                         params: {
                           id: Number(index),
+                          type: GalleryType.GALLERY,
                         },
                       })
                     }
@@ -273,9 +409,12 @@ const Property = () => {
             </View>
           )}
         </View>
+        <ConfidentialDetails mode={mode} propertyQuery={propertyQuery} />
       </ScrollView>
-
-      {mode !== PropertyScreenMode.VIEW_ONLY && (
+      {!(
+        mode === PropertyScreenMode.VIEW_ONLY ||
+        mode === PropertyScreenMode.EYE_BALLING
+      ) && (
         <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 p-7">
           <View className="flex flex-row items-center justify-between gap-10">
             <View className="flex flex-col items-start">

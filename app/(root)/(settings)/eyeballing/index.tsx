@@ -8,36 +8,38 @@ import {
   ActivityIndicator,
   ScrollView,
   Text,
-  TouchableOpacity,
 } from "react-native";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { useOwnedPropertyQuery } from "@/hooks/query/usePropertyQuery";
+import {
+  useEyeballingPropertiesQuery,
+  useOwnedPropertyQuery,
+} from "@/hooks/query/usePropertyQuery";
 import { Filter } from "@/interfaces";
 import SearchBar from "@/components/SearchBar";
-import { Screens, UserType } from "@/constants/enums";
-import { AntDesign } from "@expo/vector-icons";
-import { Colors } from "@/constants/common";
+import { PropertyScreenMode, UserType } from "@/constants/enums";
+import EmptyNotifications from "@/components/empty-screens/notifications";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 
-const MyPerchs = () => {
+const Eyeballing = () => {
   const [filters, setFilters] = useState<Filter>({
     location: "",
     limit: 10,
-    from: UserType.HOST,
+    from: UserType.ADMIN,
   });
 
   const handleCardPress = (id: number) => {
     router.push({
-      pathname: "/my-perchs/form",
+      pathname: "/properties/[id]",
       params: {
         id,
+        mode: PropertyScreenMode.EYE_BALLING,
       },
     });
   };
 
   // Memoize derived data
-  const propertiesQuery = useOwnedPropertyQuery(filters);
+  const propertiesQuery = useEyeballingPropertiesQuery(filters);
 
   const properties = useMemo(
     () => propertiesQuery.data?.pages.flatMap((page) => page.data) || [],
@@ -58,7 +60,7 @@ const MyPerchs = () => {
 
   return (
     <View style={[styles.container, { flex: 1 }]}>
-      <SettingsHeader title="My Perchs" />
+      <SettingsHeader title="Eyeballing" />
       {properties.length > 0 && (
         <View className="mx-5 pb-5">
           <SearchBar />
@@ -81,11 +83,7 @@ const MyPerchs = () => {
                 entering={FadeIn.duration(500)}
                 className="mx-5"
               >
-                <Card
-                  item={item}
-                  source={Screens.MY_PERCHS}
-                  onPress={() => handleCardPress(item.id)}
-                />
+                <Card item={item} onPress={() => handleCardPress(item.id)} />
               </Animated.View>
             )}
             ListHeaderComponent={listHeader}
@@ -97,10 +95,7 @@ const MyPerchs = () => {
                 />
               ) : (
                 <View className="items-center justify-center mt-52">
-                  <GradientCard
-                    onPress={() => router.push("/my-perchs/form")}
-                    bgColor={"#F5F5F5"}
-                  />
+                  <EmptyNotifications />
                 </View>
               )
             }
@@ -109,14 +104,6 @@ const MyPerchs = () => {
           />
         </View>
       </ScrollView>
-      {properties.length > 0 && (
-        <TouchableOpacity
-          onPress={() => router.push("/my-perchs/form")}
-          className="absolute w-full items-end px-10 bottom-16 shadow-sm"
-        >
-          <AntDesign name="pluscircle" size={60} color={Colors.primary} />
-        </TouchableOpacity>
-      )}
     </View>
   );
 };
@@ -131,4 +118,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MyPerchs;
+export default Eyeballing;

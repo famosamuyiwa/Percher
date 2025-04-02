@@ -6,6 +6,7 @@ import {
   PerchRegistrationFormData,
   ResetPasswordRequest,
   ReviewBookingRequest,
+  ReviewPropertyRequest,
   SignupRequest,
   User,
   Wallet,
@@ -237,6 +238,18 @@ export const reviewBooking = async (credentials: ReviewBookingRequest) => {
   try {
     const { data: payload } = await api.post(
       `${API_BASE_URL}/booking/review/${id}?action=${action}&from=${from}`
+    );
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const reviewProperty = async (credentials: ReviewPropertyRequest) => {
+  const { id, action } = credentials;
+  try {
+    const { data: payload } = await api.post(
+      `${API_BASE_URL}/property/review/${id}?action=${action}`
     );
     return payload;
   } catch (error: any) {

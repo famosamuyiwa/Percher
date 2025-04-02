@@ -5,14 +5,15 @@ import {
   USE_OWNED_PROPERTIES_QUERY_KEY,
   USE_PROPERTIES_QUERY_KEY,
   USE_EXPLORE_PROPERTIES_QUERY_KEY,
+  USE_EYEBALLING_PROPERTIES_QUERY_KEY,
 } from "@/constants/common";
-import { Category } from "@/constants/enums";
 import { Filter } from "@/interfaces";
 import {
   FeaturedPropertiesCache,
   OwnedPropertiesCache,
   PropertiesCache,
   PropertyCache,
+  EyeballingPropertiesCache,
   explorePropertiesCache,
 } from "@/utils/types";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
@@ -20,6 +21,19 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 export const usePropertiesQuery = (filters: Filter) => {
   return useInfiniteQuery<PropertiesCache>({
     queryKey: [USE_PROPERTIES_QUERY_KEY, filters],
+    queryFn: ({ pageParam = null }: any) =>
+      getAllProperties(pageParam, filters),
+    retry: 3,
+    retryDelay: 1 * 60 * 1000,
+    staleTime: 0,
+    initialPageParam: null, // Set the initial page param
+    getNextPageParam: (lastPage) => lastPage.nextCursor || null, // Handle pagination with the cursor
+  });
+};
+
+export const useEyeballingPropertiesQuery = (filters: Filter) => {
+  return useInfiniteQuery<EyeballingPropertiesCache>({
+    queryKey: [USE_EYEBALLING_PROPERTIES_QUERY_KEY, filters],
     queryFn: ({ pageParam = null }: any) =>
       getAllProperties(pageParam, filters),
     retry: 3,

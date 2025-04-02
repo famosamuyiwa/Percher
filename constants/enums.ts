@@ -21,6 +21,7 @@ export enum Modal {
 export enum UserType {
   HOST = "Host",
   GUEST = "Guest",
+  ADMIN = "Admin",
 }
 
 export enum FilterCategoryKey {
@@ -111,6 +112,7 @@ export enum Screens {
   SECURITY = "SECURITY",
   HELP = "HELP",
   REFERRALS = "REFERRALS",
+  EYE_BALLING = "EYE_BALLING",
 }
 
 export enum ToastType {
@@ -142,6 +144,7 @@ export enum BookingStatus {
 
 export enum PropertyScreenMode {
   VIEW_ONLY = "VIEW_ONLY",
+  EYE_BALLING = "EYE_BALLING",
 }
 
 export enum TransactionStatus {
@@ -196,3 +199,9 @@ export const WEBSOCKET_DISCONNECT_REASON = {
   TOKEN_REFRESH_ERROR: "token_refresh_error",
   NORMAL_DISCONNECT: "normal_disconnect",
 };
+
+export enum GalleryType {
+  PROOF_OF_IDENTITY = "proofOfIdentity",
+  PROOF_OF_OWNERSHIP = "proofOfOwnership",
+  GALLERY = "gallery",
+}

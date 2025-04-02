@@ -1,6 +1,7 @@
-import { createProperty } from "@/api/api.service";
+import { createProperty, reviewProperty } from "@/api/api.service";
 import {
   USE_AUTH_QUERY_KEY,
+  USE_EYEBALLING_PROPERTIES_QUERY_KEY,
   USE_OWNED_PROPERTIES_QUERY_KEY,
 } from "@/constants/common";
 import { ToastType } from "@/constants/enums";
@@ -31,5 +32,30 @@ export const useCreatePropertyMutation = () => {
     mutationFn: createProperty,
     onSuccess: onUseCreatePropertyMutationSuccess,
     onError: onUseCreatePropertyMutationError,
+  });
+};
+
+export const useReviewPropertyMutation = () => {
+  const queryClient = useQueryClient();
+
+  const { displayToast } = useGlobalContext();
+
+  const onUseReviewPropertyMutationSuccess = (payload: ApiResponse) => {
+    queryClient.invalidateQueries({
+      queryKey: USE_EYEBALLING_PROPERTIES_QUERY_KEY,
+    });
+  };
+
+  const onUseReviewPropertyMutationError = (error: Error) => {
+    displayToast({
+      type: ToastType.ERROR,
+      description: error.message,
+    });
+  };
+
+  return useMutation({
+    mutationFn: reviewProperty,
+    onSuccess: onUseReviewPropertyMutationSuccess,
+    onError: onUseReviewPropertyMutationError,
   });
 };

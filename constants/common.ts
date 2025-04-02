@@ -2,6 +2,7 @@ import { CalendarTheme } from "@marceloterreiro/flash-calendar";
 
 export const USE_AUTH_QUERY_KEY = ["auth"];
 export const USE_PROPERTIES_QUERY_KEY = ["properties"];
+export const USE_EYEBALLING_PROPERTIES_QUERY_KEY = ["properties", "eyeballing"];
 export const USE_FEATURED_PROPERTY_QUERY_KEY = ["property", "featured"];
 export const USE_OWNED_PROPERTIES_QUERY_KEY = ["property", "owned"];
 export const USE_EXPLORE_PROPERTIES_QUERY_KEY = ["property", "explore"];

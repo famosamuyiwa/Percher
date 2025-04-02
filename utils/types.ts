@@ -10,6 +10,7 @@ import {
 
 export type AuthCache = ApiResponse<User>; // You can extend this with more response interfaces if needed
 export type PropertiesCache = ApiResponse<Property[]>;
+export type EyeballingPropertiesCache = ApiResponse<Property[]>;
 export type FeaturedPropertiesCache = ApiResponse<Property[]>;
 export type explorePropertiesCache = ApiResponse<Property[]>;
 export type OwnedPropertiesCache = ApiResponse<Property[]>;

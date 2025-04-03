@@ -24,7 +24,7 @@ import { Colors } from "@/constants/common";
 import { useGlobalContext } from "@/lib/global-provider";
 import { logout } from "@/api/api.service";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
-import { Screens, ToastType } from "@/constants/enums";
+import { Screens, ToastType, Roles } from "@/constants/enums";
 
 const Profile = () => {
   const insets = useSafeAreaInsets();
@@ -163,13 +163,15 @@ const Profile = () => {
               onPress={() => handleNavigation(Screens.MY_PERCHS)}
             />
           </View>
-          <View style={styles.borderedItem} className="pt-2">
-            <SettingsItem
-              icon={<Fontisto name="eye" color={Colors.primary} size={16} />}
-              title="Eyeballing"
-              onPress={() => handleNavigation(Screens.EYE_BALLING)}
-            />
-          </View>
+          {user?.role === Roles.ADMIN && (
+            <View style={styles.borderedItem} className="pt-2">
+              <SettingsItem
+                icon={<Fontisto name="eye" color={Colors.primary} size={16} />}
+                title="Eyeballing"
+                onPress={() => handleNavigation(Screens.EYE_BALLING)}
+              />
+            </View>
+          )}
           <View className="pt-2">
             <SettingsItem
               icon={

@@ -16,7 +16,7 @@ import icons from "@/constants/icons";
 import images from "@/constants/images";
 import Comment from "@/components/Comment";
 import { facilities } from "@/constants/data";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   AntDesign,
   Entypo,
@@ -35,6 +35,7 @@ import {
   GalleryType,
   ReviewAction,
   ToastType,
+  RegistrationStatus,
 } from "@/constants/enums";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useReviewPropertyMutation } from "@/hooks/mutation/usePropertyMutation";
@@ -180,6 +181,22 @@ const Property = () => {
     );
   };
 
+  const approvalButtons = useMemo(() => {
+    return (
+      mode === PropertyScreenMode.EYE_BALLING &&
+      propertyQuery?.data?.data.status === RegistrationStatus.IN_REVIEW && (
+        <View className="flex flex-row items-center gap-5">
+          <TouchableOpacity onPress={() => showPrompt(ReviewAction.APPROVE)}>
+            <Ionicons name="checkmark-circle" size={40} color="limegreen" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => showPrompt(ReviewAction.REJECT)}>
+            <Ionicons name="close-circle" size={40} color="red" />
+          </TouchableOpacity>
+        </View>
+      )
+    );
+  }, [mode, propertyQuery?.data?.data]);
+
   return (
     <View>
       <ScrollView
@@ -222,24 +239,7 @@ const Property = () => {
             <Text className="text-2xl font-plus-jakarta-extrabold">
               {propertyQuery?.data?.data?.name}
             </Text>
-            {mode === PropertyScreenMode.EYE_BALLING && (
-              <View className="flex flex-row items-center gap-5">
-                <TouchableOpacity
-                  onPress={() => showPrompt(ReviewAction.APPROVE)}
-                >
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={40}
-                    color="limegreen"
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => showPrompt(ReviewAction.REJECT)}
-                >
-                  <Ionicons name="close-circle" size={40} color="red" />
-                </TouchableOpacity>
-              </View>
-            )}
+            {approvalButtons}
           </View>
 
           <View className="flex flex-row items-center gap-3">
@@ -318,96 +318,90 @@ const Property = () => {
               Facilities
             </Text>
 
-            {(propertyQuery?.data?.data?.facilities?.length ?? 0) > 0 && (
-              <View className="flex flex-row flex-wrap items-start justify-start mt-2 gap-5">
-                {propertyQuery?.data?.data?.facilities.map(
-                  (item: string, index: number) => {
-                    const facility = facilities.find(
-                      (facility) => facility.title === item
-                    );
-                    return (
-                      <View
-                        key={index}
-                        className="flex flex-1 flex-col items-center min-w-16 max-w-20"
-                      >
-                        <View className="size-14 bg-accent-100 rounded-full flex items-center justify-center">
-                          <Ionicons
-                            name={facility ? facility.icon : icons.info}
-                            size={24}
-                            color={Colors.accent}
-                          />
-                        </View>
-
-                        <Text
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                          className="text-black-300 text-sm text-center font-plus-jakarta mt-1.5"
-                        >
-                          {item}
-                        </Text>
+            <View className="flex flex-row flex-wrap items-start justify-start mt-2 gap-5">
+              {(propertyQuery?.data?.data?.facilities ?? []).map(
+                (item: string, index: number) => {
+                  const facility = facilities.find(
+                    (facility) => facility.title === item
+                  );
+                  return (
+                    <View
+                      key={index}
+                      className="flex flex-1 flex-col items-center min-w-16 max-w-20"
+                    >
+                      <View className="size-14 bg-accent-100 rounded-full flex items-center justify-center">
+                        <Ionicons
+                          name={facility ? facility.icon : icons.info}
+                          size={24}
+                          color={Colors.accent}
+                        />
                       </View>
-                    );
-                  }
-                )}
-              </View>
-            )}
+
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        className="text-black-300 text-sm text-center font-plus-jakarta mt-1.5"
+                      >
+                        {item}
+                      </Text>
+                    </View>
+                  );
+                }
+              )}
+            </View>
           </View>
 
-          {(propertyQuery?.data?.data?.gallery?.length ?? 0) > 0 && (
-            <View className="mt-7">
-              <Text className="text-black-300 text-xl font-plus-jakarta-bold">
-                Gallery
-              </Text>
-              <FlatList
-                contentContainerStyle={{ paddingRight: 20 }}
-                data={propertyQuery?.data?.data?.gallery}
-                keyExtractor={(item) => item}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                renderItem={({ item, index }) => (
-                  <TouchableOpacity
-                    onPress={() =>
-                      router.push({
-                        pathname: "/properties/gallery",
-                        params: {
-                          id: Number(index),
-                          type: GalleryType.GALLERY,
-                        },
-                      })
-                    }
-                  >
-                    <Image source={{ uri: item }} style={styles.galleryImg} />
-                  </TouchableOpacity>
-                )}
-                contentContainerClassName="flex gap-4 mt-3"
-                scrollEventThrottle={16}
-              />
-            </View>
-          )}
-
-          {propertyQuery?.data?.data?.reviews?.length > 0 && (
-            <View className="mt-7">
-              <View className="flex flex-row items-center justify-between">
-                <View className="flex flex-row items-center">
-                  <AntDesign name="star" size={20} color="gold" />
-                  <Text className="text-black-300 text-xl font-plus-jakarta-bold ml-2">
-                    {propertyQuery?.data?.data?.rating} (
-                    {propertyQuery?.data?.data?.reviews.length} reviews)
-                  </Text>
-                </View>
-
-                <TouchableOpacity>
-                  <Text className="text-primary-300 text-base font-plus-jakarta-bold">
-                    View All
-                  </Text>
+          <View className="mt-7">
+            <Text className="text-black-300 text-xl font-plus-jakarta-bold">
+              Gallery
+            </Text>
+            <FlatList
+              contentContainerStyle={{ paddingRight: 20 }}
+              data={propertyQuery?.data?.data?.gallery ?? []}
+              keyExtractor={(item) => item}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item, index }) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    router.push({
+                      pathname: "/properties/gallery",
+                      params: {
+                        id: Number(index),
+                        type: GalleryType.GALLERY,
+                      },
+                    })
+                  }
+                >
+                  <Image source={{ uri: item }} style={styles.galleryImg} />
                 </TouchableOpacity>
+              )}
+              contentContainerClassName="flex gap-4 mt-3"
+              scrollEventThrottle={16}
+            />
+          </View>
+
+          <View className="mt-7">
+            <View className="flex flex-row items-center justify-between">
+              <View className="flex flex-row items-center">
+                <AntDesign name="star" size={20} color="gold" />
+                <Text className="text-black-300 text-xl font-plus-jakarta-bold ml-2">
+                  {propertyQuery?.data?.data?.rating} (
+                  {propertyQuery?.data?.data?.reviews?.length ?? 0} reviews)
+                </Text>
               </View>
 
-              <View className="mt-5">
-                <Comment item={propertyQuery?.data?.data?.reviews[0]} />
-              </View>
+              <TouchableOpacity>
+                <Text className="text-primary-300 text-base font-plus-jakarta-bold">
+                  View All
+                </Text>
+              </TouchableOpacity>
             </View>
-          )}
+
+            <View className="mt-5">
+              {/* <Comment item={propertyQuery?.data?.data?.reviews[0]} /> */}
+            </View>
+          </View>
         </View>
         <ConfidentialDetails mode={mode} propertyQuery={propertyQuery} />
       </ScrollView>

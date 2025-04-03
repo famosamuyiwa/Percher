@@ -48,9 +48,12 @@ export const FeaturedCard = ({ item, onPress }: Props) => {
         <Text className="text-base font-plus-jakarta-regular text-white">
           {item.location}
         </Text>
-        <View className="flex flex-row items-center justify-between w-full">
+        <View className="flex flex-row items-center gap-2 w-full">
           <Text className="text-xl font-plus-jakarta-extrabold text-white">
             ₦{Commafy(item.price)}
+          </Text>
+          <Text className="text-xs font-plus-jakarta-regular text-white">
+            {item.chargeType.toLowerCase()}
           </Text>
         </View>
       </View>
@@ -84,9 +87,15 @@ export const Card = ({ item, source, onPress }: Props) => {
         </Text>
 
         <View className="flex flex-row items-center justify-between mt-2">
-          <Text className="text-base font-plus-jakarta-bold text-primary-300">
-            ₦{Commafy(item.price)}
-          </Text>
+          <View className="flex flex-row items-center gap-1">
+            <Text className="text-base font-plus-jakarta-bold text-primary-300">
+              ₦{Commafy(item.price)}
+            </Text>
+            <Text className="text-xs font-plus-jakarta-regular text-black-100">
+              {item.chargeType.toLowerCase()}
+            </Text>
+          </View>
+
           {source === Screens.MY_PERCHS && (
             <View
               style={{ backgroundColor: Colors.secondary }}

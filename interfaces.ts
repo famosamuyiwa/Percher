@@ -11,6 +11,7 @@ import {
   PerchTypes,
   RegistrationStatus,
   ReviewAction,
+  Roles,
   TransactionMode,
   TransactionType,
   UserType,
@@ -135,11 +136,11 @@ export interface User extends BaseEntity {
   phone: string;
   password: string;
   avatar: string;
-  role: string;
   referredBy: User;
   referredUsers: User[];
   referralCode?: string;
   wallet?: Wallet;
+  role?: Roles;
 }
 
 export enum ResponseStatus {

@@ -205,3 +205,8 @@ export enum GalleryType {
   PROOF_OF_OWNERSHIP = "proofOfOwnership",
   GALLERY = "gallery",
 }
+
+export enum Roles {
+  USER = "Role_User",
+  ADMIN = "Role_Admin",
+}

@@ -819,8 +819,8 @@ export default function PerchRegistrationForm({
             render={({ field: { onChange, value, onBlur } }) => (
               <View>
                 <Text className="text-xs font-plus-jakarta-regular pb-3">
-                  Proof of ownership or authority (utility bills, deeds, legal
-                  documents etc.)
+                  Proof of ownership or Rent Permit (Deeds, legal documents
+                  etc.)
                 </Text>
                 <View className="flex-row items-center">
                   <TouchableOpacity

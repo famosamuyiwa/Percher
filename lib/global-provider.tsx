@@ -18,16 +18,12 @@ interface GlobalContextType {
   showLoader: () => void;
   hideLoader: () => void;
   alertComingSoon: () => void;
-  notifications: INotification<any>[];
-  unreadCount: number;
-  markAllAsRead: () => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const { data, isLoading, refetch, isError, error } = useAuthQuery();
-  const { notifications, unreadCount, markAllAsRead } = useNotifications();
   const user = data?.data;
   let isLoggedIn = !!user;
   const toastRef = useRef<any>({});
@@ -73,9 +69,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         showLoader,
         hideLoader,
         alertComingSoon,
-        notifications,
-        unreadCount,
-        markAllAsRead,
       }}
     >
       {children}

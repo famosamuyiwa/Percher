@@ -22,7 +22,7 @@ import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 
 const MyPerchs = () => {
   const [filters, setFilters] = useState<Filter>({
-    location: "",
+    location: {},
     limit: 10,
     from: UserType.HOST,
   });

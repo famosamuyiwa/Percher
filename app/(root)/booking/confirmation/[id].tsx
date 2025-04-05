@@ -23,7 +23,6 @@ import PaystackCheckout from "@/hooks/usePaystack";
 import CustomButton from "@/components/Button";
 import { useCreateBookingMutation } from "@/hooks/mutation/useBookingMutation";
 import { useGlobalStore } from "@/store/store";
-import { useGlobalContext } from "@/lib/global-provider";
 import {
   Commafy,
   convertToInternationalPhoneNumber,
@@ -33,6 +32,7 @@ import {
 import { ApiResponse, Booking, Payment } from "@/interfaces";
 import { useVerifyPaymentMutation } from "@/hooks/mutation/usePaymentMutation";
 import { TransactionType } from "@/constants/enums";
+import { useGlobalContext } from "@/lib/global-provider";
 
 const BookingConfirmation = () => {
   const insets = useSafeAreaInsets();
@@ -105,7 +105,10 @@ const BookingConfirmation = () => {
   };
 
   return (
-    <View className="pb-5 flex-1 bg-white" style={{ paddingTop: insets.top }}>
+    <View
+      className="pb-5 flex-1 bg-white"
+      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+    >
       <View className="my-2 py-4">
         <View className="pb-8 flex-row justify-between items-baseline px-5">
           <TouchableOpacity onPress={() => router.back()}>
@@ -172,7 +175,7 @@ const BookingConfirmation = () => {
                 <View className="flex-row gap-2 items-baseline">
                   <Entypo name="location" size={14} color={Colors.accent} />
                   <Text className="font-plus-jakarta-regular text-sm">
-                    {property?.location}
+                    {property?.location.address}
                   </Text>
                 </View>
                 <View className="flex-row items-center">

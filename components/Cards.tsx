@@ -46,7 +46,7 @@ export const FeaturedCard = ({ item, onPress }: Props) => {
           {item.name}
         </Text>
         <Text className="text-base font-plus-jakarta-regular text-white">
-          {item.location}
+          {item.location.address}
         </Text>
         <View className="flex flex-row items-center gap-2 w-full">
           <Text className="text-xl font-plus-jakarta-extrabold text-white">
@@ -83,7 +83,7 @@ export const Card = ({ item, source, onPress }: Props) => {
           {item.name}
         </Text>
         <Text className="text-xs font-plus-jakarta-regular text-black-100">
-          {item.location}
+          {item.location.address}
         </Text>
 
         <View className="flex flex-row items-center justify-between mt-2">
@@ -160,7 +160,7 @@ export const BookingCardGuest = ({ item, onPress }: BookingProps) => {
           <View className="flex-row justify-between">
             <Entypo name="location" size={14} color={Colors.accent} />
             <Text className=" font-plus-jakarta-regular text-xs">
-              {item.property?.location}
+              {item.property?.location.address}
             </Text>
           </View>
           <View className="flex-row justify-end">

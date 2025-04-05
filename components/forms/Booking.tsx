@@ -5,31 +5,23 @@ import * as z from "zod";
 import { useState } from "react";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
-import useImagePicker from "@/hooks/useImagePicker";
 import { Picker } from "@react-native-picker/picker";
-import {
-  ChargeType,
-  CheckOutTime,
-  ToastType,
-  TransactionType,
-} from "@/constants/enums";
+import { ToastType } from "@/constants/enums";
 import CustomButton from "../Button";
 import { useGlobalContext } from "@/lib/global-provider";
 import { BookingFormData, FormProps } from "@/interfaces";
 import CalendarList from "../CalendarList";
 import { formStyles } from "./styles";
 import { formatDate } from "@/utils/common";
-import { TextField } from "../Textfield";
-import Calendar from "../Calendar";
 
 // Validation Schema
 const schema = z.object({
   periodOfStay: z.string().min(1, "Required"),
   checkInTime: z.string().min(1, "Required"),
   checkOutTime: z.string().min(1, "Required"),
-  periodInDigits: z.number().default(1),
-  arrivalDate: z.date().optional(),
-  departureDate: z.date().optional(),
+  // periodInDigits: z.number().default(1),
+  arrivalDate: z.date().nullable(),
+  departureDate: z.date().nullable(),
 });
 
 enum ModalType {
@@ -43,9 +35,9 @@ function isCheckOutModal(content: ModalType): content is ModalType.CHECK_OUT {
   return content === ModalType.CHECK_OUT;
 }
 
-function isChargeTypeMonthlyOrYearly(chargeType: ChargeType): boolean {
-  return chargeType === ChargeType.MONTHLY || chargeType === ChargeType.YEARLY;
-}
+// function isChargeTypeMonthlyOrYearly(chargeType: ChargeType): boolean {
+//   return chargeType === ChargeType.MONTHLY || chargeType === ChargeType.YEARLY;
+// }
 
 export default function BookingForm({
   data,
@@ -91,7 +83,10 @@ export default function BookingForm({
     if (startDate && endDate) {
       setValue(
         "periodOfStay",
-        `${formatDate(startDate)} - ${formatDate(endDate)}`
+        `${formatDate(startDate)} - ${formatDate(endDate)}`,
+        {
+          shouldValidate: true,
+        }
       );
       setValue("arrivalDate", startDate);
       setValue("departureDate", endDate);
@@ -119,11 +114,16 @@ export default function BookingForm({
   const handleModalDoneClick = (modalContent: ModalType) => {
     switch (modalContent) {
       case ModalType.CHECK_IN:
-        if (!checkInTime) setValue("checkInTime", staticData?.checkInPeriod[0]);
+        if (!checkInTime)
+          setValue("checkInTime", staticData?.checkInPeriod[0], {
+            shouldValidate: true,
+          });
         break;
       case ModalType.CHECK_OUT:
         if (!checkOutTime)
-          setValue("checkOutTime", staticData?.checkOutPeriod[0]);
+          setValue("checkOutTime", staticData?.checkOutPeriod[0], {
+            shouldValidate: true,
+          });
         break;
     }
     resetModal();
@@ -135,7 +135,7 @@ export default function BookingForm({
         <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 mb-2">
           <Ionicons name="ticket" size={20} color={Colors.accent} />
         </View>
-        {staticData?.chargeType !== ChargeType.NIGHTLY && (
+        {/* {staticData?.chargeType !== ChargeType.NIGHTLY && (
           <View className="w-4/12">
             <Controller
               control={control}
@@ -164,7 +164,7 @@ export default function BookingForm({
               </Text>
             )}
           </View>
-        )}
+        )} */}
         <View>
           <Controller
             control={control}
@@ -172,9 +172,10 @@ export default function BookingForm({
             render={({ field: { onChange, value, onBlur } }) => (
               <View>
                 <Text className="text-xs font-plus-jakarta-regular pb-3">
-                  {isChargeTypeMonthlyOrYearly(staticData?.chargeType)
+                  {/* {isChargeTypeMonthlyOrYearly(staticData?.chargeType)
                     ? "Arrival Date"
-                    : "Period of Stay"}
+                    : "Period of Stay"} */}
+                  Period of Stay
                 </Text>
                 <TouchableOpacity
                   onPress={() => openModal(ModalType.CALENDAR)}
@@ -183,10 +184,11 @@ export default function BookingForm({
                   <Ionicons name="calendar-number" size={20} />
                   <View className="flex-1 justify-center">
                     <Text className="font-plus-jakarta-regular ">
-                      {periodOfStay ??
+                      {/* {periodOfStay ??
                         (isChargeTypeMonthlyOrYearly(staticData?.chargeType)
                           ? "-- Pick arrival date --"
-                          : "-- Pick range --")}
+                          : "-- Pick range --")} */}
+                      {periodOfStay ?? "-- Pick range --"}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -293,11 +295,12 @@ export default function BookingForm({
       <Modal visible={modalVisible} transparent animationType="slide">
         {modalContent === ModalType.CALENDAR && (
           <View style={formStyles.calendarModalContainer}>
-            {isChargeTypeMonthlyOrYearly(staticData?.chargeType) ? (
+            {/* {isChargeTypeMonthlyOrYearly(staticData?.chargeType) ? (
               <Calendar onBack={handleOnCalendarModalDismiss} />
             ) : (
               <CalendarList onBack={handleOnCalendarRangeModalDismiss} />
-            )}
+            )} */}
+            <CalendarList onBack={handleOnCalendarRangeModalDismiss} />
           </View>
         )}
 
@@ -313,7 +316,7 @@ export default function BookingForm({
                   const fieldName = isCheckOutModal(modalContent)
                     ? "checkOutTime"
                     : "checkInTime";
-                  setValue(fieldName, itemValue);
+                  setValue(fieldName, itemValue, { shouldValidate: true });
                 }}
                 itemStyle={{
                   color: "black", // Set text color

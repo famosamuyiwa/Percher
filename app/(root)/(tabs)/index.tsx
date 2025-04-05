@@ -26,6 +26,7 @@ import {
   useFeaturedPropertyQuery,
   usePropertiesQuery,
 } from "@/hooks/query/usePropertyQuery";
+import { useAuthenticatedScreensContext } from "@/lib/authenticated-screens-provider";
 
 export default function Index() {
   const insets = useSafeAreaInsets();
@@ -39,12 +40,13 @@ export default function Index() {
     categoryFilter?: PerchTypes;
   }>();
   const [filters, setFilters] = useState<Filter>({
-    location: "",
+    location: {},
     limit: 10,
     from: UserType.GUEST,
     perchType: params.categoryFilter,
   });
-  const { user, unreadCount } = useGlobalContext();
+  const { user } = useGlobalContext();
+  const { unreadCount } = useAuthenticatedScreensContext();
 
   const propertiesQuery = usePropertiesQuery({
     ...filters,

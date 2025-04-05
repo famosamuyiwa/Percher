@@ -29,16 +29,6 @@ export const filterCategories = [
     key: FilterCategoryKey.PERCHTYPE,
   },
   {
-    title: PerchTypes.SELF_CONTAINED,
-    category: PerchTypes.SELF_CONTAINED,
-    key: FilterCategoryKey.PERCHTYPE,
-  },
-  {
-    title: PerchTypes.BOYS_QUARTERS,
-    category: PerchTypes.BOYS_QUARTERS,
-    key: FilterCategoryKey.PERCHTYPE,
-  },
-  {
     title: PerchTypes.OFFICE_SPACE,
     category: PerchTypes.OFFICE_SPACE,
     key: FilterCategoryKey.PERCHTYPE,
@@ -116,4 +106,17 @@ export const facilities = [
     title: Facility.ESTATE_SECURITY,
     icon: "shield-checkmark",
   },
+];
+
+export const propertyCoordinates = [
+  { id: 1, lat: 6.5244, long: 3.3792 },
+  { id: 2, lat: 6.5281, long: 3.3754 },
+  { id: 3, lat: 6.5157, long: 3.3951 },
+  { id: 4, lat: 6.5402, long: 3.3629 },
+  { id: 5, lat: 6.4987, long: 3.3824 },
+  { id: 6, lat: 6.5341, long: 3.4053 },
+  { id: 7, lat: 6.5105, long: 3.3611 },
+  { id: 8, lat: 6.5566, long: 3.3919 },
+  { id: 9, lat: 6.52, long: 3.3502 },
+  { id: 10, lat: 6.5077, long: 3.3998 },
 ];

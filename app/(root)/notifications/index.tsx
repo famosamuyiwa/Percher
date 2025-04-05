@@ -2,7 +2,7 @@ import EmptyBookings from "@/components/empty-screens/bookings";
 import EmptyNotifications from "@/components/empty-screens/notifications";
 import NotificationItem from "@/components/NotificationItem";
 import { useNotificationQuery } from "@/hooks/query/useNotificationQuery";
-import { useGlobalContext } from "@/lib/global-provider";
+import { useAuthenticatedScreensContext } from "@/lib/authenticated-screens-provider";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { router } from "expo-router";
@@ -20,7 +20,7 @@ const Notifications = () => {
     return null; // Prevents glitching by waiting for insets
   }
 
-  const { unreadCount, markAllAsRead } = useGlobalContext();
+  const { unreadCount, markAllAsRead } = useAuthenticatedScreensContext();
   const notificationsQuery = useNotificationQuery();
 
   const notifications =

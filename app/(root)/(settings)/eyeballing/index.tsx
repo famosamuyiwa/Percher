@@ -23,7 +23,7 @@ import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 
 const Eyeballing = () => {
   const [filters, setFilters] = useState<Filter>({
-    location: "",
+    location: {},
     limit: 10,
     from: UserType.ADMIN,
   });

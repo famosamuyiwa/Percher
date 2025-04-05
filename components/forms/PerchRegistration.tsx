@@ -37,6 +37,7 @@ import CustomButton from "../Button";
 import { useGlobalContext } from "@/lib/global-provider";
 import { FormProps, PerchRegistrationFormData } from "@/interfaces";
 import { formStyles } from "./styles";
+import { router } from "expo-router";
 
 // Validation Schema
 const schema = z.object({
@@ -47,7 +48,6 @@ const schema = z.object({
   bathrooms: z.number().min(1, "Must be at least 1"),
   description: z.string().min(20, "Must be at least 50 characters"),
   header: z.string().min(20, "Upload a header"),
-  location: z.string().min(10, "Must be at least 10 characters"),
   price: z.number().min(1, "Must be at least 1"),
   cautionFee: z.number().min(1, "Must be at least 1"),
   gallery: z.array(z.string()).default([]), // Ensures it's always an array
@@ -59,6 +59,14 @@ const schema = z.object({
   facilities: z.array(z.string()).default([]), // Ensures it's always an array
   checkInTimes: z.array(z.string()).min(1, "Required").default([]), // Ensures it's always an array
   checkOutTime: z.string().min(1, "Required").default(""),
+  propertyNumber: z.number().min(1, "Required"),
+  streetAddress: z.string().min(1, "Required"),
+  city: z.string().min(1, "Required"),
+  state: z.string().min(1, "Required"),
+  country: z.string().min(1, "Required"),
+  snapshot: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
 });
 
 export default function PerchRegistrationForm({
@@ -84,7 +92,7 @@ export default function PerchRegistrationForm({
   } = useForm({
     resolver: zodResolver(schema),
     mode: "onChange",
-    defaultValues: data,
+    defaultValues: { ...data, country: "Nigeria" },
   });
   const header = watch("header"); // Automatically updates when changed
   const gallery = watch("gallery");
@@ -96,14 +104,20 @@ export default function PerchRegistrationForm({
   const perchType = watch("propertyType");
   const checkInTimes = watch("checkInTimes");
   const checkOutTime = watch("checkOutTime");
-
+  const snapshot = watch("snapshot");
   const handleHeaderSelect = async () => {
     try {
       const image: any = await pickMultimedia(false, true);
-      setValue("header", image.uri[0]);
+      setValue("header", image.uri[0], { shouldValidate: true });
     } catch {
       console.log("Error picking media");
     }
+  };
+
+  const handleSnapshotSelect = async () => {
+    router.push({
+      pathname: "/map",
+    });
   };
 
   const handleAddToList = async (listName: string) => {
@@ -114,7 +128,7 @@ export default function PerchRegistrationForm({
           const currentGallery = gallery || []; // Ensure it's an array
           const updatedGallery = [...currentGallery, ...images.uri];
 
-          setValue("gallery", updatedGallery); // Update form state
+          setValue("gallery", updatedGallery, { shouldValidate: true }); // Update form state
           break;
         case "proofOfOwnership":
           const currentProofOfOwnership = proofOfOwnership || []; // Ensure it's an array
@@ -122,7 +136,9 @@ export default function PerchRegistrationForm({
             ...currentProofOfOwnership,
             ...images.uri,
           ];
-          setValue("proofOfOwnership", updatedProofOfOwnership); // Update form state
+          setValue("proofOfOwnership", updatedProofOfOwnership, {
+            shouldValidate: true,
+          }); // Update form state
           break;
         case "proofOfIdentity":
           const currentProofOfIdentity = proofOfIdentity || []; // Ensure it's an array
@@ -131,7 +147,9 @@ export default function PerchRegistrationForm({
             ...images.uri,
           ];
 
-          setValue("proofOfIdentity", updatedProofOfIdentity); // Update form state
+          setValue("proofOfIdentity", updatedProofOfIdentity, {
+            shouldValidate: true,
+          }); // Update form state
           break;
         default:
           return;
@@ -146,19 +164,22 @@ export default function PerchRegistrationForm({
       case "gallery":
         setValue(
           "gallery",
-          gallery?.filter((uri) => uri !== imgUri)
+          gallery?.filter((uri) => uri !== imgUri),
+          { shouldValidate: true }
         );
         break;
       case "proofOfOwnership":
         setValue(
           "proofOfOwnership",
-          proofOfOwnership?.filter((uri) => uri !== imgUri)
+          proofOfOwnership?.filter((uri) => uri !== imgUri),
+          { shouldValidate: true }
         );
         break;
       case "proofOfIdentity":
         setValue(
           "proofOfIdentity",
-          proofOfIdentity?.filter((uri) => uri !== imgUri)
+          proofOfIdentity?.filter((uri) => uri !== imgUri),
+          { shouldValidate: true }
         );
         break;
       default:
@@ -306,7 +327,9 @@ export default function PerchRegistrationForm({
                         <Picker
                           selectedValue={perchType}
                           onValueChange={(itemValue) =>
-                            setValue("propertyType", itemValue)
+                            setValue("propertyType", itemValue, {
+                              shouldValidate: true,
+                            })
                           }
                           itemStyle={{
                             color: "black", // Set text color
@@ -433,12 +456,12 @@ export default function PerchRegistrationForm({
         <View>
           <Controller
             control={control}
-            name="location"
+            name="streetAddress"
             render={({ field: { onChange, value, onBlur } }) => (
               <TextField
                 isSmallLabelVisible={true}
-                label="Location"
-                placeholder="e.g Ogudu G.R.A, Lagos"
+                label="Street Address"
+                placeholder="e.g Omoighodalo Street"
                 value={value}
                 onValueChange={onChange}
                 style={formStyles.input}
@@ -447,9 +470,157 @@ export default function PerchRegistrationForm({
               />
             )}
           />
-          {errors.location && (
+          {errors.streetAddress && (
             <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
-              {errors.location.message}
+              {errors.streetAddress.message}
+            </Text>
+          )}
+        </View>
+
+        <View className="flex-row gap-5">
+          <View className="w-5/12">
+            <Controller
+              control={control}
+              name="propertyNumber"
+              render={({ field: { onChange, value, onBlur } }) => (
+                <TextField
+                  isSmallLabelVisible={true}
+                  label="House Number"
+                  placeholder="e.g 23"
+                  value={value}
+                  onValueChange={(text: string) => onChange(Number(text))}
+                  style={formStyles.input}
+                  onBlur={onBlur}
+                  keyboardType="numeric"
+                  placeholderColor="darkgrey"
+                />
+              )}
+            />
+            {errors.propertyNumber && (
+              <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
+                {errors.propertyNumber.message}
+              </Text>
+            )}
+          </View>
+          <View className="w-5/12">
+            <Controller
+              control={control}
+              name="city"
+              render={({ field: { onChange, value, onBlur } }) => (
+                <TextField
+                  isSmallLabelVisible={true}
+                  label="City"
+                  placeholder="e.g Ogudu"
+                  value={value}
+                  onValueChange={(text: string) => onChange(text)}
+                  style={formStyles.input}
+                  onBlur={onBlur}
+                  placeholderColor="darkgrey"
+                />
+              )}
+            />
+            {errors.city && (
+              <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
+                {errors.city.message}
+              </Text>
+            )}
+          </View>
+        </View>
+
+        <View className="flex-row gap-5">
+          <View className="w-5/12">
+            <Controller
+              control={control}
+              name="state"
+              render={({ field: { onChange, value, onBlur } }) => (
+                <TextField
+                  isSmallLabelVisible={true}
+                  label="State"
+                  placeholder="e.g Lagos"
+                  value={value}
+                  onValueChange={(text: string) => onChange(text)}
+                  style={formStyles.input}
+                  onBlur={onBlur}
+                  placeholderColor="darkgrey"
+                />
+              )}
+            />
+            {errors.state && (
+              <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
+                {errors.state.message}
+              </Text>
+            )}
+          </View>
+
+          <View className="w-5/12">
+            <Controller
+              control={control}
+              name="country"
+              render={({ field: { onChange, value, onBlur } }) => (
+                <TextField
+                  isSmallLabelVisible={true}
+                  label="Country"
+                  placeholder="e.g Nigeria"
+                  value={value}
+                  onValueChange={(text: string) => onChange(text)}
+                  style={formStyles.input}
+                  onBlur={onBlur}
+                  placeholderColor="darkgrey"
+                  isEditable={false}
+                />
+              )}
+            />
+            {errors.country && (
+              <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
+                {errors.country.message}
+              </Text>
+            )}
+          </View>
+        </View>
+        <View>
+          <Controller
+            control={control}
+            name="snapshot"
+            render={({ field: { onChange, value, onBlur } }) => (
+              <View>
+                <Text className="text-xs font-plus-jakarta-regular pb-3">
+                  Location
+                </Text>
+                <TouchableOpacity
+                  className="h-52 items-center justify-center"
+                  style={{ backgroundColor: "lightgrey", borderRadius: 10 }}
+                  onPress={() => {
+                    handleSnapshotSelect();
+                  }}
+                >
+                  {!snapshot && (
+                    <FontAwesome6
+                      name="map-location-dot"
+                      size={50}
+                      color={"darkgrey"}
+                    />
+                  )}
+                  {snapshot && (
+                    <Image
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: 10,
+                        borderWidth: 0.4,
+                        borderColor: Colors.accent,
+                      }}
+                      source={{ uri: snapshot }}
+                      contentFit="cover"
+                      contentPosition={"center"}
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+          {errors.snapshot && (
+            <Text className="font-plus-jakarta-regular text-red-500 text-xs self-end">
+              {errors.snapshot.message}
             </Text>
           )}
         </View>
@@ -540,7 +711,9 @@ export default function PerchRegistrationForm({
                         <Picker
                           selectedValue={chargeType}
                           onValueChange={(itemValue) =>
-                            setValue("chargeType", itemValue)
+                            setValue("chargeType", itemValue, {
+                              shouldValidate: true,
+                            })
                           }
                           itemStyle={{
                             color: "black", // Set text color

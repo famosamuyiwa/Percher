@@ -9,12 +9,12 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Colors } from "@/constants/common";
-import { useGlobalContext } from "@/lib/global-provider";
+import { useAuthenticatedScreensContext } from "@/lib/authenticated-screens-provider";
 
 type RouteName = "index" | "explore" | "bookings" | "profile"; // Define valid route names
 
 const TabBar = ({ state, descriptors, navigation }: any) => {
-  const { unreadCount } = useGlobalContext();
+  const { unreadCount } = useAuthenticatedScreensContext();
   const tabIconDefault = "#666876";
   const tabIconSelected = Colors.primary;
   const icons = {

@@ -43,11 +43,31 @@ const Form = () => {
       );
       loadingMessage = "Uploading proof of ownership...";
       const dataAfterMediaUpload = {
-        ...formData,
+        propertyName: formData.propertyName || "",
+        propertyType: formData.propertyType || "",
+        chargeType: formData.chargeType || "",
+        beds: formData.beds || 0,
+        bathrooms: formData.bathrooms || 0,
+        description: formData.description || "",
+        price: formData.price || 0,
+        cautionFee: formData.cautionFee || 0,
+        facilities: formData.facilities || [],
+        checkInTimes: formData.checkInTimes || [],
+        checkOutTime: formData.checkOutTime || "",
+        txc: formData.txc || false,
         header: header ? header[0] : "",
         gallery: gallery ?? [],
         proofOfIdentity: proofOfIdentity ?? [],
         proofOfOwnership: proofOfOwnership ?? [],
+        latitude: formData.latitude ?? 0,
+        longitude: formData.longitude ?? 0,
+        address: `${formData.streetAddress}, ${formData.city}, ${formData.state}. ${formData.country}`,
+        streetAddress: formData.streetAddress,
+        propertyNumber: formData.propertyNumber,
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+        snapshot: formData.snapshot ?? "ook",
       };
       loadingMessage = "Finalizing perch registration...";
       console.log("data: ", dataAfterMediaUpload);
@@ -91,19 +111,27 @@ const Form = () => {
   const preloadedData = () => {
     const data = propertyQuery.data?.data;
     if (!id || !data) return {} as PerchRegistrationFormData;
-    console.log("price: ", typeof data.price);
-    console.log("bed: ", typeof data.bed);
+    console.log("data: ", data);
+
     const mappedData: PerchRegistrationFormData = {
       ...data,
       propertyName: data.name,
       propertyType: data.type,
-      beds: data.bed,
-      bathrooms: data.bathroom,
+      beds: data.bed.toString(), //the form is expecting strings instead of numbers for some reason
+      bathrooms: data.bathroom.toString(),
       gallery: data.gallery ?? [],
       facilities: (data.facilities as unknown as string[]) ?? [],
       checkInTimes: data.checkInPeriods ?? [],
       checkOutTime: data.checkOutPeriod ?? "",
       txc: data.termsAndConditions,
+      propertyNumber: data.location.propertyNumber.toString(),
+      streetAddress: data.location.streetAddress,
+      city: data.location.city,
+      state: data.location.state,
+      country: data.location.country,
+      snapshot: data.location.snapshotUrl,
+      latitude: data.location.latitude,
+      longitude: data.location.longitude,
     };
     return mappedData;
   };

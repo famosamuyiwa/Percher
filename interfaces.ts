@@ -30,7 +30,7 @@ export interface Property extends BaseEntity {
   facilities: Facility[];
   type: string;
   description: string;
-  location: string;
+  location: Location;
   price: number;
   cautionFee: number;
   header: string;
@@ -52,11 +52,10 @@ export interface PerchRegistrationFormData {
   propertyName: string;
   propertyType: string;
   chargeType: string;
-  beds: number;
-  bathrooms: number;
+  beds: any;
+  bathrooms: any;
   description: string;
   header: string;
-  location: string;
   price: number;
   cautionFee: number;
   gallery: string[];
@@ -66,6 +65,14 @@ export interface PerchRegistrationFormData {
   facilities: string[];
   checkInTimes: string[];
   checkOutTime: string;
+  propertyNumber: any;
+  streetAddress: string;
+  city: string;
+  state: string;
+  country: string;
+  snapshot: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface BookingFormData {
@@ -74,7 +81,7 @@ export interface BookingFormData {
   departureDate: Date;
   checkInTime: string;
   checkOutTime: string;
-  periodInDigits: number;
+  // periodInDigits: number;
 }
 
 export interface FormProps<T, S> {
@@ -173,8 +180,7 @@ export interface ToastProps {
 }
 
 export interface Filter {
-  location?: string;
-  type?: PerchTypes;
+  location?: Partial<Location>;
   limit?: number;
   category?: Category;
   from?: UserType;
@@ -256,4 +262,16 @@ export interface INotification<T> {
   data?: T;
   createdAt: Date;
   modifiedAt: Date;
+}
+
+export interface Location {
+  latitude: number;
+  longitude: number;
+  address: string;
+  streetAddress: string;
+  propertyNumber: number;
+  city: string;
+  state: string;
+  country: string;
+  snapshotUrl: string;
 }

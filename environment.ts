@@ -17,3 +17,5 @@ export const API_BASE_URL =
   (Platform.OS === "android"
     ? "http://10.0.2.2:3000"
     : "http://localhost:3000");
+
+export const MAPBOX_ACCESS_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_PUBLIC_KEY!;

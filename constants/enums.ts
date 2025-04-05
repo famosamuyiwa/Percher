@@ -45,8 +45,6 @@ export enum PerchTypes {
 
 export enum ChargeType {
   NIGHTLY = "Nightly",
-  MONTHLY = "Monthly",
-  YEARLY = "Yearly",
 }
 
 export enum CheckInTime {

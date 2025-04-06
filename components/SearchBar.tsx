@@ -8,9 +8,11 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 const SearchBar = ({
   isFiltered,
   placeholder,
+  className,
 }: {
   isFiltered?: boolean;
   placeholder?: string;
+  className?: string;
 }) => {
   const params = useLocalSearchParams<{ query?: string }>();
   const [search, setSearch] = useState(params.query);
@@ -24,7 +26,9 @@ const SearchBar = ({
     debouncedSearch(text);
   };
   return (
-    <View className="flex flex-row items-center justify-between w-full px-4 rounded-full bg-secondary-100 border border-primary-100 mt-5 py-2">
+    <View
+      className={`flex flex-row items-center justify-between w-full px-4 rounded-full bg-secondary-100 border border-primary-100 py-2 mt-5 ${className}`}
+    >
       <View className="flex-1 flex flex-row items-center justify-start z-50">
         <Feather name="search" size={20} color="grey" />
         <TextInput

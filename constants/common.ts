@@ -1,4 +1,5 @@
 import { CalendarTheme } from "@marceloterreiro/flash-calendar";
+import { MapMode } from "./enums";
 
 export const USE_AUTH_QUERY_KEY = ["auth"];
 export const USE_PROPERTIES_QUERY_KEY = ["properties"];
@@ -74,5 +75,18 @@ export const CalendarRangeTheme: CalendarTheme = {
         color: "lightgrey",
       },
     }),
+  },
+};
+
+export const MapSettings = {
+  [MapMode.DEFAULT]: {
+    cluster: false,
+    showPropertyMarkers: false,
+    scaleBarEnabled: false,
+  },
+  [MapMode.PROPERTY_REGISTRATION]: {
+    cluster: false,
+    showPropertyMarkers: true,
+    scaleBarEnabled: false,
   },
 };

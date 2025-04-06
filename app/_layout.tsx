@@ -7,7 +7,7 @@ import GlobalProvider from "../lib/global-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as SplashScreen from "expo-splash-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const queryClient = new QueryClient();
@@ -33,16 +33,21 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
+
+  /* gesture handler root view required for reanimated in bottom sheet */
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <GlobalProvider>
-        <SafeAreaProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="sign-in" />
-            <Stack.Screen name="mail-auth" />
-          </Stack>
-        </SafeAreaProvider>
-      </GlobalProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <GlobalProvider>
+          <SafeAreaProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="sign-in" />
+              <Stack.Screen name="mail-auth" />
+            </Stack>
+          </SafeAreaProvider>
+        </GlobalProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

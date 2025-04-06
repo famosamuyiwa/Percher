@@ -276,7 +276,7 @@ const Property = () => {
           <View className="flex flex-row items-center justify-start mt-4 gap-2">
             <Entypo name="location" size={16} color={Colors.accent} />
             <Text className="text-black-200 text-sm font-plus-jakarta-medium">
-              {propertyQuery?.data?.data?.location}
+              {propertyQuery?.data?.data?.location?.address}
             </Text>
           </View>
 

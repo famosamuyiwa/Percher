@@ -208,3 +208,8 @@ export enum Roles {
   USER = "Role_User",
   ADMIN = "Role_Admin",
 }
+
+export enum MapMode {
+  DEFAULT = "DEFAULT",
+  PROPERTY_REGISTRATION = "PROPERTY_REGISTRATION",
+}

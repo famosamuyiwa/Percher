@@ -16,7 +16,7 @@ import axios from "axios";
 import api from "./axios";
 import * as SecureStore from "expo-secure-store";
 import { signOut } from "@/hooks/useGoogleOAuth";
-import { API_BASE_URL } from "@/environment";
+import { API_BASE_URL, MAPBOX_ACCESS_TOKEN } from "@/environment";
 
 const PAYSTACK_SECRET_KEY = process.env.EXPO_PUBLIC_PAYSTACK_TEST_SECRET_KEY!;
 
@@ -464,6 +464,17 @@ export const verifyAccountNumberFromPaystack = async (
           Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
         },
       }
+    );
+    return payload;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+export const geocode = async (longitude: number, latitude: number) => {
+  try {
+    const { data: payload } = await axios.get(
+      `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${longitude}&latitude=${latitude}&access_token=${MAPBOX_ACCESS_TOKEN}`
     );
     return payload;
   } catch (error) {

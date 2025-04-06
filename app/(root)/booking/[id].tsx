@@ -33,15 +33,15 @@ const Booking = () => {
   const handleOnContinue = (formData: BookingFormData) => {
     if (!property) return;
 
-    if (chargeType === ChargeType.MONTHLY && formData.periodInDigits > 0) {
-      const endDate = addMonths(formData.arrivalDate, formData.periodInDigits);
-      formData.departureDate = addDays(endDate, 1);
-    }
+    // if (chargeType === ChargeType.MONTHLY && formData.periodInDigits > 0) {
+    //   const endDate = addMonths(formData.arrivalDate, formData.periodInDigits);
+    //   formData.departureDate = addDays(endDate, 1);
+    // }
 
-    if (chargeType === ChargeType.YEARLY && formData.periodInDigits > 0) {
-      const endDate = addYears(formData.arrivalDate, formData.periodInDigits);
-      formData.departureDate = addDays(endDate, 1);
-    }
+    // if (chargeType === ChargeType.YEARLY && formData.periodInDigits > 0) {
+    //   const endDate = addYears(formData.arrivalDate, formData.periodInDigits);
+    //   formData.departureDate = addDays(endDate, 1);
+    // }
 
     let period = 0;
 
@@ -50,9 +50,10 @@ const Booking = () => {
         formData.departureDate,
         formData.arrivalDate
       );
-    } else {
-      period = formData.periodInDigits;
     }
+    // } else {
+    //   period = formData.periodInDigits;
+    // }
 
     const subPrice = Number(property.price);
     const price = subPrice * period;

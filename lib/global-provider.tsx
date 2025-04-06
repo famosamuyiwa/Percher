@@ -6,6 +6,7 @@ import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { Toast } from "@/components/animation-toast/components";
 import Loader from "@/components/Loader";
 import { useNotifications } from "@/hooks/useNotification";
+import MapBottomSheet from "@/components/MapBottomSheet";
 
 interface GlobalContextType {
   isLoggedIn: boolean;
@@ -28,7 +29,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   let isLoggedIn = !!user;
   const toastRef = useRef<any>({});
   const loaderRef = useRef<any>({});
-
+  const mapBottomSheetRef = useRef<any>({});
   if (isError) {
     console.log("GlobalContextException: ", error);
     if (
@@ -74,6 +75,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       {children}
       <Loader ref={loaderRef} />
       <Toast ref={toastRef} />
+      <MapBottomSheet ref={mapBottomSheetRef} />
     </GlobalContext.Provider>
   );
 };

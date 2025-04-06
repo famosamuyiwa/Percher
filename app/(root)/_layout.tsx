@@ -3,9 +3,8 @@ import { useGlobalContext } from "../../lib/global-provider";
 import { ActivityIndicator } from "react-native";
 import { Redirect, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AuthenticatedScreensProvider, {
-  useAuthenticatedScreensContext,
-} from "@/lib/authenticated-screens-provider";
+import AuthenticatedScreensProvider from "@/lib/authenticated-screens-provider";
+import MapProvider from "@/lib/map-provider";
 
 export default function AppLayout() {
   const { loading, isLoggedIn } = useGlobalContext();
@@ -22,13 +21,15 @@ export default function AppLayout() {
 
   return (
     <AuthenticatedScreensProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="booking" />
-        <Stack.Screen name="notifications/index" />
-        <Stack.Screen name="properties/[id]" />
-        <Stack.Screen name="(settings)" />
-      </Stack>
+      <MapProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="booking" />
+          <Stack.Screen name="notifications/index" />
+          <Stack.Screen name="properties/[id]" />
+          <Stack.Screen name="(settings)" />
+        </Stack>
+      </MapProvider>
     </AuthenticatedScreensProvider>
   );
 }

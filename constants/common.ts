@@ -90,3 +90,9 @@ export const MapSettings = {
     scaleBarEnabled: false,
   },
 };
+
+export const ImagePickerMediaTypes = {
+  Images: "images" as any,
+  Videos: "videos" as any,
+  Multimedia: ["images", "videos"] as any,
+};

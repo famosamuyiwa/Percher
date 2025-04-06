@@ -1,15 +1,25 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useRef } from "react";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useMapContext } from "@/lib/map-provider";
 import { router, useLocalSearchParams } from "expo-router";
+import { Colors } from "@/constants/common";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 
 const MapBottomSheet = () => {
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const { selectedAddress, selectedCoordinates, takeMapSnapshot } =
-    useMapContext();
+  const {
+    selectedAddress,
+    selectedCoordinates,
+    takeMapSnapshot,
+    isLoadingSelectedAddress,
+  } = useMapContext();
 
   const { from } = useLocalSearchParams<{ from?: string }>();
 
@@ -24,24 +34,12 @@ const MapBottomSheet = () => {
     // Take a snapshot of the map
     if (selectedCoordinates) {
       // Take the snapshot using the function from context
-      const snapshotUri = await takeMapSnapshot();
-      console.log("Snapshot taken:", snapshotUri);
-
-      // Close the bottom sheet
-      bottomSheetRef.current?.close();
-
-      // Navigate back with the snapshot
-      if (from === "perch-registration") {
-        // If we came from the perch registration form, navigate back with the snapshot
-        router.back();
-      } else {
-        // Otherwise just go back
-        router.back();
-      }
-    } else {
-      // If no coordinates are selected, just close the bottom sheet
-      bottomSheetRef.current?.close();
+      await takeMapSnapshot();
     }
+
+    // Close the bottom sheet
+    bottomSheetRef.current?.close();
+    router.back();
   };
 
   return (
@@ -55,15 +53,32 @@ const MapBottomSheet = () => {
         <View className="px-4">
           <Text className="text-xl font-bold mb-4 ">Location Details</Text>
 
-          {selectedAddress ? (
+          {isLoadingSelectedAddress && (
+            <Animated.View
+              layout={LinearTransition}
+              entering={FadeIn.duration(500)}
+              exiting={FadeOut.duration(200)}
+              className="mt-5"
+            >
+              <ActivityIndicator size="small" color={Colors.primary} />
+            </Animated.View>
+          )}
+
+          {!isLoadingSelectedAddress && (
             <>
-              <Text className="text-base font-semibold mt-3 mb-1">Area:</Text>
-              <Text className="text-base mb-2">{selectedAddress}</Text>
+              {selectedAddress ? (
+                <>
+                  <Text className="text-base font-semibold mt-3 mb-1">
+                    Area:
+                  </Text>
+                  <Text className="text-base mb-2">{selectedAddress}</Text>
+                </>
+              ) : (
+                <Text className="text-base italic text-gray-500 mb-2">
+                  No address selected
+                </Text>
+              )}
             </>
-          ) : (
-            <Text className="text-base italic text-gray-500 mb-2">
-              No address selected
-            </Text>
           )}
 
           {selectedCoordinates ? (

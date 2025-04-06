@@ -13,7 +13,6 @@ import Mapbox, {
   MapView,
   ShapeSource,
   SymbolLayer,
-  UserLocation,
   UserTrackingMode,
 } from "@rnmapbox/maps";
 import { MAPBOX_ACCESS_TOKEN } from "@/environment";
@@ -24,11 +23,13 @@ import { propertyCoordinates } from "@/constants/data";
 import locationPin from "@/assets/icons/home.png";
 import { useMapContext } from "@/lib/map-provider";
 import { Ionicons } from "@expo/vector-icons";
-import { MapSettings } from "@/constants/common";
+import { Colors, MapSettings } from "@/constants/common";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SearchBar from "./SearchBar";
 import { useLocalSearchParams, router, useNavigation } from "expo-router";
 import { geocode } from "@/api/api.service";
+import { GeocodeType } from "@/constants/enums";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -45,11 +46,11 @@ const Map = () => {
   const {
     mapMode,
     setSnapshot,
-    selectedAddress,
     setSelectedAddress,
     selectedCoordinates,
     setSelectedCoordinates,
     setMapRef,
+    setIsLoadingSelectedAddress,
   } = useMapContext();
   const mapRef = useRef<MapView>(null);
   const cameraRef = useRef<Camera>(null);
@@ -61,7 +62,7 @@ const Map = () => {
   const [customMarker, setCustomMarker] = useState<[number, number] | null>(
     null
   );
-  const [isLoadingAddress, setIsLoadingAddress] = useState<boolean>(false);
+  const [geocodeResults, setGeocodeResults] = useState<[]>([]);
   const lastPressTime = useRef(0);
 
   // Set the map reference in the context
@@ -71,7 +72,7 @@ const Map = () => {
 
   useEffect(() => {
     if (query) {
-      console.log("query", query);
+      fetchAddress(GeocodeType.FORWARD, [0, 0]);
     }
   }, [query]);
 
@@ -145,32 +146,34 @@ const Map = () => {
         location.coords.longitude
       );
 
-      // Set the center coordinate and disable follow user location
-      setCenterCoordinate([
+      // Set the center coordinate
+      centerOnCoordinates([
         location.coords.longitude,
         location.coords.latitude,
       ]);
-      setFollowUserLocation(false);
-
-      // Re-enable follow user location after a short delay
-      setTimeout(() => {
-        setFollowUserLocation(true);
-      }, 2000);
     } catch (error) {
       console.error("Error getting location:", error);
     }
+  };
+
+  const centerOnCoordinates = async (coordinates: [number, number]) => {
+    setCenterCoordinate(coordinates);
+    setFollowUserLocation(false);
+    setTimeout(() => {
+      setFollowUserLocation(true);
+    }, 100);
   };
 
   const takeMapSnapshot = async () => {
     if (!mapRef.current) return;
 
     try {
+      if (selectedCoordinates) {
+        centerOnCoordinates(selectedCoordinates);
+      }
       // Take the snapshot
       const snapshot = await mapRef.current.takeSnap(true);
-      console.log("snapshot: ", snapshot);
-
       setSnapshot(snapshot);
-      Alert.alert("Success", "Map snapshot saved and shared!");
     } catch (error) {
       console.error("Error taking snapshot:", error);
       Alert.alert("Error", "Failed to take map snapshot");
@@ -178,14 +181,32 @@ const Map = () => {
   };
 
   // Function to get address from coordinates using Mapbox Geocoding API
-  const getAddressFromCoordinates = async (coordinates: [number, number]) => {
+  const fetchAddress = async (
+    type: GeocodeType,
+    coordinates: [number, number]
+  ) => {
     try {
-      setIsLoadingAddress(true);
+      if (type === GeocodeType.REVERSE) {
+        setIsLoadingSelectedAddress(true);
+      }
       const [longitude, latitude] = coordinates;
 
-      const data = await geocode(longitude, latitude);
+      const data = await geocode({
+        type,
+        longitude,
+        latitude,
+        query,
+      });
 
-      if (data.features && data.features.length > 0) {
+      if (type === GeocodeType.FORWARD) {
+        setGeocodeResults(data.features);
+      }
+
+      if (
+        type === GeocodeType.REVERSE &&
+        data.features &&
+        data.features.length > 0
+      ) {
         const address = data.features[0].properties.place_formatted;
         setSelectedAddress(address);
         return address;
@@ -196,7 +217,7 @@ const Map = () => {
       console.error("Error getting address:", error);
       return "Error getting address";
     } finally {
-      setIsLoadingAddress(false);
+      setIsLoadingSelectedAddress(false);
     }
   };
 
@@ -219,7 +240,7 @@ const Map = () => {
     setCustomMarker(coordinates);
     setSelectedCoordinates(coordinates);
     // Get the address for the coordinates
-    getAddressFromCoordinates(coordinates);
+    fetchAddress(GeocodeType.REVERSE, coordinates);
   }, []);
 
   const removeCustomMarker = () => {
@@ -246,15 +267,14 @@ const Map = () => {
         onDidFinishLoadingMap={() => setIsMapReady(true)}
         scaleBarEnabled={false}
         onPress={handleMapPress}
-        compassEnabled={false}
-        rotateEnabled={false}
-        pitchEnabled={false}
       >
         <Camera
           ref={cameraRef}
+          defaultSettings={{}}
           followUserLocation={followUserLocation}
           followZoomLevel={16}
           followUserMode={UserTrackingMode.FollowWithCourse}
+          animationMode={"flyTo"}
           animationDuration={1000}
           centerCoordinate={centerCoordinate || undefined}
         />
@@ -352,14 +372,14 @@ const Map = () => {
           className="bg-white rounded-full w-11 h-11 justify-center items-center shadow-md"
           onPress={() => {}}
         >
-          <Ionicons name={"settings-outline"} size={24} color="#007AFF" />
+          <Ionicons name={"settings-outline"} size={24} color={Colors.accent} />
         </TouchableOpacity>
         {/* Custom get current user location button */}
         <TouchableOpacity
           className="bg-white rounded-full w-11 h-11 justify-center items-center shadow-md"
           onPress={centerOnUserLocation}
         >
-          <Ionicons name="locate" size={24} color="#007AFF" />
+          <Ionicons name="locate" size={24} color={Colors.accent} />
         </TouchableOpacity>
 
         {/* Remove marker button */}
@@ -373,11 +393,34 @@ const Map = () => {
         )}
       </View>
 
-      <View className="absolute w-9/12 mx-5" style={{ top: insets.top + 20 }}>
-        <SearchBar
-          placeholder="Search for a location"
-          className="mt-0 bg-white"
-        />
+      <View
+        className="absolute w-9/12 mx-5 gap-2"
+        style={{ top: insets.top + 20 }}
+      >
+        <SearchBar placeholder="Search for a location" className="bg-white" />
+        {geocodeResults.length > 0 && (
+          <Animated.View
+            entering={FadeIn.duration(500)}
+            exiting={FadeOut.duration(500)}
+            className="flex-grow bg-white w-full"
+          >
+            {geocodeResults.map((result: any) => (
+              <TouchableOpacity
+                key={result.id}
+                onPress={() => {
+                  centerOnCoordinates([
+                    result.geometry.coordinates[0],
+                    result.geometry.coordinates[1],
+                  ]);
+                  setGeocodeResults([]);
+                }}
+                className="p-4"
+              >
+                <Text key={result.id}>{result.properties.full_address}</Text>
+              </TouchableOpacity>
+            ))}
+          </Animated.View>
+        )}
       </View>
     </View>
   );

@@ -213,3 +213,8 @@ export enum MapMode {
   DEFAULT = "DEFAULT",
   PROPERTY_REGISTRATION = "PROPERTY_REGISTRATION",
 }
+
+export enum GeocodeType {
+  FORWARD = "forward",
+  REVERSE = "reverse",
+}

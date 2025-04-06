@@ -66,8 +66,8 @@ const schema = z.object({
   state: z.string().min(1, "Required"),
   country: z.string().min(1, "Required"),
   snapshot: z.string().optional(),
-  latitude: z.number().optional(),
-  longitude: z.number().optional(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
 });
 
 export default function PerchRegistrationForm({
@@ -117,8 +117,12 @@ export default function PerchRegistrationForm({
 
   useEffect(() => {
     if (selectedCoordinates) {
-      setValue("latitude", selectedCoordinates[1], { shouldValidate: true });
-      setValue("longitude", selectedCoordinates[0], { shouldValidate: true });
+      setValue("latitude", selectedCoordinates[0].toString(), {
+        shouldValidate: true,
+      });
+      setValue("longitude", selectedCoordinates[1].toString(), {
+        shouldValidate: true,
+      });
     }
   }, [selectedCoordinates, setValue]);
 
@@ -172,7 +176,7 @@ export default function PerchRegistrationForm({
           return;
       }
     } catch {
-      console.log("Error uploading image");
+      console.log("Error picking media");
     }
   };
 

@@ -112,7 +112,7 @@ const PropertyInfo = ({ property, userType, booking, showPrompt }: any) => (
     <View className="flex flex-row items-center justify-start gap-2 px-5">
       <Entypo name="location" size={16} color={Colors.accent} />
       <Text className="text-black-200 text-sm font-plus-jakarta-medium">
-        {property?.location}
+        {property?.location?.address}
       </Text>
     </View>
   </View>

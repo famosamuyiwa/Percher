@@ -22,11 +22,9 @@ import { useMapContext } from "@/lib/map-provider";
 const Form = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { uploadMultimedia, progress } = useStorageBucket();
-  const [isLoading, setIsLoading] = useState(false);
   const { displayToast, showLoader, hideLoader } = useGlobalContext();
   const createPropertyMutation = useCreatePropertyMutation();
   const propertyQuery = usePropertyQuery(Number(id));
-  const { setSnapshot } = useMapContext();
 
   const handleRegisterClick = async (formData: PerchRegistrationFormData) => {
     showLoader();
@@ -44,6 +42,10 @@ const Form = () => {
         formData.proofOfOwnership
       );
       loadingMessage = "Uploading proof of ownership...";
+      const snapshotUrl = await uploadAndUpdateFormMediaURLs([
+        formData.snapshot,
+      ]);
+      loadingMessage = "Uploading Snapshot...";
       const dataAfterMediaUpload = {
         propertyName: formData.propertyName || "",
         propertyType: formData.propertyType || "",
@@ -69,7 +71,7 @@ const Form = () => {
         city: formData.city,
         state: formData.state,
         country: formData.country,
-        snapshot: formData.snapshot ?? "ook",
+        snapshot: snapshotUrl ? snapshotUrl[0] : "",
       };
       loadingMessage = "Finalizing perch registration...";
       console.log("data: ", dataAfterMediaUpload);

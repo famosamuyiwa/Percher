@@ -1,7 +1,8 @@
 import { useState } from "react";
 import * as MediaPicker from "expo-image-picker";
-import { compressImage } from "./useImageManipulator";
 import useStorageBucket from "./useBackblazeStorageBucket";
+import { MediaType } from "expo-image-picker";
+import { ImagePickerMediaTypes } from "@/constants/common";
 
 const useImagePicker = () => {
   const [imageUris, setImageUris] = useState<string[]>([]);
@@ -10,12 +11,13 @@ const useImagePicker = () => {
   async function pickMultimedia(
     isUpload: boolean,
     editable?: boolean,
-    allowMultiple?: boolean
+    allowMultiple?: boolean,
+    mediaType?: MediaType | MediaType[]
   ) {
     return new Promise(async (resolve, reject) => {
       // No permissions request is necessary for launching the image library
       let result: any = await MediaPicker.launchImageLibraryAsync({
-        mediaTypes: MediaPicker.MediaTypeOptions.Images,
+        mediaTypes: mediaType ?? ImagePickerMediaTypes.Images,
         allowsEditing: editable,
         aspect: [1, 1],
         quality: 1,

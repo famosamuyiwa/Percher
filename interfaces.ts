@@ -4,6 +4,7 @@ import {
   Category,
   ChargeType,
   Facility,
+  GeocodeType,
   LoginProvider,
   NotificationStatus,
   NotificationType,
@@ -71,8 +72,8 @@ export interface PerchRegistrationFormData {
   state: string;
   country: string;
   snapshot: string;
-  latitude: number;
-  longitude: number;
+  latitude: string;
+  longitude: string;
 }
 
 export interface BookingFormData {
@@ -265,8 +266,8 @@ export interface INotification<T> {
 }
 
 export interface Location {
-  latitude: number;
-  longitude: number;
+  latitude: string;
+  longitude: string;
   address: string;
   streetAddress: string;
   propertyNumber: number;
@@ -274,4 +275,11 @@ export interface Location {
   state: string;
   country: string;
   snapshotUrl: string;
+}
+
+export interface GeocodeCredentials {
+  type: GeocodeType;
+  longitude?: number;
+  latitude?: number;
+  query?: string;
 }

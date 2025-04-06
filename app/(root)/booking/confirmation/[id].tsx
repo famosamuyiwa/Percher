@@ -175,7 +175,7 @@ const BookingConfirmation = () => {
                 <View className="flex-row gap-2 items-baseline">
                   <Entypo name="location" size={14} color={Colors.accent} />
                   <Text className="font-plus-jakarta-regular text-sm">
-                    {property?.location.address}
+                    {property?.location?.address}
                   </Text>
                 </View>
                 <View className="flex-row items-center">

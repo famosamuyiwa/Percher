@@ -382,6 +382,60 @@ const Property = () => {
           </View>
 
           <View className="mt-7">
+            <Text className="text-black-300 text-xl font-plus-jakarta-bold">
+              Location
+            </Text>
+            <View className="mt-2 gap-2">
+              <View className="flex-row items-center justify-between gap-2">
+                <Text className="text-black-300  font-plus-jakarta-semibold">
+                  Property number
+                </Text>
+                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                  {propertyQuery?.data?.data?.location?.propertyNumber}
+                </Text>
+              </View>
+              <View className="flex flex-row items-center justify-between gap-2">
+                <Text className="text-black-300  font-plus-jakarta-semibold">
+                  Street address
+                </Text>
+                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                  {propertyQuery?.data?.data?.location?.streetAddress}
+                </Text>
+              </View>
+              <View className="flex flex-row items-center justify-between gap-2">
+                <Text className="text-black-300  font-plus-jakarta-semibold">
+                  City
+                </Text>
+                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                  {propertyQuery?.data?.data?.location?.city}
+                </Text>
+              </View>
+              <View className="flex flex-row items-center justify-between gap-2">
+                <Text className="text-black-300  font-plus-jakarta-semibold">
+                  State
+                </Text>
+                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                  {propertyQuery?.data?.data?.location?.state}
+                </Text>
+              </View>
+              <View className="flex flex-row items-center justify-between gap-2">
+                <Text className="text-black-300  font-plus-jakarta-semibold">
+                  Country
+                </Text>
+                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                  {propertyQuery?.data?.data?.location?.country}
+                </Text>
+              </View>
+              <Image
+                source={{
+                  uri: propertyQuery?.data?.data?.location?.snapshotUrl,
+                }}
+                style={styles.locationImg}
+              />
+            </View>
+          </View>
+
+          <View className="mt-7">
             <View className="flex flex-row items-center justify-between">
               <View className="flex flex-row items-center">
                 <AntDesign name="star" size={20} color="gold" />
@@ -456,7 +510,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   locationImg: {
-    height: 208,
+    height: 300,
     width: "100%",
     marginTop: 20,
     borderRadius: 12,

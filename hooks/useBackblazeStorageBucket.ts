@@ -32,10 +32,7 @@ const useStorageBucket = () => {
     }
   }
 
-  async function uploadMultimedia(
-    files: any[],
-    callback: (urls: string[]) => void
-  ) {
+  async function uploadMultimedia(file: any, callback: (url: string) => void) {
     try {
       console.log("start upload");
       setError(null);
@@ -47,46 +44,28 @@ const useStorageBucket = () => {
 
       const { apiUrl, authorizationToken, downloadUrl, recommendedPartSize } =
         authResponse.data;
-      let uploadedUrls: string[] = [];
 
-      await Promise.all(
-        files.map(async (file) => {
-          try {
-            console.log(`Processing file: ${file.uri}`);
-            const fileInfo = await FileSystem.getInfoAsync(file.uri);
-            if (!fileInfo.exists || fileInfo.size === 0) {
-              throw new Error(`File doesn't exist or is empty: ${file.uri}`);
-            }
+      console.log(`Processing file: ${file.uri}`);
+      const fileInfo = await FileSystem.getInfoAsync(file.uri);
+      if (!fileInfo.exists || fileInfo.size === 0) {
+        throw new Error(`File doesn't exist or is empty: ${file.uri}`);
+      }
 
-            const fileUrl =
-              fileInfo.size > 5 * 1024 * 1024
-                ? await multipartUpload(
-                    apiUrl,
-                    authorizationToken,
-                    downloadUrl,
-                    file,
-                    recommendedPartSize
-                  )
-                : await simpleUpload(
-                    apiUrl,
-                    authorizationToken,
-                    downloadUrl,
-                    file
-                  );
+      const fileUrl =
+        fileInfo.size > 5 * 1024 * 1024
+          ? await multipartUpload(
+              apiUrl,
+              authorizationToken,
+              downloadUrl,
+              file,
+              recommendedPartSize
+            )
+          : await simpleUpload(apiUrl, authorizationToken, downloadUrl, file);
 
-            uploadedUrls.push(fileUrl);
-          } catch (error: any) {
-            console.log(`Upload failed for ${file.uri}:`, error);
-            throw new Error(`Media upload failed, please try again later.`);
-          }
-        })
-      );
-
-      if (uploadedUrls.length > 0) callback(uploadedUrls);
-      else console.error("No files were successfully uploaded");
+      callback(fileUrl);
     } catch (error: any) {
-      console.error("Bulk upload failed:", error);
-      throw new Error(error.message);
+      console.log(`Upload failed for ${file.uri}:`, error);
+      throw new Error(`Media upload failed, please try again later.`);
     }
   }
 
@@ -191,9 +170,39 @@ const useStorageBucket = () => {
 
   const getFileExtension = (uri: string): string =>
     uri.split(".").pop()?.toLowerCase() || "jpg";
-  const getMimeType = (extension: string): string =>
-    ({ jpg: "image/jpeg", png: "image/png" }[extension] ||
-    "application/octet-stream");
+
+  const getMimeType = (extension: string): string => {
+    // Image formats
+    const imageFormats: Record<string, string> = {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+    };
+
+    // Video formats
+    const videoFormats: Record<string, string> = {
+      mp4: "video/mp4",
+      mov: "video/quicktime",
+      avi: "video/x-msvideo",
+      webm: "video/webm",
+      mkv: "video/x-matroska",
+      m4v: "video/mp4",
+      m4a: "video/mp4",
+    };
+
+    // Check if extension is in image formats
+    if (extension in imageFormats) {
+      return imageFormats[extension];
+    }
+
+    // Check if extension is in video formats
+    if (extension in videoFormats) {
+      return videoFormats[extension];
+    }
+
+    // Default fallback
+    return "application/octet-stream";
+  };
 
   return { uploadMultimedia, progress, error };
 };

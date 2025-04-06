@@ -54,9 +54,6 @@ const Map = () => {
   } = useMapContext();
   const mapRef = useRef<MapView>(null);
   const cameraRef = useRef<Camera>(null);
-  const [centerCoordinate, setCenterCoordinate] = useState<
-    [number, number] | null
-  >(null);
   const [followUserLocation, setFollowUserLocation] = useState<boolean>(false);
   const [settings, setSettings] = useState(MapSettings[mapMode]);
   const [customMarker, setCustomMarker] = useState<[number, number] | null>(
@@ -147,30 +144,32 @@ const Map = () => {
       );
 
       // Set the center coordinate
-      centerOnCoordinates([
-        location.coords.longitude,
-        location.coords.latitude,
-      ]);
+      centerOnCoordinates(
+        [location.coords.longitude, location.coords.latitude],
+        true
+      );
     } catch (error) {
       console.error("Error getting location:", error);
     }
   };
 
-  const centerOnCoordinates = async (coordinates: [number, number]) => {
-    setCenterCoordinate(coordinates);
-    setFollowUserLocation(false);
-    setTimeout(() => {
-      setFollowUserLocation(true);
-    }, 100);
+  const centerOnCoordinates = async (
+    coordinates: [number, number],
+    currentLocation?: boolean
+  ) => {
+    if (cameraRef.current) {
+      cameraRef.current.setCamera({
+        centerCoordinate: coordinates,
+        zoomLevel: currentLocation ? 16 : 14,
+        animationDuration: 1000,
+      });
+    }
   };
 
   const takeMapSnapshot = async () => {
     if (!mapRef.current) return;
 
     try {
-      if (selectedCoordinates) {
-        centerOnCoordinates(selectedCoordinates);
-      }
       // Take the snapshot
       const snapshot = await mapRef.current.takeSnap(true);
       setSnapshot(snapshot);
@@ -270,13 +269,13 @@ const Map = () => {
       >
         <Camera
           ref={cameraRef}
-          defaultSettings={{}}
-          followUserLocation={followUserLocation}
-          followZoomLevel={16}
-          followUserMode={UserTrackingMode.FollowWithCourse}
-          animationMode={"flyTo"}
+          defaultSettings={{
+            zoomLevel: 1,
+          }}
+          animationMode="flyTo"
           animationDuration={1000}
-          centerCoordinate={centerCoordinate || undefined}
+          zoomLevel={10}
+          centerCoordinate={[3.38975, 6.453928]} //coordinates for center of lagos, nigeria
         />
 
         {locationPermission && (
@@ -400,7 +399,7 @@ const Map = () => {
         <SearchBar placeholder="Search for a location" className="bg-white" />
         {geocodeResults.length > 0 && (
           <Animated.View
-            entering={FadeIn.duration(500)}
+            entering={FadeIn.duration(300)}
             exiting={FadeOut.duration(500)}
             className="flex-grow bg-white w-full"
           >

@@ -645,6 +645,14 @@ export default function PerchRegistrationForm({
             </Text>
           )}
         </View>
+
+        <View className="flex-row items-baseline gap-2 ml-2">
+          <FontAwesome name="warning" size={10} color={"gold"} />
+          <Text className="text-xs font-plus-jakarta-xs text-gray-500">
+            Map area data might be inaccurate, zoom in and pin your property on
+            the map
+          </Text>
+        </View>
       </View>
 
       <View className="bg-white rounded-2xl p-5 gap-5 ">

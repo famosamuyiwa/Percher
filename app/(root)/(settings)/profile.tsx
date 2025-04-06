@@ -47,12 +47,15 @@ const ProfileScreen = () => {
   };
 
   const handleCancel = () => {
-    // setAvatar(authQuery.data?.data?.avatar);
-    // setName(authQuery.data?.data?.name);
-    // setUserName(authQuery.data?.data?.username);
-    // setEmail(authQuery.data?.data?.email);
-    // setPhoneNumber(authQuery.data?.data?.phoneNumber);
+    resetInfo();
     setIsEditing(false);
+  };
+
+  const resetInfo = () => {
+    setAvatar(user?.avatar);
+    setName(user?.name);
+    setEmail(user?.email);
+    setPhoneNumber(user?.phone);
   };
 
   const handleImagePress = async () => {
@@ -66,18 +69,15 @@ const ProfileScreen = () => {
   const uploadAndMutate = async () => {
     try {
       await uploadMultimedia(
-        [
-          {
-            uri: avatar,
-          },
-        ],
-        (downloadUrls: string[]) => {
-          console.log("dowloadUrls: ", downloadUrls);
+        {
+          uri: avatar,
+        },
+        (downloadUrl: string) => {
           updateUserMutation.mutate(
             {
               id: user?.id,
               name,
-              avatar: downloadUrls[0] || avatar,
+              avatar: downloadUrl || avatar,
               phone: phoneNumber,
             },
             { onSettled, onSuccess }

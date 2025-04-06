@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import * as z from "zod";
 import { TextField } from "../Textfield";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Entypo,
   FontAwesome,
@@ -38,6 +38,7 @@ import { useGlobalContext } from "@/lib/global-provider";
 import { FormProps, PerchRegistrationFormData } from "@/interfaces";
 import { formStyles } from "./styles";
 import { router } from "expo-router";
+import { useMapContext } from "@/lib/map-provider";
 
 // Validation Schema
 const schema = z.object({
@@ -81,6 +82,7 @@ export default function PerchRegistrationForm({
 
   const { displayToast } = useGlobalContext();
   const { pickMultimedia } = useImagePicker();
+  const { snapshot: mapSnapshot, selectedCoordinates } = useMapContext();
 
   const {
     control,
@@ -105,6 +107,21 @@ export default function PerchRegistrationForm({
   const checkInTimes = watch("checkInTimes");
   const checkOutTime = watch("checkOutTime");
   const snapshot = watch("snapshot");
+
+  // Update the form's snapshot value when the mapSnapshot changes
+  useEffect(() => {
+    if (mapSnapshot) {
+      setValue("snapshot", mapSnapshot, { shouldValidate: true });
+    }
+  }, [mapSnapshot, setValue]);
+
+  useEffect(() => {
+    if (selectedCoordinates) {
+      setValue("latitude", selectedCoordinates[1], { shouldValidate: true });
+      setValue("longitude", selectedCoordinates[0], { shouldValidate: true });
+    }
+  }, [selectedCoordinates, setValue]);
+
   const handleHeaderSelect = async () => {
     try {
       const image: any = await pickMultimedia(false, true);

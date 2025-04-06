@@ -17,6 +17,7 @@ import { useGlobalContext } from "@/lib/global-provider";
 import { useCreatePropertyMutation } from "@/hooks/mutation/usePropertyMutation";
 import { router, useLocalSearchParams } from "expo-router";
 import { usePropertyQuery } from "@/hooks/query/usePropertyQuery";
+import { useMapContext } from "@/lib/map-provider";
 
 const Form = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -25,6 +26,7 @@ const Form = () => {
   const { displayToast, showLoader, hideLoader } = useGlobalContext();
   const createPropertyMutation = useCreatePropertyMutation();
   const propertyQuery = usePropertyQuery(Number(id));
+  const { setSnapshot } = useMapContext();
 
   const handleRegisterClick = async (formData: PerchRegistrationFormData) => {
     showLoader();

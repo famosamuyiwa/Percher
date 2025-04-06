@@ -29,7 +29,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   let isLoggedIn = !!user;
   const toastRef = useRef<any>({});
   const loaderRef = useRef<any>({});
-  const mapBottomSheetRef = useRef<any>({});
   if (isError) {
     console.log("GlobalContextException: ", error);
     if (
@@ -75,7 +74,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       {children}
       <Loader ref={loaderRef} />
       <Toast ref={toastRef} />
-      <MapBottomSheet ref={mapBottomSheetRef} />
     </GlobalContext.Provider>
   );
 };

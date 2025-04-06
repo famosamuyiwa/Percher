@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { router } from "expo-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useOwnedPropertyQuery } from "@/hooks/query/usePropertyQuery";
 import { Filter } from "@/interfaces";
 import SearchBar from "@/components/SearchBar";
@@ -19,6 +19,7 @@ import { Screens, UserType } from "@/constants/enums";
 import { AntDesign } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
+import { useMapContext } from "@/lib/map-provider";
 
 const MyPerchs = () => {
   const [filters, setFilters] = useState<Filter>({
@@ -26,6 +27,8 @@ const MyPerchs = () => {
     limit: 10,
     from: UserType.HOST,
   });
+
+  const { resetMap } = useMapContext();
 
   const handleCardPress = (id: number) => {
     router.push({
@@ -55,6 +58,10 @@ const MyPerchs = () => {
       )
     );
   };
+
+  useEffect(() => {
+    resetMap();
+  }, []);
 
   return (
     <View style={[styles.container, { flex: 1 }]}>

@@ -1,6 +1,13 @@
 import { MapMode } from "@/constants/enums";
 import { Property } from "@/interfaces";
-import { PropsWithChildren, createContext, useContext, useState } from "react";
+import {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useState,
+  useRef,
+} from "react";
+import { MapView } from "@rnmapbox/maps";
 
 interface MapContextType {
   selectedProperty: Property | null;
@@ -14,7 +21,11 @@ interface MapContextType {
   isLoadingSelectedAddress: boolean;
   setIsLoadingSelectedAddress: (isLoading: boolean) => void;
   selectedCoordinates: [number, number] | null;
-  setSelectedCoordinates: (coordinates: [number, number]) => void;
+  setSelectedCoordinates: (coordinates: [number, number] | null) => void;
+  mapRef: React.RefObject<MapView> | null;
+  setMapRef: (ref: React.RefObject<MapView>) => void;
+  takeMapSnapshot: () => Promise<void>;
+  resetMap: () => void;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -31,6 +42,31 @@ export const MapProvider = ({ children }: PropsWithChildren) => {
   const [selectedCoordinates, setSelectedCoordinates] = useState<
     [number, number] | null
   >(null);
+  const [mapRef, setMapRef] = useState<React.RefObject<MapView> | null>(null);
+
+  const takeMapSnapshot = async (): Promise<void> => {
+    if (!mapRef?.current) return;
+
+    try {
+      // Take the snapshot
+      const snapshotResult = await mapRef.current.takeSnap(true);
+      console.log("snapshot: ", snapshotResult);
+
+      setSnapshot(snapshotResult);
+    } catch (error) {
+      console.error("Error taking snapshot:", error);
+    }
+  };
+
+  const resetMap = () => {
+    setSelectedProperty(null);
+    setMapMode(MapMode.DEFAULT);
+    setSnapshot("");
+    setSelectedAddress(null);
+    setIsLoadingSelectedAddress(false);
+    setSelectedCoordinates(null);
+  };
+
   return (
     <MapContext.Provider
       value={{
@@ -46,6 +82,10 @@ export const MapProvider = ({ children }: PropsWithChildren) => {
         setIsLoadingSelectedAddress,
         selectedCoordinates,
         setSelectedCoordinates,
+        mapRef,
+        setMapRef,
+        takeMapSnapshot,
+        resetMap,
       }}
     >
       {children}

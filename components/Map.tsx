@@ -27,16 +27,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { MapSettings } from "@/constants/common";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SearchBar from "./SearchBar";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router, useNavigation } from "expo-router";
 import { geocode } from "@/api/api.service";
 
 Mapbox.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 const Map = () => {
   const insets = useSafeAreaInsets();
-  const { query } = useLocalSearchParams<{
+  const { query, from } = useLocalSearchParams<{
     query?: string;
+    from?: string;
   }>();
+  const navigation = useNavigation();
 
   const [locationPermission, setLocationPermission] = useState<boolean>(false);
   const [isMapReady, setIsMapReady] = useState<boolean>(false);
@@ -47,6 +49,7 @@ const Map = () => {
     setSelectedAddress,
     selectedCoordinates,
     setSelectedCoordinates,
+    setMapRef,
   } = useMapContext();
   const mapRef = useRef<MapView>(null);
   const cameraRef = useRef<Camera>(null);
@@ -58,15 +61,33 @@ const Map = () => {
   const [customMarker, setCustomMarker] = useState<[number, number] | null>(
     null
   );
-  const [address, setAddress] = useState<string | null>(null);
   const [isLoadingAddress, setIsLoadingAddress] = useState<boolean>(false);
   const lastPressTime = useRef(0);
+
+  // Set the map reference in the context
+  useEffect(() => {
+    setMapRef(mapRef);
+  }, [mapRef, setMapRef]);
 
   useEffect(() => {
     if (query) {
       console.log("query", query);
     }
   }, [query]);
+
+  // Add a new effect to handle taking a snapshot when returning from the bottom sheet
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", () => {
+      // If we have selected coordinates, take a snapshot before navigating back
+      if (selectedCoordinates) {
+        takeMapSnapshot();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [selectedCoordinates, navigation]);
 
   // Create a feature collection for the property coordinates
   const perchFeatures = useMemo(() => {
@@ -165,16 +186,14 @@ const Map = () => {
       const data = await geocode(longitude, latitude);
 
       if (data.features && data.features.length > 0) {
-        const address = data.features[0].place_name;
-        setAddress(address);
+        const address = data.features[0].properties.place_formatted;
+        setSelectedAddress(address);
         return address;
       } else {
-        setAddress("Address not found");
         return "Address not found";
       }
     } catch (error) {
       console.error("Error getting address:", error);
-      setAddress("Error getting address");
       return "Error getting address";
     } finally {
       setIsLoadingAddress(false);
@@ -205,7 +224,8 @@ const Map = () => {
 
   const removeCustomMarker = () => {
     setCustomMarker(null);
-    setAddress(null);
+    setSelectedAddress("");
+    setSelectedCoordinates(null);
   };
 
   const applyMapSettings = () => {
@@ -327,15 +347,6 @@ const Map = () => {
         )}
       </MapView>
 
-      {/* Address display */}
-      {address && (
-        <View className="absolute bottom-20 left-4 right-4 bg-white p-4 rounded-lg shadow-md">
-          <Text className="text-base font-medium">
-            {isLoadingAddress ? "Loading address..." : address}
-          </Text>
-        </View>
-      )}
-
       <View className="absolute right-4 gap-5" style={{ top: insets.top + 20 }}>
         <TouchableOpacity
           className="bg-white rounded-full w-11 h-11 justify-center items-center shadow-md"
@@ -350,13 +361,7 @@ const Map = () => {
         >
           <Ionicons name="locate" size={24} color="#007AFF" />
         </TouchableOpacity>
-        {/* Snapshot button */}
-        <TouchableOpacity
-          className="bg-white rounded-full w-11 h-11 justify-center items-center shadow-md"
-          onPress={takeMapSnapshot}
-        >
-          <Ionicons name={"camera-outline"} size={24} color="#007AFF" />
-        </TouchableOpacity>
+
         {/* Remove marker button */}
         {customMarker && (
           <TouchableOpacity

@@ -20,7 +20,7 @@ import * as Location from "expo-location";
 import { View, TouchableOpacity, Alert, Text } from "react-native";
 import { featureCollection, point } from "@turf/helpers";
 import { propertyCoordinates } from "@/constants/data";
-import locationPin from "@/assets/icons/home.png";
+import locationPin from "@/assets/images/location-pin.png";
 import { useMapContext } from "@/lib/map-provider";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors, MapSettings } from "@/constants/common";
@@ -54,7 +54,6 @@ const Map = () => {
   } = useMapContext();
   const mapRef = useRef<MapView>(null);
   const cameraRef = useRef<Camera>(null);
-  const [followUserLocation, setFollowUserLocation] = useState<boolean>(false);
   const [settings, setSettings] = useState(MapSettings[mapMode]);
   const [customMarker, setCustomMarker] = useState<[number, number] | null>(
     null
@@ -320,7 +319,7 @@ const Map = () => {
               filter={["has", "point_count"]}
               belowLayerID="clusters-count"
               style={{
-                circleColor: "blue",
+                circleColor: Colors.primary,
                 circleRadius: [
                   "step",
                   ["get", "point_count"],

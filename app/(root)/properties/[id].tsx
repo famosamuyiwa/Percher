@@ -39,6 +39,7 @@ import {
 } from "@/constants/enums";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useReviewPropertyMutation } from "@/hooks/mutation/usePropertyMutation";
+import UploadStatus from "@/components/UploadStatus";
 
 const ConfidentialDetails = ({
   mode,
@@ -233,7 +234,6 @@ const Property = () => {
             </View>
           </View>
         </View>
-
         <View className="px-5 mt-7 flex gap-2">
           <View className="flex flex-row items-center justify-between">
             <Text className="text-2xl font-plus-jakarta-extrabold">

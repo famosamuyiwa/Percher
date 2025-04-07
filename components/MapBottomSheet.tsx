@@ -64,25 +64,10 @@ const MapBottomSheet = () => {
             </Animated.View>
           )}
 
-          {!isLoadingSelectedAddress && (
+          {!isLoadingSelectedAddress && selectedCoordinates && (
             <>
-              {selectedAddress ? (
-                <>
-                  <Text className="text-base font-semibold mt-3 mb-1">
-                    Area:
-                  </Text>
-                  <Text className="text-base mb-2">{selectedAddress}</Text>
-                </>
-              ) : (
-                <Text className="text-base italic text-gray-500 mb-2">
-                  No address selected
-                </Text>
-              )}
-            </>
-          )}
-
-          {selectedCoordinates ? (
-            <>
+              <Text className="text-base font-semibold mt-3 mb-1">Area:</Text>
+              <Text className="text-base mb-2">{selectedAddress}</Text>
               <Text className="text-base font-semibold mt-3 mb-1">
                 Coordinates:
               </Text>
@@ -91,10 +76,14 @@ const MapBottomSheet = () => {
                 {selectedCoordinates[0].toFixed(6)}
               </Text>
             </>
-          ) : (
-            <Text className="text-base italic text-gray-500 mb-2">
-              No coordinates selected
-            </Text>
+          )}
+
+          {!isLoadingSelectedAddress && !selectedCoordinates && (
+            <>
+              <Text className="text-base italic text-gray-500 mb-2 text-center">
+                Tap on the map to pin your location
+              </Text>
+            </>
           )}
 
           <TouchableOpacity

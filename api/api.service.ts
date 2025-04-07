@@ -3,6 +3,7 @@ import {
   CreatePaymentRequest,
   Filter,
   GeocodeCredentials,
+  MediaUploadRequest,
   OAuthRequest,
   PerchRegistrationFormData,
   ResetPasswordRequest,
@@ -207,6 +208,17 @@ export const createProperty = async (
 ) => {
   try {
     const { data: payload } = await api.post(`${API_BASE_URL}/property`, {
+      ...credentials,
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const createMediaUpload = async (credentials: MediaUploadRequest) => {
+  try {
+    const { data: payload } = await api.post(`${API_BASE_URL}/uploads`, {
       ...credentials,
     });
     return payload;

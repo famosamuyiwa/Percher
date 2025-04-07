@@ -5,7 +5,9 @@ import {
   ChargeType,
   Facility,
   GeocodeType,
+  MediaEntityType,
   LoginProvider,
+  MediaUploadType,
   NotificationStatus,
   NotificationType,
   PaymentStatus,
@@ -282,4 +284,17 @@ export interface GeocodeCredentials {
   longitude?: number;
   latitude?: number;
   query?: string;
+}
+
+export interface MediaUploadRequest {
+  mediaEntityType: MediaEntityType;
+  mediaType: MediaUploadType;
+  mediaEntityTypeId: number;
+  mediaUrl: string;
+}
+
+export interface UploadTracker {
+  entityId: string;
+  entityType: MediaEntityType;
+  isUploading: boolean;
 }

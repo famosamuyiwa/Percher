@@ -25,7 +25,7 @@ import { signIn } from "@/hooks/useGoogleOAuth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Colors } from "@/constants/common";
 import { loginWithOAuth } from "@/api/api.service";
-import { Toast } from "@/components/animation-toast/components";
+import { useGlobalStore } from "@/store/store";
 
 GoogleSignin.configure({
   webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID!, // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
@@ -36,6 +36,7 @@ GoogleSignin.configure({
 
 const SignIn = () => {
   const { refetch, loading, isLoggedIn, displayToast } = useGlobalContext();
+  const { clearAllFailedUploads } = useGlobalStore();
   const [isLoading, setIsLoading] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -46,6 +47,7 @@ const SignIn = () => {
   }
 
   const handleLogin = async (provider: LoginProvider) => {
+    clearAllFailedUploads();
     switch (provider) {
       case LoginProvider.GOOGLE:
         onHandleLoginWithGoogle();

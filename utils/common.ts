@@ -43,27 +43,6 @@ export const formatCurrency = (value: string) => {
   return floatValue.toFixed(2);
 };
 
-export const normalizeFormData = (data: PerchRegistrationFormData) => {
-  const normalizedData = {
-    propertyName: data.propertyName ?? "", // Default to empty string
-    propertyType: data.propertyType ?? "", // Default to empty string
-    beds: data.beds ?? 1, // Default to 1 bed
-    bathrooms: data.bathrooms ?? 1, // Default to 1 bathroom
-    description: data.description ?? "", // Default to empty string
-    header: data.header ?? "", // Default to empty string
-    location: data.location ?? "", // Default to empty string
-    price: data.price ?? 0, // Default to 0
-    cautionFee: data.cautionFee ?? 0, // Default to 0
-    gallery: data.gallery ?? [], // Default to empty array
-    proofOfOwnership: data.proofOfOwnership ?? [], // Default to empty array
-    proofOfIdentity: data.proofOfIdentity ?? [], // Default to empty array
-    txc: data.txc ?? false, // Default to false
-    facilities: data.facilities ?? [], // Default to empty array
-  };
-
-  return normalizedData;
-};
-
 export const handleApiError = (error: any): never => {
   if (error.response) {
     const customMessage = error.response.data?.message || "Request failed!";

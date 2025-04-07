@@ -20,6 +20,8 @@ import { AntDesign } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { useMapContext } from "@/lib/map-provider";
+import useBackgroundUploads from "@/hooks/useBackgroundUploads";
+import UploadStatus from "@/components/UploadStatus";
 
 const MyPerchs = () => {
   const [filters, setFilters] = useState<Filter>({
@@ -29,6 +31,8 @@ const MyPerchs = () => {
   });
 
   const { resetMap } = useMapContext();
+  const { data: ownedProperties, isLoading } = useOwnedPropertyQuery(filters);
+  const { failedUploads } = useBackgroundUploads();
 
   const handleCardPress = (id: number) => {
     router.push({
@@ -40,11 +44,9 @@ const MyPerchs = () => {
   };
 
   // Memoize derived data
-  const propertiesQuery = useOwnedPropertyQuery(filters);
-
   const properties = useMemo(
-    () => propertiesQuery.data?.pages.flatMap((page) => page.data) || [],
-    [propertiesQuery.data]
+    () => ownedProperties?.pages.flatMap((page) => page.data) || [],
+    [ownedProperties]
   );
 
   const listHeader = () => {
@@ -97,7 +99,7 @@ const MyPerchs = () => {
             )}
             ListHeaderComponent={listHeader}
             ListEmptyComponent={
-              propertiesQuery.isLoading ? (
+              isLoading ? (
                 <ActivityIndicator
                   size="small"
                   className="text-primary-300 mt-5"
@@ -135,6 +137,18 @@ const styles = StyleSheet.create({
   itemsContainer: {
     borderRadius: 15,
     height: "100%",
+  },
+  uploadStatusContainer: {
+    padding: 15,
+  },
+  uploadStatusTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  uploadStatusItem: {
+    marginRight: 15,
+    width: 300,
   },
 });
 

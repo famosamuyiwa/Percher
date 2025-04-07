@@ -9,73 +9,60 @@ import {
   Platform,
 } from "react-native";
 import PerchRegistrationForm from "@/components/forms/PerchRegistration";
-import { PerchRegistrationFormData } from "@/interfaces";
-import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
-import { useState } from "react";
-import { ToastType } from "@/constants/enums";
+import { ApiResponse, PerchRegistrationFormData, Property } from "@/interfaces";
+import { MediaEntityType, MediaUploadType, ToastType } from "@/constants/enums";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useCreatePropertyMutation } from "@/hooks/mutation/usePropertyMutation";
 import { router, useLocalSearchParams } from "expo-router";
 import { usePropertyQuery } from "@/hooks/query/usePropertyQuery";
-import { useMapContext } from "@/lib/map-provider";
+import useBackgroundUploads from "@/hooks/useBackgroundUploads";
+import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
 
 const Form = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { uploadMultimedia, progress } = useStorageBucket();
   const { displayToast, showLoader, hideLoader } = useGlobalContext();
   const createPropertyMutation = useCreatePropertyMutation();
   const propertyQuery = usePropertyQuery(Number(id));
+  const { uploadEntityMedia } = useBackgroundUploads();
+  const { uploadMultimedia } = useStorageBucket();
 
   const handleRegisterClick = async (formData: PerchRegistrationFormData) => {
     showLoader();
-    let loadingMessage = "Preparing perch details...";
+
+    //upload lightweight required media first before letting the rest upload in the background
+
+    //upload header
+    let header = "";
+    if (formData.header) {
+      await uploadMultimedia({ uri: formData.header }, (url) => {
+        header = url;
+      });
+    }
+
+    //upload snapshot
+    let snapshot = "";
+    if (formData.snapshot) {
+      await uploadMultimedia({ uri: formData.snapshot }, (url) => {
+        snapshot = url;
+      });
+    }
+
     try {
-      const header = await uploadAndUpdateFormMediaURLs([formData.header]);
-      loadingMessage = "Uploading header...";
-      const gallery = await uploadAndUpdateFormMediaURLs(formData.gallery);
-      loadingMessage = "Uploading gallery...";
-      const proofOfIdentity = await uploadAndUpdateFormMediaURLs(
-        formData.proofOfIdentity
-      );
-      loadingMessage = "Uploading proof of identity...";
-      const proofOfOwnership = await uploadAndUpdateFormMediaURLs(
-        formData.proofOfOwnership
-      );
-      loadingMessage = "Uploading proof of ownership...";
-      const snapshotUrl = await uploadAndUpdateFormMediaURLs([
-        formData.snapshot,
-      ]);
-      loadingMessage = "Uploading Snapshot...";
-      const dataAfterMediaUpload = {
-        propertyName: formData.propertyName || "",
-        propertyType: formData.propertyType || "",
-        chargeType: formData.chargeType || "",
-        beds: formData.beds || 0,
-        bathrooms: formData.bathrooms || 0,
-        description: formData.description || "",
-        price: formData.price || 0,
-        cautionFee: formData.cautionFee || 0,
-        facilities: formData.facilities || [],
-        checkInTimes: formData.checkInTimes || [],
-        checkOutTime: formData.checkOutTime || "",
-        txc: formData.txc || false,
-        header: header ? header[0] : "",
-        gallery: gallery ?? [],
-        proofOfIdentity: proofOfIdentity ?? [],
-        proofOfOwnership: proofOfOwnership ?? [],
-        latitude: formData.latitude ?? 0,
-        longitude: formData.longitude ?? 0,
-        address: `${formData.streetAddress}, ${formData.city}, ${formData.state}. ${formData.country}`,
-        streetAddress: formData.streetAddress,
-        propertyNumber: formData.propertyNumber,
-        city: formData.city,
-        state: formData.state,
-        country: formData.country,
-        snapshot: snapshotUrl ? snapshotUrl[0] : "",
+      // Create a copy of form data with empty media URLs for initial registration
+      const initialFormData = {
+        ...formData,
+        address: `${formData.streetAddress}, ${formData.city}, ${formData.state}. ${formData.country}.`,
+        header,
+        gallery: [],
+        proofOfIdentity: [],
+        proofOfOwnership: [],
+        snapshot,
       };
-      loadingMessage = "Finalizing perch registration...";
-      console.log("data: ", dataAfterMediaUpload);
-      mutate(dataAfterMediaUpload);
+
+      // Register the property first without media
+      createPropertyMutation.mutate(initialFormData, {
+        onSuccess: (payload) => onSuccess(payload, formData),
+      });
     } catch (err: any) {
       displayToast({
         type: ToastType.ERROR,
@@ -86,36 +73,32 @@ const Form = () => {
     }
   };
 
-  const uploadAndUpdateFormMediaURLs = async (uriList: any[]) => {
-    let downloadUrls;
-
-    if (uriList.length < 1) return;
-
-    const files = uriList.map((u) => ({
-      uri: u,
-    }));
-
-    await uploadMultimedia(files, (data: string[]) => {
-      downloadUrls = data;
-    });
-
-    return downloadUrls;
-  };
-
-  const mutate = (formData: PerchRegistrationFormData) => {
-    createPropertyMutation.mutate(formData, { onSettled, onSuccess });
-  };
-
   const onSettled = () => {};
 
-  const onSuccess = () => {
+  const onSuccess = (
+    payload: ApiResponse<Property>,
+    formData: PerchRegistrationFormData
+  ) => {
+    const propertyId = payload.data.id.toString();
+
+    // Add media uploads to the background queue
+    uploadEntityMedia(
+      propertyId,
+      MediaEntityType.PROPERTY,
+      mediaItems(formData)
+    );
+
+    displayToast({
+      type: ToastType.SUCCESS,
+      description:
+        "Property registered successfully. Media uploads will continue in the background.",
+    });
     router.dismiss();
   };
 
   const preloadedData = () => {
     const data = propertyQuery.data?.data;
     if (!id || !data) return {} as PerchRegistrationFormData;
-    console.log("data: ", data);
 
     const mappedData: PerchRegistrationFormData = {
       ...data,
@@ -138,6 +121,23 @@ const Form = () => {
       longitude: data.location.longitude,
     };
     return mappedData;
+  };
+
+  const mediaItems = (formData: PerchRegistrationFormData) => {
+    return [
+      ...formData.gallery.map((uri) => ({
+        uri,
+        type: MediaUploadType.GALLERY,
+      })),
+      ...formData.proofOfIdentity.map((uri) => ({
+        uri,
+        type: MediaUploadType.PROOF_OF_IDENTITY,
+      })),
+      ...formData.proofOfOwnership.map((uri) => ({
+        uri,
+        type: MediaUploadType.PROOF_OF_OWNERSHIP,
+      })),
+    ];
   };
 
   return (

@@ -86,7 +86,7 @@ export const MapSettings = {
   },
   [MapMode.PROPERTY_REGISTRATION]: {
     cluster: false,
-    showPropertyMarkers: true,
+    showPropertyMarkers: false,
     scaleBarEnabled: false,
   },
 };

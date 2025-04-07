@@ -218,3 +218,14 @@ export enum GeocodeType {
   FORWARD = "forward",
   REVERSE = "reverse",
 }
+
+export enum MediaUploadType {
+  PROOF_OF_IDENTITY = "proofOfOwnership",
+  PROOF_OF_OWNERSHIP = "proofOfIdentity",
+  GALLERY = "gallery",
+}
+
+export enum MediaEntityType {
+  USER = "user",
+  PROPERTY = "property",
+}

@@ -1,4 +1,4 @@
-import { Card, GradientCard } from "@/components/Cards";
+import { Card, GradientCard, PerchSettingsCard } from "@/components/Cards";
 import SettingsHeader from "@/components/SettingsHeader";
 import { FlashList } from "@shopify/flash-list";
 
@@ -8,21 +8,18 @@ import {
   ActivityIndicator,
   ScrollView,
   Text,
-  TouchableOpacity,
+  Button,
 } from "react-native";
 import { router } from "expo-router";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useOwnedPropertyQuery } from "@/hooks/query/usePropertyQuery";
 import { Filter } from "@/interfaces";
 import SearchBar from "@/components/SearchBar";
-import { Screens, UserType } from "@/constants/enums";
-import { AntDesign } from "@expo/vector-icons";
-import { Colors } from "@/constants/common";
+import { MediaEntityType, UserType } from "@/constants/enums";
 import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { useMapContext } from "@/lib/map-provider";
+import { useGlobalStore } from "@/store/store";
 import useBackgroundUploads from "@/hooks/useBackgroundUploads";
-import UploadStatus from "@/components/UploadStatus";
-
 const MyPerchs = () => {
   const [filters, setFilters] = useState<Filter>({
     location: {},
@@ -32,7 +29,7 @@ const MyPerchs = () => {
 
   const { resetMap } = useMapContext();
   const { data: ownedProperties, isLoading } = useOwnedPropertyQuery(filters);
-  const { failedUploads } = useBackgroundUploads();
+  const { failedUploads, uploadEntityMedia } = useBackgroundUploads();
 
   const handleCardPress = (id: number) => {
     router.push({
@@ -65,9 +62,36 @@ const MyPerchs = () => {
     resetMap();
   }, []);
 
+  const isAddButtonVisible = useCallback(() => {
+    return properties.length > 0;
+  }, [properties.length]);
+
+  const uploadDummyData = () => {
+    //dummy data
+    const dummyData = [
+      {
+        type: "gallery",
+        uri: "file:///Users/mac/Library/Developer/CoreSimulator/Devices/CA7EC17D-9FD5-49EC-8CEE-11E1FEA4973F/data/Containers/Data/Application/B2F85648-9916-46BE-A668-528E904704BA/Library/Caches/ImagePicker/5E64D8C2-14F2-44DD-B837-5238148CF994.mp4",
+      },
+      {
+        type: "proofOfOwnership",
+        uri: "file:///Users/mac/Library/Developer/CoreSimulator/Devices/CA7EC17D-9FD5-49EC-8CEE-11E1FEA4973F/data/Containers/Data/Application/B2F85648-9916-46BE-A668-528E904704BA/Library/Caches/ImagePicker/3637E63E-EBBF-4644-A1CD-AAAC519D2240.mp4",
+      },
+      // {
+      //   type: "proofOfIdentity",
+      //   uri: "file:///Users/mac/Library/Developer/CoreSimulator/Devices/CA7EC17D-9FD5-49EC-8CEE-11E1FEA4973F/data/Containers/Data/Application/B2F85648-9916-46BE-A668-528E904704BA/Library/Caches/ImagePicker/20F309B5-2D4B-4219-8119-F2676021DEAC.mp4",
+      // },
+    ] as any;
+    uploadEntityMedia("1", MediaEntityType.PROPERTY, dummyData);
+  };
+
   return (
     <View style={[styles.container, { flex: 1 }]}>
-      <SettingsHeader title="My Perchs" />
+      <SettingsHeader
+        title="My Perchs"
+        isAddButtonVisible={isAddButtonVisible()}
+      />
+      <Button title="Upload Dummy Data" onPress={uploadDummyData} />
       {properties.length > 0 && (
         <View className="mx-5 pb-5">
           <SearchBar />
@@ -86,13 +110,13 @@ const MyPerchs = () => {
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => (
               <Animated.View
+                key={index}
                 layout={LinearTransition}
                 entering={FadeIn.duration(500)}
                 className="mx-5"
               >
-                <Card
+                <PerchSettingsCard
                   item={item}
-                  source={Screens.MY_PERCHS}
                   onPress={() => handleCardPress(item.id)}
                 />
               </Animated.View>
@@ -118,14 +142,6 @@ const MyPerchs = () => {
           />
         </View>
       </ScrollView>
-      {properties.length > 0 && (
-        <TouchableOpacity
-          onPress={() => router.push("/my-perchs/form")}
-          className="absolute w-full items-end px-10 bottom-16 shadow-sm"
-        >
-          <AntDesign name="pluscircle" size={60} color={Colors.primary} />
-        </TouchableOpacity>
-      )}
     </View>
   );
 };
@@ -133,22 +149,6 @@ const MyPerchs = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#F5F5F5",
-  },
-  itemsContainer: {
-    borderRadius: 15,
-    height: "100%",
-  },
-  uploadStatusContainer: {
-    padding: 15,
-  },
-  uploadStatusTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  uploadStatusItem: {
-    marginRight: 15,
-    width: 300,
   },
 });
 

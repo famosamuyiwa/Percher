@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     marginHorizontal: 5,
+    paddingHorizontal: 10,
   },
   description: {
     fontSize: 12,

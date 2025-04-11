@@ -5,17 +5,20 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect } from "react";
+import React from "react";
 import { Image } from "expo-image";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
+import { ResizeMode, Video } from "expo-av";
 
 const MiniGalleryItem = ({
   uri,
   isRemovable,
+  type,
   onPressRemoveBtn,
 }: {
   uri: any;
+  type: "image" | "video";
   isRemovable: boolean;
   onPressRemoveBtn: () => void;
 }) => {
@@ -31,18 +34,69 @@ const MiniGalleryItem = ({
           </View>
         </TouchableOpacity>
       )}
-      <Image
-        style={styles.image}
-        source={{ uri }}
-        contentFit="cover"
-        transition={300}
-      />
+      {type === "image" && (
+        <Image
+          source={{ uri }}
+          style={styles.miniMedia}
+          contentFit="cover"
+          transition={300}
+        />
+      )}
+      {type === "video" && (
+        <>
+          <Video
+            source={{ uri }}
+            style={styles.miniMedia}
+            videoStyle={{}}
+            rate={1.0}
+            volume={1.0}
+            isMuted={false}
+            shouldPlay={false}
+            isLooping={false}
+            resizeMode={ResizeMode.COVER}
+            useNativeControls
+          />
+          <Ionicons name="play" style={styles.playBtn} />
+        </>
+      )}
     </View>
   );
 };
 
+const GalleryItem = ({ uri, type }: { uri: any; type: "image" | "video" }) => {
+  return (
+    <>
+      {type === "image" && (
+        <Image
+          source={{ uri }}
+          style={styles.media}
+          contentFit="cover"
+          transition={300}
+        />
+      )}
+      {type === "video" && (
+        <>
+          <Video
+            source={{ uri }}
+            style={styles.media}
+            videoStyle={{}}
+            rate={1.0}
+            volume={1.0}
+            isMuted={false}
+            shouldPlay={false}
+            isLooping={false}
+            resizeMode={ResizeMode.COVER}
+            // useNativeControls
+          />
+          <Ionicons name="play" style={styles.playBtn} />
+        </>
+      )}
+    </>
+  );
+};
+
 const styles = StyleSheet.create({
-  image: {
+  miniMedia: {
     height: 100,
     width: 100,
     borderRadius: 20,
@@ -50,6 +104,23 @@ const styles = StyleSheet.create({
     borderWidth: 0.4,
     borderColor: Colors.accent,
   },
+  media: {
+    height: 250,
+    width: 250,
+    borderRadius: 12,
+  },
+  playBtn: {
+    fontSize: 30,
+    position: "absolute",
+    right: 5,
+    bottom: 5,
+    color: "white",
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
 });
 
-export default MiniGalleryItem;
+export { MiniGalleryItem, GalleryItem };

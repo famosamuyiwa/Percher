@@ -1,27 +1,38 @@
 import { useState } from "react";
-import useStorageBucket from "./useBackblazeStorageBucket";
 import { useGlobalStore } from "@/store/store";
-import { MediaUploadType, ToastType, MediaEntityType } from "@/constants/enums";
+import {
+  MediaUploadType,
+  ToastType,
+  MediaEntityType,
+  MediaUploadStatus,
+} from "@/constants/enums";
 import { createMediaUpload } from "@/api/api.service";
 import { useGlobalContext } from "@/lib/global-provider";
 import { UploadTracker } from "@/interfaces";
+import { uploadToR2 } from "@/hooks/useR2";
 
 const useBackgroundUploads = () => {
-  const { uploadMultimedia } = useStorageBucket();
-  // Track uploads by entity ID and type
-  const [uploadingEntities, setUploadingEntities] = useState<
-    Record<string, UploadTracker>
-  >({});
   const { displayToast } = useGlobalContext();
 
-  // Use Zustand store for failed uploads
+  // Use Zustand store for uploads
   const {
     failedUploads,
+    activeUploads,
     addFailedUpload,
     removeFailedUpload,
     clearFailedUploads,
     clearAllFailedUploads,
+    addActiveUpload,
+    updateActiveUpload,
+    removeActiveUpload,
+    clearActiveUploads,
+    clearAllActiveUploads,
   } = useGlobalStore();
+
+  // Track uploads by entity ID and type
+  const [uploadingMedia, setUploadingMedia] = useState<
+    Record<string, UploadTracker>
+  >({});
 
   // Generic function to upload media for any entity
   const uploadEntityMedia = async (
@@ -30,17 +41,30 @@ const useBackgroundUploads = () => {
     mediaItems: { uri: string; type: MediaUploadType }[]
   ) => {
     // Set this entity as uploading
-    setUploadingEntities((prev) => ({
+    setUploadingMedia((prev) => ({
       ...prev,
       [entityId]: { entityId, entityType, isUploading: true },
     }));
+
+    const uploadId = `${entityType}_${Date.now()}_${Math.random()
+      .toString(36)
+      .substring(2, 9)}`;
+
+    // Add to active uploads //might want to handle other uploads differently
+    if (entityType === MediaEntityType.PROPERTY) {
+      addActiveUpload(entityId, {
+        id: uploadId,
+        entityId,
+        status: MediaUploadStatus.UPLOADING,
+      });
+    }
 
     try {
       for (const item of mediaItems) {
         try {
           let downloadUrl = "";
-          await uploadMultimedia({ uri: item.uri }, (url: string) => {
-            downloadUrl = url;
+          downloadUrl = await uploadToR2(item.uri, (progress) => {
+            console.log("progress", progress);
           });
 
           // Update the entity data with the new URL
@@ -50,16 +74,26 @@ const useBackgroundUploads = () => {
             item.type,
             downloadUrl
           );
+
+          // Update status to completed
+          updateActiveUpload(entityId, uploadId, {
+            status: MediaUploadStatus.COMPLETED,
+          });
         } catch (error: any) {
           console.error(`${item.type} upload failed for ${item.uri}:`, error);
           displayToast({
             type: ToastType.ERROR,
             description: "Upload failed. Try again later",
           });
+
+          // Update status to failed
+          updateActiveUpload(entityId, uploadId, {
+            status: MediaUploadStatus.FAILED,
+          });
+
+          // Add to failed uploads
           addFailedUpload(entityId, {
-            id: `${item.type}_${Date.now()}_${Math.random()
-              .toString(36)
-              .substring(2, 9)}`,
+            id: uploadId,
             entityId: entityId,
             entityType: entityType,
             type: item.type,
@@ -79,11 +113,16 @@ const useBackgroundUploads = () => {
       );
     } finally {
       // Set this entity as no longer uploading
-      setUploadingEntities((prev) => ({
+      setUploadingMedia((prev) => ({
         ...prev,
         [entityId]: { entityId, entityType, isUploading: false },
       }));
     }
+
+    // Remove from active uploads after a short delay
+    setTimeout(() => {
+      clearAllActiveUploads();
+    }, 1000);
   };
 
   // Retry a failed upload
@@ -96,7 +135,7 @@ const useBackgroundUploads = () => {
     if (!uploadToRetry) return;
 
     // Set this entity as uploading during retry
-    setUploadingEntities((prev) => ({
+    setUploadingMedia((prev) => ({
       ...prev,
       [entityId]: {
         entityId,
@@ -107,8 +146,8 @@ const useBackgroundUploads = () => {
 
     try {
       let downloadUrl = "";
-      await uploadMultimedia({ uri: uploadToRetry.uri }, (url: string) => {
-        downloadUrl = url;
+      downloadUrl = await uploadToR2(uploadToRetry.uri, (progress) => {
+        console.log("progress", progress);
       });
 
       // Update the entity data with the new URL
@@ -119,18 +158,39 @@ const useBackgroundUploads = () => {
         downloadUrl
       );
 
+      // Update status to completed
+      updateActiveUpload(entityId, uploadId, {
+        status: MediaUploadStatus.COMPLETED,
+      });
+
       // Remove from failed uploads
       removeFailedUpload(entityId, uploadId);
+
+      // Remove from active uploads after a short delay
+      setTimeout(() => {
+        removeActiveUpload(entityId, uploadId);
+      }, 2000);
     } catch (error: any) {
       console.error(`Retry upload failed for ${uploadToRetry.uri}:`, error);
+
+      // Update status to failed
+      updateActiveUpload(entityId, uploadId, {
+        status: MediaUploadStatus.FAILED,
+      });
+
       // Update the error message
       addFailedUpload(entityId, {
         ...uploadToRetry,
         error: error.message || "Unknown error",
       });
+
+      // Remove from active uploads after a short delay
+      setTimeout(() => {
+        removeActiveUpload(entityId, uploadId);
+      }, 2000);
     } finally {
       // Set this entity as no longer uploading
-      setUploadingEntities((prev) => ({
+      setUploadingMedia((prev) => ({
         ...prev,
         [entityId]: {
           entityId,
@@ -162,24 +222,47 @@ const useBackgroundUploads = () => {
     }
   };
 
-  // Helper function to check if a specific entity is uploading
-  const isEntityUploading = (entityId: string): boolean => {
-    return !!uploadingEntities[entityId]?.isUploading;
+  // Helper function to check if a specific media is uploading
+  const isMediaUploading = (entityId: string): boolean => {
+    return !!uploadingMedia[entityId]?.isUploading;
   };
 
   // Helper function to get the entity type for a specific entity
   const getEntityType = (entityId: string): string => {
-    return uploadingEntities[entityId]?.entityType || "unknown";
+    return uploadingMedia[entityId]?.entityType || "unknown";
+  };
+
+  // Helper function to get the status of a specific property
+  const getPropertyStatus = (
+    propertyId: string
+  ): MediaUploadStatus | undefined => {
+    const isUploading = isMediaUploading(propertyId);
+    const propertyFailedUploads = failedUploads[propertyId] || [];
+    const failedUploadCount = propertyFailedUploads.length;
+
+    let uploadingStat = undefined;
+    if (isUploading) {
+      uploadingStat = MediaUploadStatus.UPLOADING;
+    } else if (failedUploadCount > 0) {
+      uploadingStat = MediaUploadStatus.FAILED;
+    } else {
+      uploadingStat = undefined;
+    }
+    return uploadingStat;
   };
 
   return {
     uploadEntityMedia,
     retryUpload,
     failedUploads,
-    isEntityUploading,
+    activeUploads,
+    isMediaUploading,
     getEntityType,
+    getPropertyStatus,
     clearFailedUploads,
     clearAllFailedUploads,
+    clearActiveUploads,
+    clearAllActiveUploads,
   };
 };
 

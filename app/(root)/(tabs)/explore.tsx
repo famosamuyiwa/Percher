@@ -31,7 +31,6 @@ export default function Explore() {
     categoryFilter?: PerchTypes;
   }>();
   const [filters, setFilters] = useState<Filter>({
-    location: "",
     limit: 10,
     from: UserType.GUEST,
     perchType: params.categoryFilter,
@@ -84,7 +83,7 @@ export default function Explore() {
     >
       {/* <Button title="Seed" onPress={seed} /> */}
 
-      <View className="px-5">
+      <View className="px-5 pt-2">
         <Text className="font-plus-jakarta-bold self-center text-lg">
           Explore
         </Text>

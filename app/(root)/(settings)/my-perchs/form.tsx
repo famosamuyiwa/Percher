@@ -16,7 +16,7 @@ import { useCreatePropertyMutation } from "@/hooks/mutation/usePropertyMutation"
 import { router, useLocalSearchParams } from "expo-router";
 import { usePropertyQuery } from "@/hooks/query/usePropertyQuery";
 import useBackgroundUploads from "@/hooks/useBackgroundUploads";
-import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
+import { uploadToR2 } from "@/hooks/useR2";
 
 const Form = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,38 +24,32 @@ const Form = () => {
   const createPropertyMutation = useCreatePropertyMutation();
   const propertyQuery = usePropertyQuery(Number(id));
   const { uploadEntityMedia } = useBackgroundUploads();
-  const { uploadMultimedia } = useStorageBucket();
 
   const handleRegisterClick = async (formData: PerchRegistrationFormData) => {
     showLoader();
 
-    //upload lightweight required media first before letting the rest upload in the background
-
-    //upload header
-    let header = "";
-    if (formData.header) {
-      await uploadMultimedia({ uri: formData.header }, (url) => {
-        header = url;
-      });
-    }
-
-    //upload snapshot
-    let snapshot = "";
-    if (formData.snapshot) {
-      await uploadMultimedia({ uri: formData.snapshot }, (url) => {
-        snapshot = url;
-      });
-    }
-
     try {
+      //upload lightweight required media first before letting the rest upload in the background
+
+      //upload header
+      let header = "";
+      if (formData.header) {
+        const url = await uploadToR2(formData.header);
+        header = url;
+      }
+
+      //upload snapshot
+      let snapshot = "";
+      if (formData.snapshot) {
+        const url = await uploadToR2(formData.snapshot);
+        snapshot = url;
+      }
+
       // Create a copy of form data with empty media URLs for initial registration
       const initialFormData = {
         ...formData,
         address: `${formData.streetAddress}, ${formData.city}, ${formData.state}. ${formData.country}.`,
         header,
-        gallery: [],
-        proofOfIdentity: [],
-        proofOfOwnership: [],
         snapshot,
       };
 

@@ -40,6 +40,7 @@ import {
 import { useGlobalContext } from "@/lib/global-provider";
 import { useReviewPropertyMutation } from "@/hooks/mutation/usePropertyMutation";
 import UploadStatus from "@/components/UploadStatus";
+import { GalleryItem } from "@/components/GalleryItem";
 
 const ConfidentialDetails = ({
   mode,
@@ -74,7 +75,10 @@ const ConfidentialDetails = ({
                     })
                   }
                 >
-                  <Image source={{ uri: item }} style={styles.galleryImg} />
+                  <GalleryItem
+                    uri={item}
+                    type={item.includes("mp4") ? "video" : "image"}
+                  />
                 </TouchableOpacity>
               )}
               contentContainerClassName="flex gap-4 mt-3"
@@ -105,7 +109,10 @@ const ConfidentialDetails = ({
                     })
                   }
                 >
-                  <Image source={{ uri: item }} style={styles.galleryImg} />
+                  <GalleryItem
+                    uri={item}
+                    type={item.includes("mp4") ? "video" : "image"}
+                  />
                 </TouchableOpacity>
               )}
               contentContainerClassName="flex gap-4 mt-3"
@@ -355,30 +362,43 @@ const Property = () => {
             <Text className="text-black-300 text-xl font-plus-jakarta-bold">
               Gallery
             </Text>
-            <FlatList
-              contentContainerStyle={{ paddingRight: 20 }}
-              data={propertyQuery?.data?.data?.gallery ?? []}
-              keyExtractor={(item) => item}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item, index }) => (
-                <TouchableOpacity
-                  onPress={() =>
-                    router.push({
-                      pathname: "/properties/gallery",
-                      params: {
-                        id: Number(index),
-                        type: GalleryType.GALLERY,
-                      },
-                    })
-                  }
-                >
-                  <Image source={{ uri: item }} style={styles.galleryImg} />
-                </TouchableOpacity>
-              )}
-              contentContainerClassName="flex gap-4 mt-3"
-              scrollEventThrottle={16}
-            />
+            {(propertyQuery?.data?.data?.gallery?.length ?? 0) > 0 ? (
+              <FlatList
+                contentContainerStyle={{ paddingRight: 20 }}
+                data={propertyQuery?.data?.data?.gallery}
+                keyExtractor={(item) => item}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={({ item, index }) => (
+                  <TouchableOpacity
+                    onPress={() =>
+                      router.push({
+                        pathname: "/properties/gallery",
+                        params: {
+                          id: Number(index),
+                          type: GalleryType.GALLERY,
+                        },
+                      })
+                    }
+                  >
+                    <GalleryItem
+                      uri={item}
+                      type={
+                        (item as string).includes("mp4") ? "video" : "image"
+                      }
+                    />
+                  </TouchableOpacity>
+                )}
+                contentContainerClassName="flex gap-4 mt-3"
+                scrollEventThrottle={16}
+              />
+            ) : (
+              <View className="flex flex-row items-center justify-center">
+                <Text className="text-black-300 text-sm font-plus-jakarta-regular">
+                  No images available
+                </Text>
+              </View>
+            )}
           </View>
 
           <View className="mt-7">
@@ -387,42 +407,42 @@ const Property = () => {
             </Text>
             <View className="mt-2 gap-2">
               <View className="flex-row items-center justify-between gap-2">
-                <Text className="text-black-300  font-plus-jakarta-semibold">
+                <Text className="text-black-300 text-sm font-plus-jakarta-regular">
                   Property number
                 </Text>
-                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                <Text className=" text-xs font-plus-jakarta-light">
                   {propertyQuery?.data?.data?.location?.propertyNumber}
                 </Text>
               </View>
               <View className="flex flex-row items-center justify-between gap-2">
-                <Text className="text-black-300  font-plus-jakarta-semibold">
+                <Text className="text-black-300 text-sm font-plus-jakarta-regular">
                   Street address
                 </Text>
-                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                <Text className=" text-xs font-plus-jakarta-light">
                   {propertyQuery?.data?.data?.location?.streetAddress}
                 </Text>
               </View>
               <View className="flex flex-row items-center justify-between gap-2">
-                <Text className="text-black-300  font-plus-jakarta-semibold">
+                <Text className="text-black-300 text-sm font-plus-jakarta-regular">
                   City
                 </Text>
-                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                <Text className=" text-xs font-plus-jakarta-light">
                   {propertyQuery?.data?.data?.location?.city}
                 </Text>
               </View>
               <View className="flex flex-row items-center justify-between gap-2">
-                <Text className="text-black-300  font-plus-jakarta-semibold">
+                <Text className="text-black-300 text-sm font-plus-jakarta-regular">
                   State
                 </Text>
-                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                <Text className=" text-xs font-plus-jakarta-light">
                   {propertyQuery?.data?.data?.location?.state}
                 </Text>
               </View>
               <View className="flex flex-row items-center justify-between gap-2">
-                <Text className="text-black-300  font-plus-jakarta-semibold">
+                <Text className="text-black-300 text-sm font-plus-jakarta-regular">
                   Country
                 </Text>
-                <Text className="text-black-300 text-sm font-plus-jakarta-medium">
+                <Text className=" text-xs font-plus-jakarta-light">
                   {propertyQuery?.data?.data?.location?.country}
                 </Text>
               </View>
@@ -503,11 +523,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 9999,
-  },
-  galleryImg: {
-    height: 250,
-    width: 250,
-    borderRadius: 12,
   },
   locationImg: {
     height: 300,

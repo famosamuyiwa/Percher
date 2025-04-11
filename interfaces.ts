@@ -298,3 +298,11 @@ export interface UploadTracker {
   entityType: MediaEntityType;
   isUploading: boolean;
 }
+
+export interface MediaUpload extends BaseEntity {
+  user: User;
+  mediaType: MediaUploadType;
+  mediaEntityType: MediaEntityType;
+  mediaEntityTypeId: number;
+  mediaUrl: string;
+}

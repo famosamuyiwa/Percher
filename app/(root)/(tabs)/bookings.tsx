@@ -144,7 +144,7 @@ const Bookings = () => {
       style={{ paddingTop: insets.top }}
       className="flex-1 bg-white h-full"
     >
-      <View className="px-5">
+      <View className="px-5 pt-2">
         <View className="items-center justify-center">
           <Text className="font-plus-jakarta-bold text-lg self-center">
             Bookings

@@ -24,14 +24,14 @@ import {
 } from "react-native-reanimated";
 import Animated from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
-
+import { Video, ResizeMode } from "expo-av";
 const { width } = Dimensions.get("screen");
 const _itemSize = width * 0.24;
 const _spacing = 12;
 const itemTotalSize = _itemSize + _spacing;
 
-const AnimatedFlashList = Animated.createAnimatedComponent(FlashList<string>);
 const AnimatedImage = Animated.createAnimatedComponent(Image);
+const AnimatedVideo = Animated.createAnimatedComponent(Video);
 
 function CarouselItem({
   imageUri,
@@ -92,7 +92,6 @@ const MediaViewer = ({
   defaultIndex?: number;
   gallery: string[];
 }) => {
-  const scrollX = useSharedValue(0);
   const [activeIndex, setActiveIndex] = useState(defaultIndex ?? 0);
 
   const handlePrevious = () => {
@@ -105,32 +104,34 @@ const MediaViewer = ({
     setActiveIndex(newIndex);
   };
 
-  const onScroll = useAnimatedScrollHandler((e) => {
-    scrollX.value = clamp(
-      e.contentOffset.x / itemTotalSize,
-      0,
-      gallery.length - 1
-    );
-    const newActiveIndex = Math.round(scrollX.value);
-
-    if (activeIndex !== newActiveIndex) {
-      runOnJS(setActiveIndex)(newActiveIndex);
-    }
-  });
-
   return (
     <View className="flex-1 justify-center">
       <View
         style={[StyleSheet.absoluteFillObject, { backgroundColor: "black" }]}
       >
-        <AnimatedImage
-          entering={FadeIn.duration(500)}
-          exiting={FadeOut.duration(500)}
-          key={`image-${activeIndex}`}
-          source={{ uri: gallery[activeIndex] }}
-          style={{ flex: 1 }}
-          contentFit="contain"
-        />
+        {gallery[activeIndex].includes("mp4") ? (
+          <AnimatedVideo
+            key={`video-${activeIndex}`}
+            source={{ uri: gallery[activeIndex] }}
+            style={{ flex: 1 }}
+            resizeMode={ResizeMode.CONTAIN}
+            isLooping={true}
+            isMuted={false}
+            shouldPlay={true}
+            rate={1.0}
+            volume={1.0}
+            useNativeControls
+          />
+        ) : (
+          <AnimatedImage
+            entering={FadeIn.duration(500)}
+            exiting={FadeOut.duration(500)}
+            key={`image-${activeIndex}`}
+            source={{ uri: gallery[activeIndex] }}
+            style={{ flex: 1 }}
+            contentFit="contain"
+          />
+        )}
       </View>
       <View className="flex-row justify-between items-center px-4 pb-4">
         <TouchableOpacity

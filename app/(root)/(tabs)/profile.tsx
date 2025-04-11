@@ -97,15 +97,14 @@ const Profile = () => {
     <Animated.View
       layout={LinearTransition}
       entering={FadeIn.duration(500)}
-      className="flex-1 h-full px-5"
+      className="flex-1 px-5"
       style={{
         paddingTop: insets.top,
-        paddingBottom: insets.bottom,
         backgroundColor: "#F5F5F5",
       }}
     >
       <ScrollView
-        className="py-5 "
+        className="pt-5 "
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
       >
@@ -249,6 +248,7 @@ const Profile = () => {
         <Text className="text-xs text-gray-300 font-plus-jakarta-bold px-2 ">
           V-1.0.0
         </Text>
+        <View className="h-32" />
       </ScrollView>
     </Animated.View>
   );

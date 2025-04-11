@@ -507,3 +507,18 @@ export const getCurrentUser = async () => {
     handleApiError(error);
   }
 };
+
+export const getR2PresignedUrl = async (key: string) => {
+  try {
+    const { data: payload } = await api.get(
+      `${API_BASE_URL}/uploads/r2/presign`,
+      {
+        params: { key },
+      }
+    );
+
+    return payload;
+  } catch (error) {
+    handleApiError(error);
+  }
+};

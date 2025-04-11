@@ -13,10 +13,10 @@ const NoResults = () => {
       className="flex items-center my-10"
     >
       <Image source={images.noResult} style={styles.img} contentFit="contain" />
-      <Text className="text-2xl font-rubik-bold text-black-300 mt-10">
+      <Text className="text-2xl font-plus-jakarta-semibold text-black-200 mt-5">
         No Results
       </Text>
-      <Text className="text-base text-black-100 mt-2">
+      <Text className="text-base font-plus-jakarta-light text-black-100 mt-2">
         We could not find any result
       </Text>
     </Animated.View>
@@ -25,7 +25,7 @@ const NoResults = () => {
 
 const styles = StyleSheet.create({
   img: {
-    width: "91%",
+    width: "50%",
     height: 200,
   },
 });

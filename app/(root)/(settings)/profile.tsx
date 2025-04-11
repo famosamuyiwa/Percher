@@ -16,10 +16,10 @@ import {
 import { Colors } from "@/constants/common";
 import SettingsHeader from "@/components/SettingsHeader";
 import useImagePicker from "@/hooks/useImagePicker";
-import useStorageBucket from "@/hooks/useBackblazeStorageBucket";
 import { useUpdateUserMutation } from "@/hooks/mutation/useUserMutation";
 import { useGlobalContext } from "@/lib/global-provider";
 import { ToastType } from "@/constants/enums";
+import { uploadToR2 } from "@/hooks/useR2";
 
 const ProfileScreen = () => {
   const { user, refetch, displayToast } = useGlobalContext();
@@ -35,7 +35,6 @@ const ProfileScreen = () => {
 
   const tintColor = Colors.primary;
   const { pickMultimedia } = useImagePicker();
-  const { uploadMultimedia } = useStorageBucket();
 
   const handleSave = () => {
     setIsSaving(true);
@@ -67,22 +66,19 @@ const ProfileScreen = () => {
   };
 
   const uploadAndMutate = async () => {
+    if (!avatar) return;
     try {
-      await uploadMultimedia(
+      const url = await uploadToR2(avatar, (progress) => {
+        console.log("progress", progress);
+      });
+      updateUserMutation.mutate(
         {
-          uri: avatar,
+          id: user?.id,
+          name,
+          avatar: url || avatar,
+          phone: phoneNumber,
         },
-        (downloadUrl: string) => {
-          updateUserMutation.mutate(
-            {
-              id: user?.id,
-              name,
-              avatar: downloadUrl || avatar,
-              phone: phoneNumber,
-            },
-            { onSettled, onSuccess }
-          );
-        }
+        { onSettled, onSuccess }
       );
     } catch (err: any) {
       displayToast({

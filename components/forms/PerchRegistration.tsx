@@ -19,7 +19,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { Colors } from "@/constants/common";
+import { Colors, ImagePickerMediaTypes } from "@/constants/common";
 import { Image } from "expo-image";
 import useImagePicker from "@/hooks/useImagePicker";
 import { Picker } from "@react-native-picker/picker";
@@ -28,10 +28,11 @@ import {
   CheckInTime,
   CheckOutTime,
   Facility,
+  MediaUploadType,
   PerchTypes,
   ToastType,
 } from "@/constants/enums";
-import MiniGalleryItem from "../GalleryItem";
+import { MiniGalleryItem } from "../GalleryItem";
 import MultiPicker from "../MultiPicker";
 import CustomButton from "../Button";
 import { useGlobalContext } from "@/lib/global-provider";
@@ -143,7 +144,12 @@ export default function PerchRegistrationForm({
 
   const handleAddToList = async (listName: string) => {
     try {
-      const images: any = await pickMultimedia(false, false, true);
+      const images: any = await pickMultimedia(
+        false,
+        false,
+        true,
+        ImagePickerMediaTypes.Multimedia
+      );
       switch (listName) {
         case "gallery":
           const currentGallery = gallery || []; // Ensure it's an array
@@ -689,6 +695,7 @@ export default function PerchRegistrationForm({
                       <View className="mr-5" key={index}>
                         <MiniGalleryItem
                           uri={picture}
+                          type={picture.includes("mp4") ? "video" : "image"}
                           isRemovable={true}
                           onPressRemoveBtn={() =>
                             handleRemoveFromList("gallery", picture)
@@ -996,6 +1003,7 @@ export default function PerchRegistrationForm({
                       <View className="mr-5" key={index}>
                         <MiniGalleryItem
                           uri={picture}
+                          type={picture.includes("mp4") ? "video" : "image"}
                           isRemovable={true}
                           onPressRemoveBtn={() =>
                             handleRemoveFromList("proofOfIdentity", picture)
@@ -1045,6 +1053,7 @@ export default function PerchRegistrationForm({
                       <View className="mr-5" key={index}>
                         <MiniGalleryItem
                           uri={picture}
+                          type={picture.includes("mp4") ? "video" : "image"}
                           isRemovable={true}
                           onPressRemoveBtn={() =>
                             handleRemoveFromList("proofOfOwnership", picture)

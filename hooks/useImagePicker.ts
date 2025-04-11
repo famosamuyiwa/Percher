@@ -1,12 +1,15 @@
 import { useState } from "react";
 import * as MediaPicker from "expo-image-picker";
-import useStorageBucket from "./useBackblazeStorageBucket";
 import { MediaType } from "expo-image-picker";
 import { ImagePickerMediaTypes } from "@/constants/common";
+import { uploadToR2 } from "./useR2";
+
+interface MediaResult {
+  uri: string[];
+}
 
 const useImagePicker = () => {
   const [imageUris, setImageUris] = useState<string[]>([]);
-  const { uploadMultimedia, progress } = useStorageBucket();
 
   async function pickMultimedia(
     isUpload: boolean,
@@ -25,32 +28,36 @@ const useImagePicker = () => {
       });
       if (result.canceled) return resolve(null);
 
-      const newMedia = {
+      const newMedia: MediaResult = {
         uri: result.assets.map((asset: any) => asset.uri),
       };
 
-      setImageUris((prevImages) => [...prevImages, newMedia.uri]);
+      setImageUris((prevImages) => [...prevImages, ...newMedia.uri]);
 
       if (isUpload) {
-        await uploadMultimedia(
-          imageUris.map((uri) => ({ uri })),
+        try {
+          // Upload each image and collect URLs
+          const uploadPromises = newMedia.uri.map((uri: string) =>
+            uploadToR2(uri)
+          );
+          const downloadUrls = await Promise.all(uploadPromises);
 
-          function (downloadUrls: any) {
-            setImageUris([]);
+          setImageUris([]);
 
-            //return promise resolve on successful upload
-            resolve({
-              downloadUrls,
-            });
-          }
-        );
+          // Return promise resolve on successful upload
+          resolve({
+            downloadUrls,
+          });
+        } catch (error) {
+          reject(error);
+        }
       } else {
         resolve(newMedia);
       }
     });
   }
 
-  return { imageUris, pickMultimedia, setImageUris, progress };
+  return { imageUris, pickMultimedia, setImageUris };
 };
 
 export default useImagePicker;

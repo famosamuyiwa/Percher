@@ -1,10 +1,23 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { Colors } from "@/constants/common";
 
-const SettingsHeader = ({ title }: { title: string }) => {
+const SettingsHeader = ({
+  title,
+  isAddButtonVisible,
+}: {
+  title: string;
+  isAddButtonVisible?: boolean;
+}) => {
   const insets = useSafeAreaInsets();
 
   if (!insets) {
@@ -23,6 +36,15 @@ const SettingsHeader = ({ title }: { title: string }) => {
         <Text className="text-xl text-center w-full font-plus-jakarta-bold">
           {title}
         </Text>
+
+        {isAddButtonVisible && (
+          <TouchableOpacity
+            onPress={() => router.push("/my-perchs/form")}
+            className="absolute right-0"
+          >
+            <AntDesign name="pluscircle" size={28} color={Colors.primary} />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

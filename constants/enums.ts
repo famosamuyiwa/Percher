@@ -229,3 +229,9 @@ export enum MediaEntityType {
   USER = "user",
   PROPERTY = "property",
 }
+
+export enum MediaUploadStatus {
+  UPLOADING = "Uploading",
+  FAILED = "Failed",
+  COMPLETED = "Completed",
+}

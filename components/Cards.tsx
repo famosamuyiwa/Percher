@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import icons from "../constants/icons";
 import { Booking, Property, Transaction } from "../interfaces";
 import { Image } from "expo-image";
@@ -7,12 +7,17 @@ import { Commafy, formatDate, formatTime } from "@/utils/common";
 import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/common";
 import { LinearGradient } from "expo-linear-gradient";
-import { BookingStatus, Screens, TransactionMode } from "@/constants/enums";
+import {
+  BookingStatus,
+  Screens,
+  TransactionMode,
+  MediaUploadStatus,
+} from "@/constants/enums";
 import Lottie from "lottie-react-native";
+import { useGlobalStore } from "@/store/store";
 
 interface Props {
   item: Property;
-  source?: Screens;
   onPress?: () => void;
 }
 
@@ -61,7 +66,54 @@ export const FeaturedCard = ({ item, onPress }: Props) => {
   );
 };
 
-export const Card = ({ item, source, onPress }: Props) => {
+export const Card = ({ item, onPress }: Props) => {
+  return (
+    <TouchableOpacity
+      className="flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative"
+      onPress={onPress}
+    >
+      {item.rating && (
+        <View className="flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50">
+          <Image source={icons.star} style={styles.starSm} />
+          <Text className="text-xs font-plus-jakarta-bold text-primary-300 ml-0.5">
+            {item.rating}
+          </Text>
+        </View>
+      )}
+
+      <Image source={{ uri: item.header }} style={styles.cardImg} />
+
+      <View className="flex flex-col mt-2">
+        <Text className="text-base font-p[us-jakarta-bold text-black-300">
+          {item.name}
+        </Text>
+        <Text className="text-xs font-plus-jakarta-regular text-black-100">
+          {item.location?.address}
+        </Text>
+
+        <View className="flex flex-row items-center justify-between mt-2">
+          <View className="flex flex-row items-center gap-1">
+            <Text className="text-base font-plus-jakarta-bold text-primary-300">
+              ₦{Commafy(item.price)}
+            </Text>
+            <Text className="text-xs font-plus-jakarta-regular text-black-100">
+              {item.chargeType.toLowerCase()}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+export const PerchSettingsCard = ({ item, onPress }: Props) => {
+  const { activeUploads } = useGlobalStore();
+
+  const isUploading = useMemo(() => {
+    const uploads = activeUploads[item.id.toString()] || [];
+    return uploads.length > 0;
+  }, [activeUploads, item.id]);
+
   return (
     <TouchableOpacity
       className="flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative"
@@ -96,7 +148,7 @@ export const Card = ({ item, source, onPress }: Props) => {
             </Text>
           </View>
 
-          {source === Screens.MY_PERCHS && (
+          {!isUploading && (
             <View
               style={{ backgroundColor: Colors.secondary }}
               className="border-secondary-300 p-2 rounded-full flex-row items-center gap-2"
@@ -105,6 +157,20 @@ export const Card = ({ item, source, onPress }: Props) => {
               <Text className="text-xs font-plus-jakarta-bold text-white">
                 {item.status}
               </Text>
+            </View>
+          )}
+
+          {isUploading && (
+            <View className="absolute right-0 ">
+              <Lottie
+                source={require("@/assets/animations/uploading.json")}
+                loop={true}
+                autoPlay={true}
+                style={{
+                  width: 40,
+                  height: 40,
+                }}
+              />
             </View>
           )}
         </View>

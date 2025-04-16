@@ -63,7 +63,6 @@ export const logout = async () => {
     const { data: payload } = await api.get(`${API_BASE_URL}/auth/logout`);
     await SecureStore.deleteItemAsync("accessToken");
     await SecureStore.deleteItemAsync("refreshToken");
-    console.log("payload: ", payload);
     return payload;
   } catch (error: any) {
     handleApiError(error);
@@ -500,10 +499,13 @@ export const geocode = async (credentials: GeocodeCredentials) => {
 };
 
 export const getCurrentUser = async () => {
+  console.log("getting current user");
   try {
     const { data: payload } = await api.get(`${API_BASE_URL}/auth`);
+    console.log("data fetched");
     return payload;
   } catch (error) {
+    console.log("error: ", error);
     handleApiError(error);
   }
 };

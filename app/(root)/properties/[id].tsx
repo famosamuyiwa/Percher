@@ -8,6 +8,7 @@ import {
   Platform,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
@@ -205,6 +206,22 @@ const Property = () => {
     );
   }, [mode, propertyQuery?.data?.data]);
 
+  if (propertyQuery.isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
+  if (propertyQuery.isError) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-red-500">Error loading property details</Text>
+      </View>
+    );
+  }
+
   return (
     <View>
       <ScrollView
@@ -289,7 +306,7 @@ const Property = () => {
 
           <View className="w-full border-t border-primary-200 pt-7 mt-5">
             <Text className="text-black-300 text-xl font-plus-jakarta-bold">
-              Agent
+              Host
             </Text>
 
             <View className="flex flex-row items-center justify-between mt-4">

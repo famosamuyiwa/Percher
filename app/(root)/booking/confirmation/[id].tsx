@@ -338,7 +338,7 @@ const BookingConfirmation = () => {
             </Text>
           </View>
 
-          <View className="flex-1 justify-end py-10 px-5">
+          <View className="flex-1 justify-end py-10 px-5 mb-10">
             <CustomButton label="Make payment" onPress={handleOnMakePayment} />
           </View>
         </ScrollView>

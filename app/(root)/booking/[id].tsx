@@ -12,9 +12,6 @@ import {
 } from "@/environment";
 import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays";
 import BookingForm from "@/components/forms/Booking";
-import { addMonths } from "date-fns/addMonths";
-import { addYears } from "date-fns/addYears";
-import { addDays } from "date-fns/addDays";
 
 const Booking = () => {
   const insets = useSafeAreaInsets();
@@ -93,8 +90,8 @@ const Booking = () => {
 
   return (
     <View
-      className="flex-1 w-full rounded-3xl bg-white"
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+      className="flex-1 w-full bg-white"
+      style={{ paddingTop: insets.top || 20, paddingBottom: insets.bottom }}
     >
       <View className="flex-1 px-5 my-2">
         <View className="mb-2 items-center justify-center">

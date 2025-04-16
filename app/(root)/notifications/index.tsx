@@ -27,14 +27,11 @@ const Notifications = () => {
     notificationsQuery.data?.pages.flatMap((page) => page.data) || [];
 
   const handleOnBack = () => {
-    router.back();
-  };
-
-  useEffect(() => {
     if (unreadCount > 0) {
       markAllAsRead();
     }
-  }, []);
+    router.back();
+  };
 
   const listEmptyComponent = useMemo(() => {
     if (notificationsQuery.isLoading) {
@@ -69,7 +66,10 @@ const Notifications = () => {
   }, [notificationsQuery]);
 
   return (
-    <View className="px-5 flex-1 py-5 pb-5" style={{ paddingTop: insets.top }}>
+    <View
+      className="px-5 flex-1 py-5 pb-5"
+      style={{ paddingTop: insets.top || 20 }}
+    >
       <View className="mb-8 items-center justify-center">
         <TouchableOpacity onPress={handleOnBack} className="absolute -left-2">
           <Ionicons name="arrow-back-circle-sharp" size={40} />

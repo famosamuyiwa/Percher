@@ -53,7 +53,6 @@ export const formStyles = StyleSheet.create({
   },
   calendarModalContainer: {
     flex: 1,
-    paddingTop: 60,
     backgroundColor: "white",
   },
 });

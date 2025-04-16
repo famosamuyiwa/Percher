@@ -13,6 +13,7 @@ import { BookingFormData, FormProps } from "@/interfaces";
 import CalendarList from "../CalendarList";
 import { formStyles } from "./styles";
 import { formatDate } from "@/utils/common";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Validation Schema
 const schema = z.object({
@@ -47,6 +48,11 @@ export default function BookingForm({
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<ModalType | null>(null);
   const { displayToast } = useGlobalContext();
+  const insets = useSafeAreaInsets();
+
+  if (!insets) {
+    return null; // Prevents glitching by waiting for insets
+  }
 
   const {
     control,
@@ -183,7 +189,7 @@ export default function BookingForm({
                 >
                   <Ionicons name="calendar-number" size={20} />
                   <View className="flex-1 justify-center">
-                    <Text className="font-plus-jakarta-regular ">
+                    <Text className="font-plus-jakarta-regular text-sm">
                       {/* {periodOfStay ??
                         (isChargeTypeMonthlyOrYearly(staticData?.chargeType)
                           ? "-- Pick arrival date --"
@@ -217,7 +223,7 @@ export default function BookingForm({
                     style={formStyles.pickerBtn}
                   >
                     <Entypo name="back-in-time" size={20} />
-                    <Text className="font-plus-jakarta-regular">
+                    <Text className="font-plus-jakarta-regular text-sm">
                       {checkInTime ?? "-- Select --"}
                     </Text>
                     <Entypo
@@ -251,7 +257,7 @@ export default function BookingForm({
                   >
                     <Entypo name="back-in-time" size={20} />
 
-                    <Text className="font-plus-jakarta-regular">
+                    <Text className="font-plus-jakarta-regular text-sm ">
                       {checkOutTime ?? "-- Select --"}
                     </Text>
                     <Entypo
@@ -294,7 +300,12 @@ export default function BookingForm({
       </View>
       <Modal visible={modalVisible} transparent animationType="slide">
         {modalContent === ModalType.CALENDAR && (
-          <View style={formStyles.calendarModalContainer}>
+          <View
+            style={[
+              formStyles.calendarModalContainer,
+              { paddingTop: insets.top || 20 },
+            ]}
+          >
             {/* {isChargeTypeMonthlyOrYearly(staticData?.chargeType) ? (
               <Calendar onBack={handleOnCalendarModalDismiss} />
             ) : (

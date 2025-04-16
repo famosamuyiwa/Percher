@@ -17,7 +17,7 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/icons/adaptive-icon.png",
+        foregroundImage: "./assets/icons/icon.png",
         backgroundColor: "#ffffff",
       },
       package: "com.barrakudadev.Percher",
@@ -75,8 +75,7 @@ export default {
       [
         "expo-image-picker",
         {
-          photosPermission:
-            "The app accesses your photos to let you share them with your friends.",
+          photosPermission: "This app accesses your photos.",
         },
       ],
     ],

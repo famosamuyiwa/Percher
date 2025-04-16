@@ -64,7 +64,10 @@ const useBackgroundUploads = () => {
         try {
           let downloadUrl = "";
           downloadUrl = await uploadToR2(item.uri, (progress) => {
-            console.log("progress", progress);
+            // Update progress in the store, progress is already a percentage (0-100)
+            updateActiveUpload(entityId, uploadId, {
+              progress: progress,
+            });
           });
 
           // Update the entity data with the new URL
@@ -78,6 +81,7 @@ const useBackgroundUploads = () => {
           // Update status to completed
           updateActiveUpload(entityId, uploadId, {
             status: MediaUploadStatus.COMPLETED,
+            progress: 100,
           });
         } catch (error: any) {
           console.error(`${item.type} upload failed for ${item.uri}:`, error);

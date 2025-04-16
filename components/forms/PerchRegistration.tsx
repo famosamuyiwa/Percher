@@ -144,12 +144,7 @@ export default function PerchRegistrationForm({
 
   const handleAddToList = async (listName: string) => {
     try {
-      const images: any = await pickMultimedia(
-        false,
-        false,
-        true,
-        ImagePickerMediaTypes.Multimedia
-      );
+      const images: any = await pickMultimedia(false, false, true);
       switch (listName) {
         case "gallery":
           const currentGallery = gallery || []; // Ensure it's an array

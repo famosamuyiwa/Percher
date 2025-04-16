@@ -84,7 +84,7 @@ export const useExplorePropertyQuery = (filters: Filter) => {
 
 export const usePropertyQuery = (id: number) => {
   return useQuery<PropertyCache>({
-    queryKey: USE_PROPERTY_QUERY_KEY,
+    queryKey: [USE_PROPERTY_QUERY_KEY, id],
     queryFn: () => getPropertyById(id),
     enabled: !!id,
     retry: 3,

@@ -24,13 +24,9 @@ const MapBottomSheet = () => {
   const { from } = useLocalSearchParams<{ from?: string }>();
 
   // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
+  const handleSheetChanges = useCallback((index: number) => {}, []);
 
   const handleOnDetailsButtonPress = async () => {
-    console.log("handleOnDetailsButtonPress");
-
     // Take a snapshot of the map
     if (selectedCoordinates) {
       // Take the snapshot using the function from context

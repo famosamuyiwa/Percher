@@ -150,9 +150,7 @@ const useBackgroundUploads = () => {
 
     try {
       let downloadUrl = "";
-      downloadUrl = await uploadToR2(uploadToRetry.uri, (progress) => {
-        console.log("progress", progress);
-      });
+      downloadUrl = await uploadToR2(uploadToRetry.uri, (progress) => {});
 
       // Update the entity data with the new URL
       await updateEntityMediaUrl(
@@ -219,9 +217,7 @@ const useBackgroundUploads = () => {
         mediaUrl: url,
         mediaEntityType: entityType,
       });
-      console.log(`Updated ${type} for entity ${entityId} with URL: ${url}`);
     } catch (error) {
-      console.error(`Failed to update entity media URL:`, error);
       throw error; // Re-throw to be handled by the caller
     }
   };

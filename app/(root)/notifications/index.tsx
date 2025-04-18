@@ -54,7 +54,7 @@ const Notifications = () => {
         exiting={FadeOut.duration(500)}
         className="items-center justify-center mt-52"
       >
-        <EmptyBookings />
+        <EmptyNotifications />
       </Animated.View>
     );
   }, [notificationsQuery.isLoading]);

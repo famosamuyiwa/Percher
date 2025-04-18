@@ -9,7 +9,10 @@ const EmptyNotifications = () => {
       <Text className="text-center text-xl mt-10 mb-2" style={styles.color}>
         No notification found
       </Text>
-      <Text className="text-center text-sm" style={styles.color}>
+      <Text
+        className="text-center text-sm font-plus-jakarta-extralight"
+        style={styles.color}
+      >
         For now, you're all caught up
       </Text>
     </View>

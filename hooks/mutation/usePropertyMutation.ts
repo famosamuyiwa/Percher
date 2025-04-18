@@ -41,7 +41,6 @@ export const useReviewPropertyMutation = () => {
   const { displayToast } = useGlobalContext();
 
   const onUseReviewPropertyMutationSuccess = (payload: ApiResponse) => {
-    console.log("payload", payload);
     queryClient.invalidateQueries({
       queryKey: USE_EYEBALLING_PROPERTIES_QUERY_KEY,
     });

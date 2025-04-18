@@ -44,7 +44,6 @@ export async function uploadToR2(
   }
 
   if (uploadRes.status === 200) {
-    console.log("✅ Upload successful:", fileUrl);
     return fileUrl;
   } else {
     throw new Error(`❌ Upload failed: ${uploadRes.status}`);

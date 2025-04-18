@@ -1,14 +1,6 @@
+import { API_BASE_URL } from "@/environment";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { Platform } from "react-native";
-
-let API_BASE_URL: string;
-if (Platform.OS === "android") {
-  // Use 10.0.2.2 for accessing localhost on Android emulatorr
-  API_BASE_URL = "http://10.0.2.2:3000"; // Replace with your actual port number
-} else {
-  API_BASE_URL = "http://localhost:3000"; // Replace with your actual port number
-}
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -117,9 +117,7 @@ const Map = () => {
     }
   };
 
-  const handleShapeSourceOnPress = (e: any) => {
-    console.log("pressed");
-  };
+  const handleShapeSourceOnPress = (e: any) => {};
 
   const centerOnUserLocation = async () => {
     try {
@@ -135,12 +133,6 @@ const Map = () => {
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
-
-      console.log(
-        "Centering on location:",
-        location.coords.latitude,
-        location.coords.longitude
-      );
 
       // Set the center coordinate
       centerOnCoordinates(

@@ -17,10 +17,11 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/icons/icon.png",
+        foregroundImage: "./assets/icons/adaptive-icon-2.png",
         backgroundColor: "#ffffff",
       },
       package: "com.barrakudadev.Percher",
+      googleServicesFile: "./google-services.json",
     },
     web: {
       bundler: "metro",

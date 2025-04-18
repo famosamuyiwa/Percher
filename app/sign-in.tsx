@@ -21,10 +21,10 @@ import { useGlobalContext } from "../lib/global-provider";
 import { Redirect, router } from "expo-router";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { LoginProvider, ToastType } from "@/constants/enums";
-import { signIn } from "@/hooks/useGoogleOAuth";
+import { signIn, signOut } from "@/hooks/useGoogleOAuth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Colors } from "@/constants/common";
-import { loginWithOAuth } from "@/api/api.service";
+import { loginWithOAuth, logout } from "@/api/api.service";
 import { useGlobalStore } from "@/store/store";
 
 GoogleSignin.configure({
@@ -78,7 +78,6 @@ const SignIn = () => {
         handleToken(LoginProvider.GOOGLE, userInfo.user);
       } else {
         setIsLoading(false);
-        console.log("Sign-in was canceled or no user info available");
       }
     });
   }
@@ -100,6 +99,7 @@ const SignIn = () => {
         });
       }
     } catch (error: any) {
+      await signOut();
       return displayToast({
         type: ToastType.ERROR,
         description: error.message,

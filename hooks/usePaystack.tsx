@@ -33,15 +33,12 @@ export default function PaystackCheckout({
         onCancel={(e) => {
           // handle response here
           onEnd();
-          console.log("Transaction Canceled!!");
         }}
         onSuccess={(response: any) => {
           // handle response here
-          console.log("response: ", response);
           const responseObject = response["transactionRef"]["message"];
           if (responseObject === "Approved") {
             onSuccess();
-            console.log("Transaction Approved!!");
           }
         }}
         autoStart={clicked}

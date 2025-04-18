@@ -8,12 +8,10 @@ export const useNotifications = () => {
   const [isConnected, setIsConnected] = useState(false);
 
   const handleNewNotification = useCallback((notification: any) => {
-    console.log("Received new notification:", notification);
     setNotifications((prev) => [notification, ...prev]);
   }, []);
 
   const handleUnreadCount = useCallback((count: number) => {
-    console.log("Received unread count:", count);
     setUnreadCount(count);
   }, []);
 

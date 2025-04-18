@@ -151,6 +151,7 @@ export interface User extends BaseEntity {
   referralCode?: string;
   wallet?: Wallet;
   role?: Roles;
+  expoPushToken: string;
 }
 
 export enum ResponseStatus {

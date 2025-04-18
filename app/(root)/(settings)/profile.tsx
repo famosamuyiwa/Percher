@@ -68,9 +68,7 @@ const ProfileScreen = () => {
   const uploadAndMutate = async () => {
     if (!avatar) return;
     try {
-      const url = await uploadToR2(avatar, (progress) => {
-        console.log("progress", progress);
-      });
+      const url = await uploadToR2(avatar, (progress) => {});
       updateUserMutation.mutate(
         {
           id: user?.id,

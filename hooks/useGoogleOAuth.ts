@@ -15,7 +15,6 @@ export const signIn = async (callback: unknown) => {
         callback(null, response.data); // Pass user info to the callback
       }
     } else {
-      console.log("Sign-in canceled by user");
       if (typeof callback === "function") {
         callback(null, null); // No user info, but no error either
       }

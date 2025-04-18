@@ -131,9 +131,7 @@ export default function PerchRegistrationForm({
     try {
       const image: any = await pickMultimedia(false, true);
       setValue("header", image.uri[0], { shouldValidate: true });
-    } catch {
-      console.log("Error picking media");
-    }
+    } catch {}
   };
 
   const handleSnapshotSelect = async () => {
@@ -176,9 +174,7 @@ export default function PerchRegistrationForm({
         default:
           return;
       }
-    } catch {
-      console.log("Error picking media");
-    }
+    } catch {}
   };
 
   const handleRemoveFromList = (listName: string, imgUri: any) => {

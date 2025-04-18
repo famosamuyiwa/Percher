@@ -8,7 +8,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as SplashScreen from "expo-splash-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { PushNotificationProvider } from "@/lib/push-notification-provider";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
 SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
   const queryClient = new QueryClient();
   SplashScreen.setOptions({

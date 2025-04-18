@@ -499,13 +499,10 @@ export const geocode = async (credentials: GeocodeCredentials) => {
 };
 
 export const getCurrentUser = async () => {
-  console.log("getting current user");
   try {
     const { data: payload } = await api.get(`${API_BASE_URL}/auth`);
-    console.log("data fetched");
     return payload;
   } catch (error) {
-    console.log("error: ", error);
     handleApiError(error);
   }
 };

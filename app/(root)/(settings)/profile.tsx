@@ -90,7 +90,6 @@ const ProfileScreen = () => {
   const mutate = () => {
     updateUserMutation.mutate(
       {
-        id: user?.id,
         name,
         phone: phoneNumber,
       },

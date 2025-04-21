@@ -12,6 +12,7 @@ export const USE_BOOKINGS_QUERY_KEY = ["bookings"];
 export const USE_BOOKING_QUERY_KEY = ["booking"];
 export const USE_WALLET_QUERY_KEY = ["wallet"];
 export const USE_NOTIFICATIONS_QUERY_KEY = ["notifications"];
+
 export const Colors = {
   primary: "#00BFFF",
   accent: "#FF7F50",

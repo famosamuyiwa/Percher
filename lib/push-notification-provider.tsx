@@ -9,8 +9,8 @@ import React, {
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "@/utils/registerForPushNotificationsAsync";
 import { Subscription } from "@/types/types";
-import GlobalProvider, { useGlobalContext } from "./global-provider";
-import { useUpdateUserMutation } from "@/hooks/mutation/useUserMutation";
+import { updateUserPushToken } from "@/api/api.service";
+import { useGlobalContext } from "./global-provider";
 
 interface NotificationContextType {
   expoPushToken: string | null;
@@ -44,8 +44,6 @@ export const PushNotificationProvider: React.FC<
     useState<Notifications.Notification | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const { user } = useGlobalContext();
-  const updateUserMutation = useUpdateUserMutation();
-
   const notificationListener = useRef<Subscription>();
   const responseListener = useRef<Subscription>();
 
@@ -56,18 +54,35 @@ export const PushNotificationProvider: React.FC<
     );
 
     notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        console.log("🔔 Notification Received: ", notification);
+      Notifications.addNotificationReceivedListener(async (notification) => {
+        // console.log("🔔 Notification Received: ", notification);
         setNotification(notification);
+
+        // Wait a brief moment to ensure the notification is displayed
+        // then dismiss it automatically
+        setTimeout(async () => {
+          try {
+            // If you want to dismiss just this specific notification
+            if (notification.request.identifier) {
+              await Notifications.dismissNotificationAsync(
+                notification.request.identifier
+              );
+            }
+            // Or if you want to dismiss all notifications
+            // await Notifications.dismissAllNotificationsAsync();
+          } catch (error) {
+            console.error("Error dismissing notification:", error);
+          }
+        }, 2000); // Adjust this delay as needed
       });
 
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(
-          "🔔 Notification Response: ",
-          JSON.stringify(response, null, 2),
-          JSON.stringify(response.notification.request.content.data, null, 2)
-        );
+        // console.log(
+        //   "🔔 Notification Response: ",
+        //   JSON.stringify(response, null, 2),
+        //   JSON.stringify(response.notification.request.content.data, null, 2)
+        // );
         // Handle the notification response here
       });
 
@@ -85,11 +100,17 @@ export const PushNotificationProvider: React.FC<
 
   useEffect(() => {
     if (!user || !expoPushToken) return;
+
+    const tokenUpdate = async () => {
+      try {
+        await updateUserPushToken(expoPushToken);
+      } catch (err) {
+        console.log("error: ", err);
+      }
+    };
+
     if (!user.expoPushToken) {
-      updateUserMutation.mutate({
-        id: user?.id,
-        expoPushToken,
-      });
+      tokenUpdate();
     }
   }, [expoPushToken]);
 

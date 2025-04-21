@@ -8,7 +8,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as SplashScreen from "expo-splash-screen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { PushNotificationProvider } from "@/lib/push-notification-provider";
 import * as Notifications from "expo-notifications";
 
 Notifications.setNotificationHandler({
@@ -39,9 +38,15 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
+    const init = async () => {
+      if (fontsLoaded) {
+        await SplashScreen.hideAsync();
+        // Clear all notifications when app mounts
+        await Notifications.dismissAllNotificationsAsync();
+      }
+    };
+
+    init();
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;

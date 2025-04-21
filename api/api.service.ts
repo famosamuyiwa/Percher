@@ -28,7 +28,7 @@ export const login = async (credentials: {
   password: string;
 }) => {
   try {
-    const { data: payload } = await api.post(`${API_BASE_URL}/auth/login`, {
+    const { data: payload } = await axios.post(`${API_BASE_URL}/auth/login`, {
       ...credentials,
     });
     const { accessToken, refreshToken } = payload.data;
@@ -42,7 +42,7 @@ export const login = async (credentials: {
 
 export const loginWithOAuth = async (credentials: OAuthRequest) => {
   try {
-    const { data: payload } = await api.post(`${API_BASE_URL}/auth/oauth`, {
+    const { data: payload } = await axios.post(`${API_BASE_URL}/auth/oauth`, {
       ...credentials,
     });
     const { accessToken, refreshToken } = payload.data;
@@ -71,9 +71,12 @@ export const logout = async () => {
 
 export const signup = async (credentials: SignupRequest) => {
   try {
-    const { data: payload } = await api.post(`${API_BASE_URL}/auth/register`, {
-      ...credentials,
-    });
+    const { data: payload } = await axios.post(
+      `${API_BASE_URL}/auth/register`,
+      {
+        ...credentials,
+      }
+    );
     const { accessToken, refreshToken } = payload.data;
 
     await SecureStore.setItemAsync("accessToken", accessToken);
@@ -100,7 +103,7 @@ export const resetPassword = async (credentials: ResetPasswordRequest) => {
 
 export const verifyUserByEmail = async (email: string) => {
   try {
-    const { data: payload } = await api.get(
+    const { data: payload } = await axios.get(
       `${API_BASE_URL}/auth/check/${email}`
     );
     return payload;
@@ -111,7 +114,7 @@ export const verifyUserByEmail = async (email: string) => {
 
 export const verifyOTPByEmail = async (email: string, otp: string) => {
   try {
-    const { data: payload } = await api.get(
+    const { data: payload } = await axios.get(
       `${API_BASE_URL}/auth/verify/${otp}`,
       {
         params: { email },
@@ -375,11 +378,21 @@ export const getBookingById = async (id: number) => {
 // };
 
 export const updateUser = async (credentials: Partial<User>) => {
-  const { id } = credentials;
   delete credentials.id;
   try {
-    const { data: payload } = await api.put(`${API_BASE_URL}/user/${id}`, {
+    const { data: payload } = await api.put(`${API_BASE_URL}/user`, {
       ...credentials,
+    });
+    return payload;
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+export const updateUserPushToken = async (expoPushToken: string) => {
+  try {
+    const { data: payload } = await api.put(`${API_BASE_URL}/user/push-token`, {
+      expoPushToken,
     });
     return payload;
   } catch (error: any) {

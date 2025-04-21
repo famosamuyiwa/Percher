@@ -10,6 +10,7 @@ export const useVerifyPaymentMutation = () => {
   const { displayToast } = useGlobalContext();
 
   const onUseVerifyPaymentMutationSuccess = (payload: ApiResponse) => {
+    console.log("verified");
     queryClient.invalidateQueries({ queryKey: USE_WALLET_QUERY_KEY });
   };
 

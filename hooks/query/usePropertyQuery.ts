@@ -25,7 +25,7 @@ export const usePropertiesQuery = (filters: Filter) => {
       getAllProperties(pageParam, filters),
     retry: 3,
     retryDelay: 1 * 60 * 1000,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 60, // 1 hour
     initialPageParam: null, // Set the initial page param
     getNextPageParam: (lastPage) => lastPage.nextCursor || null, // Handle pagination with the cursor
   });

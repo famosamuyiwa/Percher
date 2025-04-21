@@ -28,7 +28,6 @@ const MyPerchs = () => {
 
   const { resetMap } = useMapContext();
   const { data: ownedProperties, isLoading } = useOwnedPropertyQuery(filters);
-  const { failedUploads, uploadEntityMedia } = useBackgroundUploads();
 
   const handleCardPress = (id: number) => {
     router.push({
@@ -94,10 +93,7 @@ const MyPerchs = () => {
                 entering={FadeIn.duration(500)}
                 className="mx-5"
               >
-                <PerchSettingsCard
-                  item={item}
-                  onPress={() => handleCardPress(item.id)}
-                />
+                <PerchSettingsCard item={item} onPress={() => {}} />
               </Animated.View>
             )}
             ListHeaderComponent={listHeader}

@@ -100,7 +100,7 @@ const MultiPicker = ({
 const styles = StyleSheet.create({
   pickerButton: {
     height: 40,
-    backgroundColor: "lightgrey",
+    backgroundColor: Colors.secondaryExtralight,
     borderRadius: 10,
     justifyContent: "center",
     paddingHorizontal: 15,

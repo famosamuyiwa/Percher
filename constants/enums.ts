@@ -111,6 +111,8 @@ export enum Screens {
   HELP = "HELP",
   REFERRALS = "REFERRALS",
   EYE_BALLING = "EYE_BALLING",
+  EXPLORE_1 = "EXPLORE_1",
+  EXPLORE_2 = "EXPLORE_2"
 }
 
 export enum ToastType {

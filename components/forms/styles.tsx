@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/common";
 import { StyleSheet } from "react-native";
 
 export const formStyles = StyleSheet.create({
@@ -7,7 +8,7 @@ export const formStyles = StyleSheet.create({
     borderWidth: 0,
     fontSize: 14,
     color: "darkgrey",
-    backgroundColor: "lightgrey",
+    backgroundColor: Colors.secondaryExtralight,
     justifyContent: "center",
   },
 
@@ -16,7 +17,7 @@ export const formStyles = StyleSheet.create({
     borderWidth: 0,
     fontSize: 14,
     color: "darkgrey",
-    backgroundColor: "lightgrey",
+    backgroundColor: Colors.secondaryExtralight,
     justifyContent: "center",
   },
 
@@ -26,7 +27,7 @@ export const formStyles = StyleSheet.create({
     borderWidth: 0,
     fontSize: 14,
     color: "darkgrey",
-    backgroundColor: "lightgrey",
+    backgroundColor: Colors.secondaryExtralight,
     justifyContent: "center",
     paddingHorizontal: 25,
   },
@@ -43,7 +44,7 @@ export const formStyles = StyleSheet.create({
     color: "black",
   },
   pickerBtn: {
-    backgroundColor: "lightgrey",
+    backgroundColor: Colors.secondaryExtralight,
     borderRadius: 10,
     height: 40,
     flexDirection: "row",

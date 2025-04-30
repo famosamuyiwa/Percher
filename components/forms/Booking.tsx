@@ -137,7 +137,7 @@ export default function BookingForm({
 
   return (
     <View className="gap-10">
-      <View className="bg-white rounded-2xl p-5 gap-5">
+      <View className="rounded-2xl p-5 gap-5">
         <View className="flex flex-row items-center justify-center bg-accent-100 rounded-full size-10 mb-2">
           <Ionicons name="ticket" size={20} color={Colors.accent} />
         </View>

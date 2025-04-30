@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
   btn: {
     width: "100%",
     height: 50,
-    borderRadius: 15,
+    borderRadius: 25,
     borderWidth: 0.5,
     flexDirection: "row",
     alignItems: "center",

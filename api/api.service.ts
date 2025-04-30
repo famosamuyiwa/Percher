@@ -27,6 +27,7 @@ export const login = async (credentials: {
   email: string;
   password: string;
 }) => {
+  console.log("base url: ", API_BASE_URL)
   try {
     const { data: payload } = await axios.post(`${API_BASE_URL}/auth/login`, {
       ...credentials,
